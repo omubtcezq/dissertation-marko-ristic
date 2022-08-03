@@ -11,77 +11,127 @@
 
 \frontmatter
 \tableofcontents
-\listoffigures
-\listoftables
 
+% 
+%        d8888  .d8888b.  888    d8P  
+%       d88888 d88P  Y88b 888   d8P   
+%      d88P888 888    888 888  d8P    
+%     d88P 888 888        888d88K     
+%    d88P  888 888        8888888b    
+%   d88P   888 888    888 888  Y88b   
+%  d8888888888 Y88b  d88P 888   Y88b  
+% d88P     888  "Y8888P"  888    Y88b 
+%                                     
+%                                     
+%                                     
+% 
 \chapter{Acknowledgements}
-
 Acks go here.
 
+% 
+%        d8888 888888b.    .d8888b.       8888888888 888b    888 
+%       d88888 888  "88b  d88P  Y88b      888        8888b   888 
+%      d88P888 888  .88P  Y88b.           888        88888b  888 
+%     d88P 888 8888888K.   "Y888b.        8888888    888Y88b 888 
+%    d88P  888 888  "Y88b     "Y88b.      888        888 Y88b888 
+%   d88P   888 888    888       "888      888        888  Y88888 
+%  d8888888888 888   d88P Y88b  d88P      888        888   Y8888 
+% d88P     888 8888888P"   "Y8888P"       8888888888 888    Y888 
+%                                                                
+%                                                                
+%                                                                
+% 
 \chapter{Abstract}
+Distributed sensing and fusion algorithms are increasingly present in public computing networks and have led to a natural concern for data security in these environments. This thesis aims to present generalisable data fusion algorithms that simultaneously provide strict cryptographic guarantees on user data confidentiality. While fusion algorithms providing some degrees of security guarantees exist, these are typically either provided at the cost of solution generality or lack formal security proofs. Here, novel cryptographic constructs and state-of-the-art encryption schemes are used to develop formal security guarantees for new and generalised data fusion algorithms. Industry standard Kalman filter derivates are modified and existing schemes abstracted such that novel cryptographic notions capturing the required communications can be formalised, while simulations provide an anlysis of practicality. Due to the generality of the presented solutions, broad applications are supported, including autonomous vehicle communications, smart sensor networks and distributed localisation.
 
-Abs goes here.
-
-\chapter{Zusammenfassung}
-
+% 
+%        d8888 888888b.    .d8888b.       8888888b.  8888888888 
+%       d88888 888  "88b  d88P  Y88b      888  "Y88b 888        
+%      d88P888 888  .88P  Y88b.           888    888 888        
+%     d88P 888 8888888K.   "Y888b.        888    888 8888888    
+%    d88P  888 888  "Y88b     "Y88b.      888    888 888        
+%   d88P   888 888    888       "888      888    888 888        
+%  d8888888888 888   d88P Y88b  d88P      888  .d88P 888        
+% d88P     888 8888888P"   "Y8888P"       8888888P"  8888888888 
+%                                                               
+%                                                               
+%                                                               
+% 
+\chapter{Kurzfassung}
 German abs goes here.
 
+% 
+% 888b    888  .d88888b. 88888888888     d8888 88888888888 8888888 .d88888b.  888b    888 
+% 8888b   888 d88P" "Y88b    888        d88888     888       888  d88P" "Y88b 8888b   888 
+% 88888b  888 888     888    888       d88P888     888       888  888     888 88888b  888 
+% 888Y88b 888 888     888    888      d88P 888     888       888  888     888 888Y88b 888 
+% 888 Y88b888 888     888    888     d88P  888     888       888  888     888 888 Y88b888 
+% 888  Y88888 888     888    888    d88P   888     888       888  888     888 888  Y88888 
+% 888   Y8888 Y88b. .d88P    888   d8888888888     888       888  Y88b. .d88P 888   Y8888 
+% 888    Y888  "Y88888P"     888  d88P     888     888     8888888 "Y88888P"  888    Y888 
+%                                                                                         
+%                                                                                         
+%                                                                                         
+% 
 \chapter{Notation}
-
 Complete notation here.
 
+% 
+% 888888b.    .d88888b.  8888888b. Y88b   d88P 
+% 888  "88b  d88P" "Y88b 888  "Y88b Y88b d88P  
+% 888  .88P  888     888 888    888  Y88o88P   
+% 8888888K.  888     888 888    888   Y888P    
+% 888  "Y88b 888     888 888    888    888     
+% 888    888 888     888 888    888    888     
+% 888   d88P Y88b. .d88P 888  .d88P    888     
+% 8888888P"   "Y88888P"  8888888P"     888     
+%                                              
+%                                              
+%                                              
+% 
 \mainmatter
+\include{intro}
+\include{lit}
+\include{prelims}
+\include{cloud_fusion}
+\include{nonlin_estimation}
+\include{privileged_estimation}
+\include{conc}
 
-\chapter{Introduction}
-\section{Thesis Structure}
-
-
-\chapter{State-of-the-Art and Research Questions}
-
-\chapter{Preliminaries}
-\section{Estimation Preliminaries}
-\subsection{Kalman Filter}
-\subsection{Kalman Filter Optimality}
-\subsection{Extended Kalman Filter}
-\subsection{Information Filter}
-\subsection{Extended Information Filter}
-\section{Encryption Preliminaries}
-\subsection{Meeting Cryptographic Notions}
-\subsection{Paillier Homomorphic Encryption Scheme}
-\subsection{Joye-Libert Aggregation Scheme}
-\subsection{Lewi Order-Revealing Encryption Scheme}
-
-\chapter{Estimate Fusion on an Untrusted Cloud}
-\section{Problem Formulation}
-\section{Related Literature}
-\section{Confidential Cloud Fusion Leaking Fusion Weights}
-\section{Confidential Cloud Fusion Without Leakage}
-
-\chapter{Distributed Non-Linear Measurement Fusion with Untrusted Participants}
-\section{Problem Formulation}
-\section{Related Literature}
-\section{Confidential Range-Only Localisation}
-\subsection{Unidirectional Alternative}
-\subsection{Solvable Sub-Class of Non-Linear Measurement Models}
-
-\chapter{Provable Estimation Performances}
-\section{Problem Formulation}
-\section{Related Literature}
-\section{Covariance Privilege}
-\section{Privileged Estimation for Linear Systems}
-\subsection{Extension to Non-Linear Systems}
-
-\chapter{Conclusion}
-
-%Bibliography
-
+% 
+%        d8888 8888888b.  8888888b.  8888888888 888b    888 8888888b. 8888888 Y88b   d88P 
+%       d88888 888   Y88b 888   Y88b 888        8888b   888 888  "Y88b  888    Y88b d88P  
+%      d88P888 888    888 888    888 888        88888b  888 888    888  888     Y88o88P   
+%     d88P 888 888   d88P 888   d88P 8888888    888Y88b 888 888    888  888      Y888P    
+%    d88P  888 8888888P"  8888888P"  888        888 Y88b888 888    888  888      d888b    
+%   d88P   888 888        888        888        888  Y88888 888    888  888     d88888b   
+%  d8888888888 888        888        888        888   Y8888 888  .d88P  888    d88P Y88b  
+% d88P     888 888        888        8888888888 888    Y888 8888888P" 8888888 d88P   Y88b 
+%                                                                                         
+%                                                                                         
+%                                                                                         
+% 
 \appendix
+\include{appendix}
 
-\chapter{Linear-Combination Aggregator Obliviousness}
-
-\chapter{Cryptographic Proof of LCAO Scheme Security}
-
-
+% 
+% 8888888b.  8888888888 8888888888 .d8888b.  
+% 888   Y88b 888        888       d88P  Y88b 
+% 888    888 888        888       Y88b.      
+% 888   d88P 8888888    8888888    "Y888b.   
+% 8888888P"  888        888           "Y88b. 
+% 888 T88b   888        888             "888 
+% 888  T88b  888        888       Y88b  d88P 
+% 888   T88b 8888888888 888        "Y8888P"  
+%                                            
+%                                            
+%                                            
+% 
 \backmatter
+% List of algorithms
+\listoffigures
+\listoftables
+% Bibliography
+% Index
 
 \end{document}
