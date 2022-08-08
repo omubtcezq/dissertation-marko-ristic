@@ -3,7 +3,7 @@
 
 Data fusion and state estimation growing in application
 
-Growing distributed networks have put a greater stress on the need for broadly applicable data fusion algorithms that support processing of different types of measurements and estimates with different accuracies and avilabilities
+Growing distributed networks have put a greater stress on the need for broadly applicable data fusion algorithms that support processing of different types of measurements and estimates with different accuracies and availabilities
 
 examples
 
@@ -13,23 +13,55 @@ The filters also allow modelling of cross correlations between local estimates, 
 
 While the challenges faced due to the correlations between error statistics have existed for some time and have been well studied, the advancements in distributed algorithms, cloud computing and public networks are bringing additional security oriented challenges to estimation solutions.
 
-
-
 privacy and security 
 
 can use normal RSA and AES
 
-more complicated examples
+more complicated examples have different requirements where these are not suitable
 
 more complicated schemes
 
-
+Due to the nature of cryptographic goals and proofs in distributed environments, security goals in estimation and fusion are often very context specific and have led to numerous solutions for various scenarios and security desires
 
 leads us into the state-of-the-art
 
 
 \section{State-of-the-Art and Research Questions}
 
+As mentioned in the previous section, the nature of cryptographic notions in distributed environments typically requires communications between participating parties to be known exactly. This in turn has lead to many, otherwise general estimation algorithms, to be restricted in some way to make communication and security easier to discuss.
+
+For example, [aristov] presents a distributed Kalman filter, namely an Information filter, where sensor measurements and measurement errors are kept private to the measuring sensors only, while the final estimation update (sum of this information) is leaked to an estimator. For this to be achieved, however, sensors must form a heirachical communication structure and measurement models must be linear, restricting the otherwise more broadly applicable information filter and its non-linear variants.
+
+[proloc]
+
+pwsac and pwsah papers
+
+
+eavesdropper paper with a secure return channel and a lossier channel for eavedroppers
+
+GPS
+
+chaotic system paper
+
+physical layer noise paper (similar to chaotic noise paper)
+
+
+
+possibly the papers given by cdc reviewer for formalising security of eavedroppers
+
+
+The two different approaches, restricting existing broad estimation methods in some ways to make cryptgraphic analysis plausible and ignoring formal security when assumptions and conclusions are intuitive demontrate a gap in the existing literature and brings us to the target research topics this thesis aims explore.
+
+\begin{itemize}
+    \item dot point topics
+\end{itemize}
+
+These broad topics aim to fulfil the goal of generalisable but cryptographically provable estimation and fusion methods in distributed environments and leads to the concrete problems tackled in this work
+
 \section{Contributions}
+
+The contributions tackle the research topics in section .. by considering three concrete problems that coincide with the broader problems in the field
+
+
 
 \section{Thesis Structure}
