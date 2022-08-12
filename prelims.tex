@@ -1,15 +1,314 @@
 
 \chapter{Preliminaries}
+When introducing the novel estimation and cryptographic methods in this thesis, we make use of several existing algorithms. In this section, an overview of these methods is given
+
+% 
+% 8888888888 .d8888b. 88888888888      8888888b.  8888888b.  8888888888 888      8888888 888b     d888 
+% 888       d88P  Y88b    888          888   Y88b 888   Y88b 888        888        888   8888b   d8888 
+% 888       Y88b.         888          888    888 888    888 888        888        888   88888b.d88888 
+% 8888888    "Y888b.      888          888   d88P 888   d88P 8888888    888        888   888Y88888P888 
+% 888           "Y88b.    888          8888888P"  8888888P"  888        888        888   888 Y888P 888 
+% 888             "888    888          888        888 T88b   888        888        888   888  Y8P  888 
+% 888       Y88b  d88P    888          888        888  T88b  888        888        888   888   "   888 
+% 8888888888 "Y8888P"     888          888        888   T88b 8888888888 88888888 8888888 888       888 
+%                                                                                                      
+%                                                                                                      
+%                                                                                                      
+% 
 \section{Estimation Preliminaries}
+As introduced in section .., the estimation and fusion algorithms considered are Bayesian and based on the Kalman filter and derivatives. The linear KF and linearising EKF are used explicitly and are the focus of the presented preliminaries.
+
+% 
+% ##    ## ######## 
+% ##   ##  ##       
+% ##  ##   ##       
+% #####    ######   
+% ##  ##   ##       
+% ##   ##  ##       
+% ##    ## ##       
+% 
 \subsection{Kalman Filter}
+
+% 
+% ##    ## ########     #######  ########  ######## 
+% ##   ##  ##          ##     ## ##     ##    ##    
+% ##  ##   ##          ##     ## ##     ##    ##    
+% #####    ######      ##     ## ########     ##    
+% ##  ##   ##          ##     ## ##           ##    
+% ##   ##  ##          ##     ## ##           ##    
+% ##    ## ##           #######  ##           ##    
+% 
 \subsection{Kalman Filter Optimality}
+
+% 
+% ######## ##    ## ######## 
+% ##       ##   ##  ##       
+% ##       ##  ##   ##       
+% ######   #####    ######   
+% ##       ##  ##   ##       
+% ##       ##   ##  ##       
+% ######## ##    ## ##       
+% 
 \subsection{Extended Kalman Filter}
+
+% 
+% #### ######## 
+%  ##  ##       
+%  ##  ##       
+%  ##  ######   
+%  ##  ##       
+%  ##  ##       
+% #### ##       
+% 
 \subsection{Information Filter}
+
+% 
+% ######## #### ######## 
+% ##        ##  ##       
+% ##        ##  ##       
+% ######    ##  ######   
+% ##        ##  ##       
+% ##        ##  ##       
+% ######## #### ##       
+% 
 \subsection{Extended Information Filter}
+
+% 
+% ########  ######  #### 
+% ##       ##    ##  ##  
+% ##       ##        ##  
+% ######   ##        ##  
+% ##       ##        ##  
+% ##       ##    ##  ##  
+% ##        ######  #### 
+% 
 \subsection{Fast Covariance Intersection}
+Covariance Intersection (CI), introduced in [julierNondivergentEstimationAlgorithm1997], provides a consistent state estimate fusion algorithm when cross-correlations are not known. The resulting fused estimate $\mean{\vec{x}}$ and covariance $\mP$ can be easily derived from its equations
+\begin{equation}
+   \mP^{-1}=\sum_{i=1}^{n}\omega_i \mP_i^{-1},\ \mP^{-1} \mean{\vec{x}} =\sum_{i=1}^{n}\omega_i \mP_i^{-1} \mean{\vec{x}}_i\enspace. \label{eqn:ci_cov_estimate}
+\end{equation}
+Note that \eqref{eqn:ci_cov_estimate} computes the fusion of the information vectors and information matrices defined in [niehsenInformationFusionBased2002] and reduces the fusion to a weighted sum. Values for weights $\omega_i$ must satisfy
+\begin{equation}
+   \omega_1 + \omega_2 + \cdots + \omega_n = 1,\ 0 \leq \omega_i \leq 1\enspace, \label{eqn:ci_omega_sum_bound}
+\end{equation}
+which guarantees consistency of the fused estimates. They are chosen in a way to speed up convergence and minimize error by minimizing a certain specified property of the resulting fused estimate covariance. One such property, the covariance trace, requires the solution to
+\begin{equation}
+   \argmin_{\omega_1,\dots,\omega_n} \{\tr(\mP)\}\! =\! \argmin_{\omega_1,\dots,\omega_n} \left\{\tr\left(\!\left(\sum_{i=1}^{n}\omega_i \mP_i^{-1}\!\right)^{-1}\right)\!\right\} \label{eqn:ci_trace_min}
+\end{equation}
+for computing weights $\omega_i$. However, minimizing this non-linear cost function can be very computationally costly and has led to the development of faster approximation techniques.
+
+The Fast Covariance Intersection (FCI) algorithm from [niehsenInformationFusionBased2002] is a non-iterative method for approximating the solution to \eqref{eqn:ci_trace_min} without the loss of guaranteed consistency. It is computed by defining a new constraint
+\begin{equation}
+   \omega_i \tr(\mP_i) - \omega_j \tr(\mP_j) = 0,\ i,j=1,2,\dots,n \label{eqn:fci_eq_big}
+\end{equation}
+on $\omega_i$ and solving the resulting equations instead. In the two sensor case, this results in the solving of
+\begin{equation}
+   \omega_1 \tr(\mP_1) - \omega_2 \tr(\mP_2) = 0,\ \omega_1 + \omega_2 = 1\enspace. \label{eqn:fci_2sen_omega_sum_eq}
+\end{equation}
+When computed for $n$ sensors, the highly redundant \eqref{eqn:fci_eq_big} can have its largest linearly independent subset represented by
+\begin{equation}
+   \omega_i \tr(\mP_i) - \omega_{i+1} \tr(\mP_{i+1}) = 0,\ i=1,2,\dots,n-1\enspace, \label{eqn:fci_eq}
+\end{equation}
+and requires the solution to the linear problem
+\begin{equation}
+   \begingroup
+   \setlength\arraycolsep{2pt}
+   \begin{bmatrix}
+      \mathcal{P}_1 & -\mathcal{P}_2 & 0 & \cdots & 0 \\
+      \cdots & \cdots & \cdots & \cdots & \cdots & \\
+      0 & \cdots & 0 & \mathcal{P}_{n-1} & -\mathcal{P}_{n} \\
+      1 & \cdots & 1 & 1 & 1 &
+   \end{bmatrix}
+   \begin{bmatrix}
+      \omega_1 \\
+      \vdots \\
+      \omega_{n-1} \\
+      \omega_{n}
+   \end{bmatrix}
+   =
+   \begin{bmatrix}
+      0 \\
+      \vdots \\
+      0 \\
+      1
+   \end{bmatrix}\enspace, \label{eqn:fci_eq_sys}
+   \endgroup
+\end{equation}
+where we let $\mathcal{P}_i = \tr(\mP_i)$.
+
+Our proposed filter aims to solve FCI fusion, namely \eqref{eqn:ci_cov_estimate} and \eqref{eqn:fci_eq_sys}, using only encrypted values from each sensor $i$, and leaking only the weight values $\omega_1,\dots,\omega_n$.
+
+% 
+%  .d8888b.  8888888888 .d8888b.       8888888b.  8888888b.  8888888888 888      8888888 888b     d888 
+% d88P  Y88b 888       d88P  Y88b      888   Y88b 888   Y88b 888        888        888   8888b   d8888 
+% Y88b.      888       888    888      888    888 888    888 888        888        888   88888b.d88888 
+%  "Y888b.   8888888   888             888   d88P 888   d88P 8888888    888        888   888Y88888P888 
+%     "Y88b. 888       888             8888888P"  8888888P"  888        888        888   888 Y888P 888 
+%       "888 888       888    888      888        888 T88b   888        888        888   888  Y8P  888 
+% Y88b  d88P 888       Y88b  d88P      888        888  T88b  888        888        888   888   "   888 
+%  "Y8888P"  8888888888 "Y8888P"       888        888   T88b 8888888888 88888888 8888888 888       888 
+%                                                                                                      
+%                                                                                                      
+%                                                                                                      
+% 
 \section{Encryption Preliminaries}
+Used cryptographic notions and schemes are summarised here. In addition, the encoding of floating point numbers to integers suitable for encryption by the presented schemes is introduced as well.
+
+% 
+% ##    ##  #######  ######## ####  #######  ##    ##  ######  
+% ###   ## ##     ##    ##     ##  ##     ## ###   ## ##    ## 
+% ####  ## ##     ##    ##     ##  ##     ## ####  ## ##       
+% ## ## ## ##     ##    ##     ##  ##     ## ## ## ##  ######  
+% ##  #### ##     ##    ##     ##  ##     ## ##  ####       ## 
+% ##   ### ##     ##    ##     ##  ##     ## ##   ### ##    ## 
+% ##    ##  #######     ##    ####  #######  ##    ##  ######  
+% 
 \subsection{Meeting Cryptographic Notions}
+
+% 
+% ########  ##     ## ######## 
+% ##     ## ##     ## ##       
+% ##     ## ##     ## ##       
+% ########  ######### ######   
+% ##        ##     ## ##       
+% ##        ##     ## ##       
+% ##        ##     ## ######## 
+% 
 \subsection{Paillier Homomorphic Encryption Scheme}
+The Paillier encryption scheme [paillierPublicKeyCryptosystemsBased1999] is an additively homomorphic encryption scheme that bases its security on the decisional composite residuosity assumption (DCRA) and meets the security notion of IND-CPA. Key generation of the Paillier scheme is performed by choosing two sufficiently large primes $p$ and $q$, and computing $N=pq$. A generator $g$ is also required for encryption, which is often set to $g=N+1$ when $p$ and $q$ are of equal bit length [katzIntroductionModernCryptography2008]. The public key is defined by $(N, g)$ and the secret key by $(p, q)$.
+
+Encryption of a plaintext message $a \in \mathbb{Z}_N$, producing ciphertext $c \in \mathbb{Z}^{*}_{N^2}$, is computed by
+\begin{equation}
+    c = g^a \rho^N \pmod{N^2}
+\end{equation}
+for a randomly chosen $\rho \in \mathbb{Z}_{N}$. Here, $\rho^N$ can be considered the noise term which hides the value $g^a \pmod{N^2}$, which due to the scheme construction, is an easily computable discrete logarithm. The decryption of a ciphertext is computed by
+\begin{equation}
+    a = \frac{L(c^\lambda\pmod{N^2})}{L(g^\lambda\pmod{N^2})} \pmod{N}
+\end{equation}
+where $\lambda = \mathsf{lcm}(p-1, q-1)$ and $L(\psi) = \frac{\psi-1}{N}$.
+
+In addition to encryption and decryption, the following homomorphic functions are provided by the Paillier scheme. $\forall a_1,a_2 \in \mathbb{Z}_N$,
+\begin{align}
+    \mathcal{D}(\mathcal{E}(a_1)\mathcal{E}(a_2) \hspace{-7pt} \pmod{N^2}) &= a_1+a_2 \hspace{-7pt} \pmod{N}\,, \label{eqn:paillier_hom_add}\\
+    \mathcal{D}(\mathcal{E}(a_1)g^{a_2} \hspace{-7pt} \pmod{N^2}) &= a_1+a_2\hspace{-7pt}\pmod{N}\,, \label{eqn:paillier_hom_plain_add}\\
+    \mathcal{D}(\mathcal{E}(a_1)^{a_2} \hspace{-7pt} \pmod{N^2}) &= a_1a_2 \hspace{-7pt} \pmod{N}\,. \label{eqn:paillier_hom_mult}
+\end{align}
+
+% 
+%    ###     ######    ######   
+%   ## ##   ##    ##  ##    ##  
+%  ##   ##  ##        ##        
+% ##     ## ##   #### ##   #### 
+% ######### ##    ##  ##    ##  
+% ##     ## ##    ##  ##    ##  
+% ##     ##  ######    ######   
+% 
 \subsection{Joye-Libert Aggregation Scheme}
+The Joye-Libert privacy-preserving aggregation scheme [joyeScalableSchemePrivacyPreserving2013] is a scheme defined on time-series data and meets the security notion of Aggregator Obliviousness (AO) [shiPrivacyPreservingAggregationTimeSeries2011]. Similarly to the Paillier scheme, it bases its security on the DCRA. A notable difference to a public-key encryption scheme is its need for a trusted party to perform the initial key generation and distribution.
+
+Key generation is computed by first choosing two equal-length and sufficiently large primes $p$ and $q$, and computing $N=pq$. A hash function $H:\mathbb{Z} \rightarrow \mathbb{Z}_{N^2}^*$ is defined and the public key is set to $(N, H)$. $n$ private keys are generated by choosing $sk_i,\,i\in\{1,\dots,n\}$, uniformly from $\mathbb{Z}_{N^2}$ and distributing them to $n$ participants (whose values are to be aggregated), while the last key is set as
+\begin{equation}
+    sk_0 = -\sum^{n}_{i=1}sk_i\,,
+\end{equation}
+and sent to the aggregator.
+
+Encryption of plaintext $a^{(t)}_{i} \in \mathbb{Z}_N$ to ciphertext $c^{(t)}_{i} \in \mathbb{Z}_{N^2}$ at instance $t$ is computed by user $i$ as
+\begin{equation}
+    c^{(t)}_{i} = (N+1)^{a^{(t)}_{i}} H(t)^{sk_i} \pmod{N^2}\,.
+\end{equation}
+Here, we can consider $H(t)^{sk_i}$ the noise term which hides the easily computable discrete logarithm $g^{a^{(t)}_{i}} \pmod{N^2}$, where $g=N+1$ (as with the Paillier scheme above).
+
+When all encryptions $c^{(t)}_{i},\,i\in\{1,\dots,n\}$ are sent to the aggregator, summation and decryption of the aggregated sum are computed by the functions
+\begin{equation}
+    c^{(t)} = H(t)^{sk_0}\prod^{n}_{i=1}c^{(t)}_{i} \pmod{N^2} \label{eqn:agg_summation}
+\end{equation}
+and
+\begin{equation}
+    \sum^{n}_{i=1}a^{(t)}_{i} = \frac{c^{(t)}-1}{N} \pmod{N}\,. \label{eqn:agg_decryption}
+\end{equation}
+Correctness follows from $\sum^{n}_{i=0}sk_i = 0$, and thus
+\begin{equation*}
+    \begin{split}
+        &H(t)^{sk_0}\prod^{n}_{i=1}c^{(t)}_{i} \pmod{N^2} \\
+        \equiv &H(t)^{sk_0}\prod^{n}_{i=1}(N+1)^{a^{(t)}_{i}} H(t)^{sk_i} \pmod{N^2} \\
+        \equiv &H(t)^{\sum^n_{j=0}sk_j} \prod^{n}_{i=1}(N+1)^{a^{(t)}_{i}} \pmod{N^2} \\
+        \equiv &(N+1)^{\sum^n_{i=1}a^{(t)}_{i}} \pmod{N^2}\,,
+    \end{split}
+\end{equation*}
+removing all noise terms.
+
+% 
+%  #######  ########  ########  ######## ########  
+% ##     ## ##     ## ##     ## ##       ##     ## 
+% ##     ## ##     ## ##     ## ##       ##     ## 
+% ##     ## ########  ##     ## ######   ########  
+% ##     ## ##   ##   ##     ## ##       ##   ##   
+% ##     ## ##    ##  ##     ## ##       ##    ##  
+%  #######  ##     ## ########  ######## ##     ## 
+% 
 \subsection{Lewi Order-Revealing Encryption Scheme}
+For ORE, we use the Lewi symmetric-key Left-Right ORE scheme as it has the added property of only allowing certain comparisons between cyphertexts. This property can be used to decide which values may not be compared, which will be shown in section ... It is described as follows: two encryption functions allow integers to be encrypted as either a ``Left'' ($L$) or ``Right'' ($R$) encryption by
+\begin{equation}
+   \begin{aligned} \label{eqn:lewi_l_r}
+      &\operatorfont{enc}^L_{ORE}(k, x) = \mathcal{E}^L_{ORE,k}(x)\enspace, \\
+      &\operatorfont{enc}^R_{ORE}(k, y) = \mathcal{E}^R_{ORE,k}(y)\enspace,
+   \end{aligned}
+\end{equation}
+and only comparisons between an $L$ and an $R$ encryption are possible, by
+\begin{equation}
+   \operatorfont{cmp}_{ORE}(\mathcal{E}^L_{ORE}(x),\ \mathcal{E}^R_{ORE}(y)) = \operatorfont{cmp}(x, y)\enspace. \label{eqn:lewi_cmp}
+\end{equation}
+Note that no decryption function is provided as only encryptions are required to provide a secure comparison. The Lewi ORE encryption scheme provides security against the simulation-based security model [chenettePracticalOrderRevealingEncryption2016] but is not secure against the IND-OCPA model.
+
+% 
+% ######## ##    ##  ######  
+% ##       ###   ## ##    ## 
+% ##       ####  ## ##       
+% ######   ## ## ## ##       
+% ##       ##  #### ##       
+% ##       ##   ### ##    ## 
+% ######## ##    ##  ######  
+% 
 \subsection{Encoding Numbers for Encryption}
+In both the Paillier and Joye-Libert schemes, as well as the one we introduce, meaningful inputs $a$ are bounded to $a \in \mathbb{Z}_N$. For this reason, real-valued estimation variables require quantisation and integer mapping for encryption and aggregation. We will rely on a generalised Q number encoding [oberstarFixedPointRepresentationFractional2007] due to implementation simplicity and applicability.
+
+We will consider a subset of rational numbers in terms of a range $M \in \mathbb{N}$ and fractional precision $\phi \in \mathbb{N}$. This contrasts with the common definition in terms of total and fractional bits [oberstarFixedPointRepresentationFractional2007, schulzedarupEncryptedCooperativeControl2019, farokhiSecurePrivateControl2017], but allows for a direct mapping to integer ranges which are not a power of two. A rational subset $\mathbb{Q}_{M,\phi}$ is then given by
+\begin{equation}
+    \mathbb{Q}_{M,\phi} = \left\{o \,\middle|\, \phi o \in \mathbb{N} \wedge -\left\lfloor\frac{M}{2}\right\rfloor \leq \phi o < \left\lfloor\frac{M}{2}\right\rfloor \right\}\,,
+\end{equation}
+and we can quantize any real number $a$ by taking the nearest rational $o \in \mathbb{Q}_{M,\phi}$, that is, $\argmin_{o\in\mathbb{Q}_{M,\phi}} |a-o|$. In this form, mapping rationals $\mathbb{Q}_{M,\phi}$ to an encryption range $\mathbb{Z}_N$ is achieved by choosing $M=N$ and handling negatives by modulo arithmetic. Additionally, we note that the Q number format requires a precision factor $\phi$ to be removed after each encoded multiplication. This is captured by a third parameter $d$; the number of additional precision factors present in encodings.
+
+The function for \textit{combined} quantisation and encoding, $\mathsf{E}_{M,\phi,d}(a)$, of a given number $a \in \mathbb{R}$ and with an integer range $\mathbb{Z}_M$, precision $\phi$ and scaling for $d$ prior encoded multiplications is given by
+\begin{equation}
+    \mathsf{E}_{M,\phi,d}(a) = \left\lfloor \phi^{d+1} a \right\rceil \pmod{M}\,. \label{eqn:encode}
+\end{equation}
+Decoding of an integer $u \in \mathbb{Z}_M$, is given by
+\begin{equation}
+    \mathsf{E}^{-1}_{M,\phi,d}(u) \!=\! 
+    \begin{dcases}
+        \frac{u\hspace{-8pt}\pmod{M}}{\phi^{d+1}}, &\hspace{-6pt}u\hspace{-8pt}\pmod{M} \leq \left\lfloor\frac{M}{2}\right\rfloor \\
+        -\frac{M - u\hspace{-8pt}\pmod{M}}{\phi^{d+1}}, &\hspace{-6pt}\text{otherwise} \\
+    \end{dcases}\!\!.\label{eqn:decode}
+\end{equation}
+
+This encoding scheme provides the following homomorphic operations,
+\begin{equation}
+    \begin{split}
+        \mathsf{E}_{M,\phi,d}(a_1) + \mathsf{E}_{M,\phi,d}(a_2)& \pmod{M} =\\
+        &\mathsf{E}_{M,\phi,d}(a_1+a_2)
+    \end{split}\label{eqn:encoding_homomorphic_add}
+\end{equation}
+and
+\begin{equation}
+    \begin{split}
+        \mathsf{E}_{M,\phi,d}(a_1)\mathsf{E}_{M,\phi,d}(a_2)& \pmod{M} =\\
+        &\mathsf{E}_{M,\phi,d+1}(a_1a_2)\,,
+    \end{split}
+\end{equation}
+noting that when $M=N$, the operations and modulus correspond with those in the Paillier homomorphic operations \eqref{eqn:paillier_hom_add}, \eqref{eqn:paillier_hom_plain_add} and \eqref{eqn:paillier_hom_mult}, and the Joye-Libert sum \eqref{eqn:agg_decryption}.
+
+In general, the choice of a large precision parameter $\phi$ may reduce quantisation errors introduced in \eqref{eqn:encode}, but risks overflow after too many multiplications. Given the largest number of encoded multiplications, $d_{max}$, and the largest value to be encoded $a_{max}$, the parameter should be chosen such that
+\begin{equation}
+    \left|\phi^{d_{max}+1}a_{max}\right| < \left\lfloor \frac{M}{2} \right\rfloor\,.
+\end{equation}
+In practice, $N$ is typically very large ($N>2^{1024}$) and this condition can be ignored when $M=N$, as $\phi$ can be made sufficiently large to make quantisation errors negligible.

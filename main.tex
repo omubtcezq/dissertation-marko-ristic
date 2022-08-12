@@ -1,5 +1,91 @@
 \documentclass[oneside]{scrbook}
 
+% Graphics
+\usepackage{tikz}
+\usepackage{graphicx}
+% Maths
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+% Algorithms
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+% Local
+\usepackage{local_macros/isasmathmacros}
+
+% Environments
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+% Algorithm settings
+\algnewcommand{\LineComment}[1]{\State \(\triangleright\) #1}
+
+% Tikz settings
+\usetikzlibrary{math}
+
+% Tikz reused commands
+\tikzset{
+   plane/.pic = {
+    \draw[fill]  plot[smooth, tension=0.6] coordinates {
+        (-0.65,-0.9) 
+        (-0.6,-0.85) 
+        (-0.4,-0.75) 
+        (-0.25,-0.65) 
+        (-0.15,-0.5) 
+        (-0.12,-0.3) 
+        (-0.1,-0.1) 
+        (0,0) 
+        (0.1,-0.1) 
+        (0.12,-0.3) 
+        (0.15,-0.5) 
+        (0.25,-0.65) 
+        (0.4,-0.75) 
+        (0.6,-0.85) 
+        (0.65,-0.9)
+        } -- plot[smooth, tension=0.6] coordinates {
+        (0.65,-0.9) 
+        (0.15,-0.91)
+        (0.35,-1.1) 
+        (0.37,-1.15)
+        } -- plot[smooth, tension=0.6] coordinates {
+        (0.37,-1.15)
+        (0,-1.12) 
+        (-0.37,-1.15) 
+        } -- plot[smooth, tension=0.6] coordinates {
+        (-0.37,-1.15)
+        (-0.35,-1.1) 
+        (-0.15,-0.91) 
+        (-0.65,-0.9) 
+        } -- cycle;
+   }
+}
+\definecolor{pyplotblue}{RGB}{31,119,180}
+\definecolor{pyplotorange}{RGB}{255,127,14}
+\definecolor{pyplotgreen}{RGB}{44,160,44}
+
+
+
+% 
+% 8888888888 8888888b.   .d88888b.  888b    888 88888888888 
+% 888        888   Y88b d88P" "Y88b 8888b   888     888     
+% 888        888    888 888     888 88888b  888     888     
+% 8888888    888   d88P 888     888 888Y88b 888     888     
+% 888        8888888P"  888     888 888 Y88b888     888     
+% 888        888 T88b   888     888 888  Y88888     888     
+% 888        888  T88b  Y88b. .d88P 888   Y8888     888     
+% 888        888   T88b  "Y88888P"  888    Y888     888     
+%                                                           
+%                                                           
+%                                                           
+% 
 \title{Data Confidentiality for Distributed Sensor Fusion}
 \author{Marko Ristic}
 \date{\today}
