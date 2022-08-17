@@ -1,17 +1,10 @@
 
 \chapter{Introduction}
-Sensor data processing, state estimation and data fusion have become increasingly prevalent in modern systems \cite{ligginsDistributedDataFusion2012}. The growing prevalence of distributed networks in particular, has put greater stress on the need for broadly applicable algorithms that support varying types of measurements, estimate accuracies and communication availabilities [], with use cases including localisation, weather forecasting, mapping, cooperative computing and cloud computing [].
+Sensor data processing, state estimation and data fusion have long been active areas of research and continue to find applications in modern systems \cite{andersonOptimalFiltering1979,simonOptimalStateEstimation2006}. As distributed networks have become more prevalent over the years, a greater stress has been put on the need for broadly applicable algorithms that support varying types of measurements, estimate accuracies and communication availabilities \cite{mutambaraDecentralizedEstimationControl1998,ligginsDistributedDataFusion2012}, supporting use cases including localisation, weather forecasting, mapping, cooperative computing and cloud computing []. The use of Bayesian estimation methods such as the popular Kalman filter and its non-linear derivatives have become especially prevalent in application due to their recursive, often optimal, estimation properties and their suitability to modelling cross correlations between local estimates \cite{chongFortyYearsDistributed2017,haugBayesianEstimationTracking2012}. The handling of these cross correlations, especially when they are not known in advance, is a common difficulty in state estimation and tied to the challenges within the field \cite{noackTreatmentDependentInformation2017}. Much of the work in this field, including some of the methods presented in this thesis, handle these challenges.
 
-
-
+While the challenges in data fusion and state estimation that relate to correlation errors are a well established field of reasearch, widespread advancements in distributed computing and uses of public networks for sensor communication have lead the additional requirements of data privacy and state secrecy to become particularly relevant in recent years \cite{brennerSecretProgramExecution2011,renSecurityChallengesPublic2012}.
 
 ---
-
-The use of Bayesian estimation methods, in particular the popular Kalman filter and its non-linear derivatives have found particularly prevalent applications due to their recursive and often optimal estimation properties 
-
-The filters also allow modelling of cross correlations between local estimates, a common cause of challenges in estimation theory, and a requirement for consistent or optimal fusion.
-
-While the challenges faced due to the correlations between error statistics have existed for some time and have been well studied, the advancements in distributed algorithms, cloud computing and public networks are bringing additional security oriented challenges to estimation solutions.
 
 privacy and security 
 
@@ -43,6 +36,8 @@ leads us into the state-of-the-art
 \section{State-of-the-Art and Research Questions}
 
 As mentioned in the previous section, the nature of cryptographic notions in distributed environments typically requires communications between participating parties to be known exactly. This in turn has lead to many, otherwise general estimation algorithms, to be restricted in some way to make communication and security easier to discuss.
+
+note privacy-preserving expression in terms of data confidentiality
 
 For example, [aristov] presents a distributed Kalman filter, namely an Information filter, where sensor measurements and measurement errors are kept private to the measuring sensors only, while the final estimation update (sum of this information) is leaked to an estimator. For this to be achieved, however, sensors must form a heirachical communication structure and measurement models must be linear, restricting the otherwise more broadly applicable information filter and its non-linear variants.
 
@@ -99,6 +94,7 @@ These broad topics aim to fulfil the goal of generalisable but cryptographically
 The contributions tackle the research topics in section .. by considering three concrete problems that coincide with the broader problems in the field
 
 
+
 % 
 %  .d8888b. 88888888888 8888888b.  888     888  .d8888b. 88888888888 
 % d88P  Y88b    888     888   Y88b 888     888 d88P  Y88b    888     
@@ -113,3 +109,5 @@ The contributions tackle the research topics in section .. by considering three 
 %                                                                    
 % 
 \section{Thesis Structure}
+
+Each chapter includes relevant related literature to the specific problem and a formal problem formalisation before presenting the novel solutions.
