@@ -91,7 +91,7 @@ Note that \eqref{eqn:ci_cov_estimate} computes the fusion of the information vec
 \begin{equation}
    \omega_1 + \omega_2 + \cdots + \omega_n = 1,\ 0 \leq \omega_i \leq 1\enspace, \label{eqn:ci_omega_sum_bound}
 \end{equation}
-which guarantees consistency of the fused estimates. They are chosen in a way to speed up convergence and minimize error by minimizing a certain specified property of the resulting fused estimate covariance. One such property, the covariance trace, requires the solution to
+which guarantees consistency of the fused estimates. They are chosen in a way to speed up convergence and minimize the error by minimizing a certain specified property of the resulting fused estimate covariance. One such property, the covariance trace, requires the solution to
 \begin{equation}
    \argmin_{\omega_1,\dots,\omega_n} \{\tr(\mP)\}\! =\! \argmin_{\omega_1,\dots,\omega_n} \left\{\tr\left(\!\left(\sum_{i=1}^{n}\omega_i \mP_i^{-1}\!\right)^{-1}\right)\!\right\} \label{eqn:ci_trace_min}
 \end{equation}
@@ -247,7 +247,7 @@ removing all noise terms.
 %  #######  ##     ## ########  ######## ##     ## 
 % 
 \subsection{Lewi Order-Revealing Encryption Scheme}
-For ORE, we use the Lewi symmetric-key Left-Right ORE scheme as it has the added property of only allowing certain comparisons between cyphertexts. This property can be used to decide which values may not be compared, which will be shown in section ... It is described as follows: two encryption functions allow integers to be encrypted as either a ``Left'' ($L$) or ``Right'' ($R$) encryption by
+For ORE, we use the Lewi symmetric-key Left-Right ORE scheme as it has the added property of only allowing certain comparisons between cyphertexts. This property can be used to decide which values may not be compared, which will be shown in the section ... It is described as follows: two encryption functions allow integers to be encrypted as either a ``Left'' ($L$) or ``Right'' ($R$) encryption by
 \begin{equation}
    \begin{aligned} \label{eqn:lewi_l_r}
       &\operatorfont{enc}^L_{ORE}(k, x) = \mathcal{E}^L_{ORE,k}(x)\enspace, \\
