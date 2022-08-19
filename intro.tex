@@ -1,27 +1,9 @@
 
 \chapter{Introduction}
-Sensor data processing, state estimation and data fusion have long been active areas of research and continue to find applications in modern systems \cite{andersonOptimalFiltering1979,simonOptimalStateEstimation2006}. As distributed networks have become more prevalent over the years, greater stress has been put on the need for broadly applicable algorithms that support varying types of measurements, estimate accuracies and communication availabilities \cite{mutambaraDecentralizedEstimationControl1998,ligginsDistributedDataFusion2012}, supporting use cases including localisation, weather forecasting, mapping, cooperative computing and cloud computing []. The use of Bayesian estimation methods such as the popular Kalman filter and its non-linear derivatives have become especially prevalent in application due to their recursive, often optimal, estimation properties and their suitability for modelling cross-correlations between local estimates \cite{chongFortyYearsDistributed2017,haugBayesianEstimationTracking2012}. The handling of these cross-correlations, especially when they are not known in advance, is a common difficulty in state estimation and is tied to the challenges within the field \cite{noackTreatmentDependentInformation2017}. Much of the work in this field, including some of the methods presented in this thesis, handle these challenges.
+Sensor data processing, state estimation and data fusion have long been active areas of research and continue to find applications in modern systems \cite{andersonOptimalFiltering1979,simonOptimalStateEstimation2006}. As distributed networks have become more prevalent over the years, greater stress has been put on the need for broadly applicable algorithms that support varying types of measurements, estimate accuracies and communication availabilities \cite{mutambaraDecentralizedEstimationControl1998,ligginsDistributedDataFusion2012}, finding uses in localisation, weather forecasting, mapping, cooperative computing and cloud computing []. The use of Bayesian estimation methods such as the popular Kalman filter and its non-linear derivatives have become especially prevalent in application due to their recursive, often optimal, estimation properties and their suitability for modelling cross-correlations between local estimates \cite{chongFortyYearsDistributed2017,haugBayesianEstimationTracking2012}. The handling of these cross-correlations, especially when they are not known in advance, is a common difficulty in state estimation and is tied to the challenges within the field \cite{noackTreatmentDependentInformation2017}. The methods presented in this thesis and much of the related work in data fusion tasks similarly require the consideration of these challenges.
 
-While the challenges in data fusion and state estimation that relate to correlation errors are a well-established field of research, widespread advancements in distributed computing and uses of public networks for sensor communication have led the additional requirements of data privacy and state secrecy to become particularly relevant in recent years \cite{brennerSecretProgramExecution2011,renSecurityChallengesPublic2012}.
+While the challenges relating to correlation errors are a well-established field of research, widespread advancements in distributed computing and uses of public networks for sensor communication have put a focus on the additional requirements of data privacy and state secrecy in recent years as well \cite{brennerSecretProgramExecution2011,renSecurityChallengesPublic2012}. Problems that require both the handling of correlation errors and guaranteeing a level of security for the participants involved are therefore a relevant topic in state estimation today and at the core of the work presented in this thesis. Achieving cryptographic secrecy typically involves hiding transferred information from unauthorised parties and can often be achieved irrespective of the estimation algorithms used by using common symmetric and public-key encryption schemes such as the Advanced Encryption Standard (AES) \cite{gueronIntelAdvancedEncryption2010} and the Rivest-Shamir-Adleman cryptosystem (RSA) \cite{rivestMethodObtainingDigital1978}, respectively. These scenarios, however, imply a trust between encrypting and decrypting parties, which cannot always be assumed in distributed environments. In addition, partial computations on encrypted data or the intended leakage of some results are sometimes required for computing final results. This has led to several operation-providing and leakage-supporting encryption schemes \cite{paillierPublicKeyCryptosystemsBased1999,shiPrivacyPreservingAggregationTimeSeries2011,joyeScalableSchemePrivacyPreserving2013,chotardDecentralizedMultiClientFunctional2018,andresGeoIndistinguishabilityDifferentialPrivacy2013} suitable for these distributed environments or when fine control over leakage is required. While these cryptographic schemes and notations are applicable in estimation and fusion tasks, the nature of cryptographic analysis in distributed environments, heavily dependent on communication protocols, has meant that developed solutions are often very context-specific, leading to numerous solutions for various estimation scenarios, use-cases and security requirements. This leads us to the current state-of-the-art literature on security-oriented state estimation and data fusion, observable gaps in this literature and the research questions we aim to answer.
 
-Problems that require careful consideration of correlations errors while simultaneously guaranteeing a level of security for the participants involved are therefore
-
-Typical cryptographic secrecy involves hiding all transferred data such that unauthorised parties gain no information from acquired encryptions. This can often be achieved irrespective of the estimation algorithms by using common symmetric and public-key encryption schemes such as the Advanced Encryption Standard (AES) [] and the Rivest-Shamir0Adleman cryptosystem (RSA) [], respectively.
-
-
----
-
-
-
-more complicated examples have different requirements where these are not suitable
-
-more complicated schemes
-
-differential privacy as a statistical security
-
-Due to the nature of cryptographic goals and proofs in distributed environments, security goals in estimation and fusion are often very context-specific and have led to numerous solutions for various scenarios and security desires
-
-leads us into the state-of-the-art
 
 % 
 %  .d8888b.   .d88888b. 88888888888     d8888 
@@ -41,6 +23,7 @@ leads us into the state-of-the-art
 As mentioned in the previous section, the nature of cryptographic notions in distributed environments typically requires communications between participating parties to be known exactly. This, in turn, has led to many, otherwise, general estimation algorithms, being restricted in some way to make communication and security easier to discuss.
 
 note privacy-preserving expression in terms of data confidentiality
+that is, note that we focus on data confidentiality and that privacy-preserving is often used in literature to mean the same
 
 For example, [aristov] presents a distributed Kalman filter, namely an Information filter, where sensor measurements and measurement errors are kept private to the measuring sensors only, while the final estimation update (sum of this information) is leaked to an estimator. For this to be achieved, however, sensors must form a hierarchical communication structure and measurement models must be linear, restricting the otherwise more broadly applicable information filter and its non-linear variants.
 
@@ -50,7 +33,7 @@ Pisac and pwsah papers
 
 aggregation papers
 
-differentially private Kalman filtering
+differential privacy and differentially private Kalman filtering
 
 privacy-preserving optimisation with security based on statistical estimation
 
