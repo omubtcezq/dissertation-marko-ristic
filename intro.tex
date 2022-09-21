@@ -20,10 +20,15 @@ While the challenges relating to correlation errors are a well-established field
 % 
 \section{State-of-the-Art and Research Questions}
 
-As mentioned in the previous section, the nature of cryptographic notions in distributed environments typically requires communications between participating parties to be known exactly. This, in turn, has led to many, otherwise, general estimation algorithms, being restricted in some way to make communication and security easier to discuss.
-
 note privacy-preserving expression in terms of data confidentiality
 that is, note that we focus on data confidentiality and that privacy-preserving is often used in literature to mean the same
+
+Before introducing relevant existing methods in security estimation and data fusion, we note the overarching security goal that this thesis considers. Namely, data confidentiality
+
+
+
+Since knowing exact communications between participating parties is required for meaningful cryptographic analysis or proof, many existing general estimation algorithms have been restricted in some way to make communication and security easier to discuss.
+
 
 For example, [aristov] presents a distributed Kalman filter, namely an Information filter, where sensor measurements and measurement errors are kept private to the measuring sensors only, while the final estimation update (sum of this information) is leaked to an estimator. For this to be achieved, however, sensors must form a hierarchical communication structure and measurement models must be linear, restricting the otherwise more broadly applicable information filter and its non-linear variants.
 
