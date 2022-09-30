@@ -3,6 +3,7 @@
 % Graphics
 \usepackage{tikz}
 \usepackage{graphicx}
+\usepackage[labelformat=simple]{subcaption}
 % Maths
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -10,10 +11,14 @@
 \usepackage{mathtools}
 \usepackage{bm}
 % Algorithms
-\usepackage{algorithmicx}
+\usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{setspace}
 % Local
 \usepackage{local_macros/isasmathmacros}
+
+% Sub figures
+\renewcommand\thesubfigure{(\alph{subfigure})}
 
 % Environments
 \theoremstyle{definition}

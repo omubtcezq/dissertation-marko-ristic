@@ -1,8 +1,157 @@
 
 \chapter{Distributed Non-Linear Measurement Fusion with Untrusted Participants}
+
+
 \section{Problem Formulation}
+In this work, we consider the context of privacy-preserving range sensor navigation, where we want no sensor to learn any information about the navigator or other sensors beyond their local measurements, and the navigator not to learn any information about individual sensors beyond its location estimate. The problem is two-fold, in that we require explicit cryptographic requirements with a suitable encryption scheme meeting them as well as an estimation scheme that can use the encryption in the context of range-only navigation.
+
+To give a formal cryptographic requirement in a distributed setting, we must first consider the communication requirements of our context and define the attacker capabilities and the desired security of a suitable encryption scheme. In this section, we will define a communication protocol and the relevant formal definition of security we aim to achieve, followed by the estimation problem to which we will apply it.
+
+% 
+%  ######  ########  ##    ## ########  ########  #######     ########  ########   #######  ########  
+% ##    ## ##     ##  ##  ##  ##     ##    ##    ##     ##    ##     ## ##     ## ##     ## ##     ## 
+% ##       ##     ##   ####   ##     ##    ##    ##     ##    ##     ## ##     ## ##     ## ##     ## 
+% ##       ########     ##    ########     ##    ##     ##    ########  ########  ##     ## ########  
+% ##       ##   ##      ##    ##           ##    ##     ##    ##        ##   ##   ##     ## ##     ## 
+% ##    ## ##    ##     ##    ##           ##    ##     ##    ##        ##    ##  ##     ## ##     ## 
+%  ######  ##     ##    ##    ##           ##     #######     ##        ##     ##  #######  ########  
+% 
+
+\subsection{Formal Cryptographic Problem} \label{subsec:crypto_problem}
+The communication between the navigator and sensors in our estimation problem will be decomposed into a simple two-step bi-directional protocol that will simplify defining formal security. In section \ref{sec:priv_localisation}, we will show how this protocol is sufficient to compute the location estimate at a navigator while meeting our desired privacy goals. The communication protocol is as follows.
+
+At every \textit{instance} $t$ (used to distinguish from an estimation \textit{timestep}), the navigator first broadcasts $m$ weights $\omega_j^{(t)}, j\in\{1,\dots,m\}$ to all sensors $i\in\{1,\dots,n\}$, who individually compute linear combinations $l^{(t)}_i=\sum^m_{j=1}a_{j,i}^{(t)}\omega_i^{(t)}$ based on their measurement data $a_{j,i}$. Linear combinations are then sent back to the navigator, who computes their sum $\sum^n_{i=1}l^{(t)}_{i}$. This two-step linear combination aggregation protocol has been visually displayed in figure \ref{fig:agg_steps}.
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[font=\footnotesize,scale=0.95]
+    % Step 1
+    \node at (3.25,5.5) {1. Broadcast and Combination Step};
+    % Navigator
+    \fill (3.25,4.75) [pyplotblue!70] ellipse (0.4 and 0.4);
+    \pic[xscale=0.22,yscale=0.3] at (3.25,4.9225) {plane};
+    % Sensors
+    \node at (1.5,1.375) {Sensor $1$};
+    \fill [pyplotorange!70] (0.25,1.625) rectangle (2.875,2.625);
+    \node at (1.625,2.125) {$\displaystyle l_1^{(t)} \!=\! \sum^m_{j=1}a_{1,j}^{(t)}\omega_j^{(t)}$};
+    \node at (5,1.375) {Sensor $n$};
+    \fill [pyplotorange!70] (3.625,1.625) rectangle (6.25,2.625);
+    \node at (5,2.125) {$\displaystyle l_n^{(t)} \!=\! \sum^m_{j=1}a_{n,j}^{(t)}\omega_j^{(t)}$};
+    \fill [black] (3.5,2.125) circle (0.05);
+    \fill [black] (3,2.125) circle (0.05);
+    \fill [black] (3.25,2.125) circle (0.05);
+    % Lines
+    \draw [-latex] plot[smooth, tension=.7] coordinates {(3.5,4.25) (5,2.875)};
+    \draw [-latex] plot[smooth, tension=.7] coordinates {(3,4.25) (1.5,2.875)};
+    \fill [lightgray] (2.125,3.875) rectangle (4.375,3.125);
+    \node at (3.25,3.5) {$\langle\omega_1^{(t)},\dots ,\omega_m^{(t)}\rangle$};
+    
+    % Step 2
+    \node at (3.25,0.25) {2. Aggregation Step};
+    % Navigator
+    \fill [pyplotblue!70] (1.375,-2) rectangle (5.125,-0.25);
+    \pic[xscale=0.22,yscale=0.3] at (3.25,-0.4775) {plane};
+    \node at (3.25,-1.375) {$\displaystyle \sum^{n}_{i=1}\sum^{m}_{j=1} a_{i,j}^{(t)}\omega_j^{(t)} = \sum^n_{i=1}l^{(t)}_{i}$};
+    % Sensors
+    \node at (1.25,-3.875) {Sensor $1$};
+    \fill  (5.25,-3.25) [pyplotorange!70] ellipse (0.4 and 0.4);
+    \node at (5.25,-3.875) {Sensor $n$};
+    \fill  (1.25,-3.25) [pyplotorange!70] ellipse (0.4 and 0.4);
+    \fill [black] (2.75,-3.25) circle (0.05);
+    \fill [black] (3.75,-3.25) circle (0.05);
+    \fill [black] (3.25,-3.25) circle (0.05);
+    % Lines
+    \draw [-latex] plot[smooth, tension=.7] coordinates {(5,-2.75) (4.5,-2.25)};
+    \draw [-latex] plot[smooth, tension=.7] coordinates {(1.5,-2.75) (2,-2.25)};
+    \fill [lightgray] (1.625,-2.5) rectangle (2.25,-3);
+    \node at (2,-2.75) {$l_1^{(t)}$};
+    \fill [lightgray] (4.25,-2.5) rectangle (4.875,-3);
+    \node at (4.625,-2.75) {$l_n^{(t)}$};
+    
+    % Bounding rectangles
+    \draw [gray] (0,6) rectangle (6.5,1);
+    \draw [gray] (0,0.75) rectangle (6.5,-4.25);
+\end{tikzpicture}
+\caption{Required linear combination aggregation steps at instance $t$.}
+\label{fig:agg_steps}
+\end{figure}
+In addition, we note that an alternative approach to the two-step protocol is computing $\sum^{m}_{j=1}(\omega_j^{(t)}\sum^{n}_{i=1} a_{i,j}^{(t)})$ at the navigator, requiring only values $a_{i,j}^{(t)}, j\in\{1,\dots,m\}$ to be sent from each sensor $i$. We justify the use of bi-directional communication by reducing communication costs when the number of weights is larger than the number of sensors, $m>n$, and by sending fewer weights in the presence of repeats, as will be shown to be the case in section \ref{sec:priv_localisation}.
+
+Before giving a formal definition for the construction and security of our desired encryption scheme, we make the following assumptions on the capabilities of the participants.
+\begin{description}
+    \item[Global Navigator Broadcast] We assume that broadcast information from the navigator is received by \textit{all} sensors involved in the protocol.
+    \item[Consistent Navigator Broadcast] We assume that broadcast information from the navigator is received equally by all sensors. This means the navigator may not send different weights to individual sensors during a single instance $t$.
+    \item[Honest-but-Curious Sensors] We adopt the honest-but-curious attacker model for all involved sensors, meaning that they follow the localisation procedure correctly but may store or use any gained sensitive information.
+\end{description}
+We justify the global broadcast assumption by noting that any subset of sensors within the range of the navigator can be considered a group and treated as the global set during estimation, generalising the method, while the wide-spread use of cheap non-directional antennas supports the assumption of consistent broadcasts. The final assumption refers to the known problem of misbehaving sensors \cite{lazosSeRLocSecureRangeindependent2004,ben-galOutlierDetection2005}, often requiring additional complicated detection mechanisms, and will not be considered in this work.
+
+We are now ready to define the type of encryption scheme we want for the specified communication protocol and the security guarantees it should provide. We let a linear combination aggregation scheme be defined as a tuple of the four algorithms $(\mathsf{Setup}, \mathsf{Enc}, \mathsf{CombEnc}, \mathsf{AggDec})$. These will be used by a trusted setup party, the navigator, and sensors $i\in\{1,\dots,n\}$. They are defined as follows.
+\begin{description}
+    \item[$\mathsf{Setup}(\kappa)$] On input of security parameter $\kappa$, generate public parameters $\mathsf{pub}$, the number of weights $m$, the navigator's public and private keys $pk_0$ and $sk_0$ and the sensor private keys $sk_i,\,i\in\{1,\dots,n\}$.
+    \item[$\mathsf{Enc}(pk_0, x)$] The navigator and sensors can encrypt any value $x$ with the navigator's public key $pk_0$ and obtain the encryption $\mathcal{E}_{pk_0}(x)$.
+    \item[$\mathsf{CombEnc}(t, pk_0, sk_i, \mathcal{E}(\omega_1^{(t)}),\dots,\mathcal{E}(\omega_m^{(t)}), a^{(t)}_{i,1},\dots,a^{(t)}_{i,m})$] At instance $t$, sensor $i$ computes and obtains the encrypted linear combination denoted $l^{(t)}_i = \mathcal{E}_{pk_0,sk_i}(\sum^m_{j=1}a^{(t)}_{i,j}\omega^{(t)}_j)$ using its secret key $sk_i$.
+    \item[$\mathsf{AggDec}(t, pk_0, sk_0, l^{(t)}_1,\dots,l^{(t)}_n)$] At instance $t$, the navigator computes the aggregation of linear combinations $\sum^{n}_{i=1}l_i^{(t)}=\sum^{n}_{i=1}\sum^{m}_{j=1} a^{(t)}_{i,j}\omega^{(t)}_j$ using its public and private keys $pk_0$, $sk_0$.
+\end{description}
+The security notions we want these algorithms to meet reflect the previously stated estimation privacy goals. The navigator should learn no information from individual sensors while sensors should learn no information from the navigator or any other sensors. In the context of the introduced communication protocol, this can be summarised as the following notions.
+\begin{description}
+    \item[Indistinguishable Weights] No colluding subset of sensors gains any new knowledge about the navigator weights $\omega^{(t)}_j,\,j\in\{1,\dots,m\}$ when receiving only their encryptions from the current and previous instances and having the ability to encrypt plaintexts of their choice.
+    \item[Linear Combination Aggregator Obliviousness] No colluding subset \textit{excluding} the navigator gains additional information about the remaining sensor values to be weighted, $a^{(t)}_{i,j},\,j\in\{1,\dots,m\}$, where sensor $i$ is not colluding, given only encryptions of their linear combinations $l_i$ from the current and previous instances. Any colluding subset \textit{including} the navigator learns only the sum of all linear combinations weighted by weights of their choice, $\sum^{n}_{i=1}l_i^{(t)}=\sum^{n}_{i=1}\sum^{m}_{j=1} a^{(t)}_{i,j}\omega^{(t)}_j$.
+\end{description}
+While indistinguishable weights can be achieved by encrypting weights with an encryption scheme meeting the notion of Indistinguishability under the Chosen Plaintext Attack (IND-CPA) \cite{katzIntroductionModernCryptography2008}, the novel notion of Linear Combination Aggregator Obliviousness (LCAO) has been formalised as a typical cryptographic game between attacker and challenger in appendix~\ref{app:lcao}. Lastly, we conclude the cryptographic problem definition with the following important remark.
+\begin{remark}
+    A leakage function including weights from the navigator requires extra care to be taken when giving its definition. If an attacker compromises the navigator, they have control over the weights, and therefore the leakage function. We note that in the leakage function above, $\sum^n_{i=1}\sum^m_{j=1}a^{(t)}_{i,j}\omega^{(t)}_j$, an individual sum weighted by the same weight may be learnt by an attacker, \textit{e.g.}, $\sum^n_{i=1}a^{(t)}_{i,1}$ given weights $(1,0,\dots,0)$, but that individual sensor values $a^{(t)}_{i,j}$ remain private due to the assumption of a consistent broadcast.
+\end{remark}
+
+% 
+% ########  ######  ########    ########  ########   #######  ########  
+% ##       ##    ##    ##       ##     ## ##     ## ##     ## ##     ## 
+% ##       ##          ##       ##     ## ##     ## ##     ## ##     ## 
+% ######    ######     ##       ########  ########  ##     ## ########  
+% ##             ##    ##       ##        ##   ##   ##     ## ##     ## 
+% ##       ##    ##    ##       ##        ##    ##  ##     ## ##     ## 
+% ########  ######     ##       ##        ##     ##  #######  ########  
+% 
+
+\subsection{Estimation problem} \label{subsec:est_problem}
+The estimation problem we consider, for which we will reformulate communication to the protocol above, is localisation with range-only sensors. In this work, we will focus on the two-dimensional case for simplicity but will derive methods suitable for extension to a three-dimensional equivalent. The state that we wish to estimate must capture the navigator position, $x$ and $y$, and may contain any other components relevant to the system. It is of the form
+\begin{equation}
+    \vec{x} = 
+    \begin{bmatrix}
+        x & y & \cdots
+    \end{bmatrix}^\top\,. \label{eqn:state_definition}
+\end{equation}
+This state evolves following some known system model, which at timestep $k$ can be written as
+\begin{equation}
+    \vec{x}_k = \vec{f}_k(\vec{x}_{k-1}, \vec{w}_k)\,, \label{eqn:system_model}
+\end{equation}
+with noise term $\vec{w}_k$. Measurements of $\vec{x}_k$ follow a measurement model dependent on sensor $i\in\{1,\dots,n\}$, given by 
+\begin{equation}
+    z_{k,i} = h_i(\vec{x}_k)+v_{k,i}\,, \label{eqn:measurement_model}
+\end{equation}
+with Gaussian measurement noises $v_{k,i} \sim \mathcal{N}(0,r_{k,i})$ and measurement function
+\begin{equation}
+    \begin{split}
+        h_i(\vec{x}) &= \left\lVert
+        \begin{bmatrix}
+            x & y
+        \end{bmatrix}^\top
+        - \vec{s}_{i}\right\rVert \\
+        &= \sqrt{(x-s_{x,i})^2 + (y-s_{y,i})^2}\,,
+    \end{split}
+\end{equation}
+where
+\begin{equation}
+    \vec{s}_i = 
+    \begin{bmatrix}
+        s_{x,i} & s_{y,i}
+    \end{bmatrix}^\top
+\end{equation} 
+is the location of sensor $i$.
+
+We aim to provide a filter that estimates the navigator's state $\vec{x}_k$, at every timestep $k$, without learning sensor positions $\vec{s}_i$, measurements $z_{k,i}$ and measurement variances $r_{k,i}$ beyond the information in the corresponding aggregation leakage function. Similarly, sensors should not learn any information about current state estimates or any other sensor information. Leakage will be further discussed in section \ref{subsec:leakage}, but we note that from any sequential state estimates, following known models, some sensor information leakage can be computed by the navigator. In the context of our leakage function, we will show that this corresponds to the global sums of private sensor information, while individual, or subsets of sensors', information remain private. Similarly, corrupted sensors with access to one or more measurements can produce state estimates of their own, leaking information about navigator state estimates, however, the most accurate estimates, requiring all measurements, will always remain private to the navigator.
+
+
 \section{Related Literature}
 \section{Confidential Range-Only Localisation}
-\subsection{Unidirectional Alternative}
+%\subsection{Unidirectional Alternative}
 \subsection{Solvable Sub-Class of Non-Linear Measurement Models}
 \section{Conclusions}
