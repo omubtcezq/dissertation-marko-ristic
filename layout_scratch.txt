@@ -1,0 +1,169 @@
+
+Introduction
+	State-of-the-art and Research Questions
+	Contributions
+	Thesis Structure
+Preliminaries
+	Estimation Preliminaries
+		Kalman Filter
+		Kalman Filter Optimality
+		Extended Kalman Filter
+		Information Fiilter
+		Extended Information Filter
+		Fast Covariance Intersection
+	Encryption Preliminaries
+		Meeting CRyptographic notations
+		Paillier Homomorphic Encryption Scheme
+		Joye-Libert Aggregation Scheme
+		Lewi Order-Revealing Encryption Scheme
+		Encoding Numbers for Encryption
+
+Estimation Fusion on an Untrusted Cloud
+	Problem Formulation
+	Related Literature
+	Confidential Cloud Fusion leaking Fusion Weights
+		Two-sensor Secure Fast Covariance Intersection
+		Multi-sensor Secure Fast Covariance Intersection
+		Computational Complexity
+		Simulation Results
+	Confidential Cloud Fusion Without Leakage
+		..
+		Complexity
+		Security Analysis
+		Simulation
+	Conclusions
+
+Distributed Non-Linear Measurement Fusion with Untrusted Participants
+	Problem Formulation
+		Formal Cryptographic Problem
+		Estimation Problem
+	Related Literature
+	Confidential Range-Only Localisation
+		Private Linear Combination Aggregation Scheme
+		Privacy-Preserving Loclisation
+			..
+			Range Measurement Modification
+			Localisation
+			PseudoCode
+			Leakage
+		Simulation and Results
+		Solvable Sub-Class of Non-Linear measurement Models
+	Conclusions
+
+Provable Estimation performances
+	Single-Sensor Problem Formulation
+		Formal Cryptographic Problem
+		Estimation Problem
+	Related Literature
+	Privileges Estimation for linear Systems
+		Gaussian Keystream
+		Additional Gaussian Noise
+		Multiple Privileges
+		Scheme Security
+			Single Privileged Case
+			Proof Sketch
+			Multiple Additional Noises
+		Simulation and Results
+		Extension to Non-Linear Systems
+	Multi-sensor Problem Formulation
+		..
+		Fusion in Privielged Estimation Environments
+			Noise Generation
+			Measurement Modification
+			Noise Distribution
+		Cryptographic Bounds
+			Performance Loss Lower Bound (PLLB)
+			Performance Gain Upper Bound (PGUB)
+		Simulation
+	Conclusions
+Conclusion
+
+
+
+
+
+
+#==========================================================================================#
+#=====================================# OLD AS GUIDE #=====================================#
+#==========================================================================================#
+
+Introduction
+	State-of-the-art and Research Questions
+	Contributions
+	Thesis Structure
+Preliminaries
+	Estimation Preliminaries
+		Kalman Filter
+		Kalman Filter Optimality
+		Extended Kalman Filter
+		Information Fiilter
+		Extended Information Filter
+		Fast Covariance Intersection
+	Encryption Preliminaries
+		Meeting CRyptographic notations
+		Paillier Homomorphic Encryption Scheme
+		Joye-Libert Aggregation Scheme
+		Lewi Order-Revealing Encryption Scheme
+		Encoding Numbers for Encryption
+
+Estimation Fusion on an Untrusted Cloud
+	Problem Formulation
+	Related Literature
+	Confidential Cloud Fusion leaking Fusion Weights
+		Two-sensor Secure Fast Covariance Intersection
+		Multi-sensor Secure Fast Covariance Intersection
+		Computational Complexity
+		Simulation Results
+	Confidential Cloud Fusion Without Leakage
+		..
+		Complexity
+		Security Analysis
+		Simulation
+	Conclusions
+
+Distributed Non-Linear Measurement Fusion with Untrusted Participants
+	Problem Formulation
+		Formal Cryptographic Problem
+		Estimation Problem
+	Related Literature
+	Confidential Range-Only Localisation
+		Private Linear Combination Aggregation Scheme
+		Privacy-Preserving Loclisation
+			..
+			Range Measurement Modification
+			Localisation
+			PseudoCode
+			Leakage
+		Simulation and Results
+		Solvable Sub-Class of Non-Linear measurement Models
+	Conclusions
+
+Provable Estimation performances
+	Single-Sensor Problem Formulation
+		Formal Cryptographic Problem
+		Estimation Problem
+	Related Literature
+	Privileges Estimation for linear Systems
+		Gaussian Keystream
+		Additional Gaussian Noise
+		Multiple Privileges
+		Scheme Security
+			Single Privileged Case
+			Proof Sketch
+			Multiple Additional Noises
+		Simulation and Results
+		Extension to Non-Linear Systems
+	Multi-sensor Problem Formulation
+		..
+		Fusion in Privielged Estimation Environments
+			Noise Generation
+			Measurement Modification
+			Noise Distribution
+		Cryptographic Bounds
+			Performance Loss Lower Bound (PLLB)
+			Performance Gain Upper Bound (PGUB)
+		Simulation
+	Conclusions
+Conclusion
+
+

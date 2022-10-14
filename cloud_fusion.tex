@@ -473,7 +473,7 @@ combine information from individual estimators $i$ and are computable homomorphi
 % ##    ## ##     ## ##     ## ##        
 %  ######   #######  ##     ## ##        
 % 
-\section{Complexity}\label{sec:complexity}
+\subsection{Complexity}\label{sec:complexity}
 The method described provides a level of security when relying on an untrusted cloud for fusing estimates. However, the added reliance on an encryption scheme and the additional computations at the third party intuitively increase the computational complexity of the algorithm and the required capabilities of participating parties. Here, we present the complexity of operations during fusion, required by each party at every timestep $k$. We assume encoding and decoding operations have complexity $O(1)$ (due to their comparative insignificance when compared to associated encryption and decryption operations) and use \cite{paillierPublicKeyCryptosystemsBased1999} to obtain the encryption complexities of the Paillier encryption scheme in table \ref{tab:enc_cmplx}, with security parameter $\lambda = \log{N}$.
 \begin{table}[tb]
     \centering
