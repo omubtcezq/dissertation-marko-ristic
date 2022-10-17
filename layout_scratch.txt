@@ -1,8 +1,16 @@
 
 Introduction
+	..
 	State-of-the-art and Research Questions
+		Confidential Estimate Fusion
+		Confidential Distributed Non-Linear Measurmeent Models
+		Provable Estimation Performances
 	Contributions
+		Estimate Fusion on an Untrusted Cloud
+		Distributed Non-Linear Measurement Fusion with Untrusted Participants
+		Provable Estimation Performance
 	Thesis Structure
+
 Preliminaries
 	Estimation Preliminaries
 		Kalman Filter
@@ -12,73 +20,73 @@ Preliminaries
 		Extended Information Filter
 		Fast Covariance Intersection
 	Encryption Preliminaries
-		Meeting CRyptographic notations
+		Meeting Cryptographic Notations
 		Paillier Homomorphic Encryption Scheme
 		Joye-Libert Aggregation Scheme
 		Lewi Order-Revealing Encryption Scheme
 		Encoding Numbers for Encryption
 
-Estimation Fusion on an Untrusted Cloud
+Estimate Fusion on an Untrusted Cloud
 	Problem Formulation
-	Related Literature
-	Confidential Cloud Fusion leaking Fusion Weights
-		Two-sensor Secure Fast Covariance Intersection
-		Multi-sensor Secure Fast Covariance Intersection
+	Confidential Cloud Fusion Leaking Fusion Weights
+		Secure Fast Covariance Intersection
+			Two-sensor case
+			Multi-sensor case
 		Computational Complexity
-		Simulation Results
-	Confidential Cloud Fusion Without Leakage
-		..
-		Complexity
 		Security Analysis
 		Simulation
-	Conclusions
+	Confidential Cloud Fusion Without Leaking Fusion Weights
+		..
+		Computational Complexity
+		Security Analysis
+		Simulation
+	Conclusions on Confidential Estimate Fusion
 
 Distributed Non-Linear Measurement Fusion with Untrusted Participants
 	Problem Formulation
 		Formal Cryptographic Problem
 		Estimation Problem
-	Related Literature
 	Confidential Range-Only Localisation
 		Private Linear Combination Aggregation Scheme
 		Privacy-Preserving Loclisation
 			..
 			Range Measurement Modification
 			Localisation
-			PseudoCode
-			Leakage
-		Simulation and Results
-		Solvable Sub-Class of Non-Linear measurement Models
-	Conclusions
+			Pseudocode
+		Solvable Sub-Class of Non-Linear Measurement Models
+		Security Analysis
+		Simulation
+	Conclusions on Confidential Distributed Non-Linear Measurement Fusion
 
-Provable Estimation performances
-	Single-Sensor Problem Formulation
+Provable Estimation Performances
+	Problem Formulation
 		Formal Cryptographic Problem
 		Estimation Problem
-	Related Literature
-	Privileges Estimation for linear Systems
+		Multi-sensor Problem
+	Privileged Estimation for Linear Systems
 		Gaussian Keystream
-		Additional Gaussian Noise
+		Measurement Modification
 		Multiple Privileges
-		Scheme Security
-			Single Privileged Case
-			Proof Sketch
-			Multiple Additional Noises
-		Simulation and Results
-		Extension to Non-Linear Systems
-	Multi-sensor Problem Formulation
-		..
-		Fusion in Privielged Estimation Environments
-			Noise Generation
-			Measurement Modification
-			Noise Distribution
-		Cryptographic Bounds
+		Security Analysis
+			Single Privilege
+				Proof Sketch
+			Multiple Privileges
+			Non-Linear Systems
+		Simulation
+	Privileged Fusion for Linear Systems
+		Noise Generation
+		Measurement Modification
+		Noise Distribution
+		Security Analysis
 			Performance Loss Lower Bound (PLLB)
 			Performance Gain Upper Bound (PGUB)
+			Non-Linear Systems
 		Simulation
-	Conclusions
+	Conclusions on Provable Estimation Performances
+
 Conclusion
 
-
+Appendix
 
 
 
