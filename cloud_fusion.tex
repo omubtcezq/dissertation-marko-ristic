@@ -14,6 +14,7 @@
 %                                              
 %                                              
 % 
+
 \section{Problem Formulation}
 %Our paper is motivated by a key step in multi-sensor fusion, the requirement of transmitting local sensor state estimates and covariance information over a network for the computation of their fused result. In particular, we consider centralized FCI fusion, where a party responsible for many networked sensors capable of computing their local state estimates, wishes to have their fused state estimate and covariance computed securely on an untrusted cloud. The same party may query the cloud fusion centre for the fused result at any time. To preserve the privacy of local sensor measurements and state estimates, we aim to provide a secure FCI algorithm such that the fusion centre does not learn individual sensor measurements, state estimates, or covariances. This will be achieved by encrypted homomorphic fusion, whereby the untrusted cloud learns only the FCI aggregation weights, which will be shown in section [sec:secfci].
 
@@ -29,7 +30,7 @@ respectively, at every timestep $k$. Our aim at every timestep is for all estima
 \end{equation}
 respectively, are computed and are consistent with the estimates in \eqref{eqn:ests_and_covs}.
 
-Simultaneously, we consider the desired security of the fusion process. The fusing cloud and estimators are treated as \textit{honest-but-curious}, that is, they follow protocols correctly but may use learned information for malicious gain, and a trusted third party exists that can query the cloud at any timestep $k$ to obtain the fusion results in \eqref{eqn:fus_ests_and_covs}. We aim for the cloud, estimators and eavesdroppers to learn no additional information from observed estimates and fusions, \eqref{eqn:ests_and_covs} and \eqref{eqn:fus_ests_and_covs}, respectively, beyond their local estimates. To guarantee this, cryptographic \textit{Indistinguishability under the Chosen Plaintext Attack} (IND-CPA) [katzIntroductionModernCryptography2008] is desired for all transmitted and processed information. This is in line with common security goals in the field and is suitable for homomorphic encryption. The communications of this scenario are summarised graphically in figure \ref{fig:layout}.
+Simultaneously, we consider the desired security of the fusion process. The fusing cloud and estimators are treated as \textit{honest-but-curious}, that is, they follow protocols correctly but may use learned information for malicious gain, and a trusted third party exists that can query the cloud at any timestep $k$ to obtain the fusion results in \eqref{eqn:fus_ests_and_covs}. We aim for the cloud, estimators and eavesdroppers to learn no additional information from observed estimates and fusions, \eqref{eqn:ests_and_covs} and \eqref{eqn:fus_ests_and_covs}, respectively, beyond their local estimates. To guarantee this, cryptographic \textit{Indistinguishability under the Chosen Plaintext Attack} (IND-CPA) [katzIntroductionModernCryptography2008] is desired for all transmitted and processed information. This is in line with common security goals in the field and is suitable for homomorphic encryption. The communications of this scenario are summarised graphically in figure [fig:layout].
 
 \begin{figure}[t]
     \centering
@@ -69,21 +70,6 @@ Simultaneously, we consider the desired security of the fusion process. The fusi
 \end{figure}
 
 % 
-% 888      8888888 88888888888 
-% 888        888       888     
-% 888        888       888     
-% 888        888       888     
-% 888        888       888     
-% 888        888       888     
-% 888        888       888     
-% 88888888 8888888     888     
-%                              
-%                              
-%                              
-% 
-\section{Related Literature}
-
-% 
 % 8888888888 888     888  .d8888b. 8888888 .d88888b.  888b    888      888      
 % 888        888     888 d88P  Y88b  888  d88P" "Y88b 8888b   888      888      
 % 888        888     888 Y88b.       888  888     888 88888b  888      888      
@@ -96,18 +82,32 @@ Simultaneously, we consider the desired security of the fusion process. The fusi
 %                                                                               
 %                                                                               
 % 
+
 \section{Confidential Cloud Fusion Leaking Fusion Weights}
 
 % 
-%  #######           ######  ######## ##    ## 
-% ##     ##         ##    ## ##       ###   ## 
-%        ##         ##       ##       ####  ## 
-%  #######  #######  ######  ######   ## ## ## 
-% ##                      ## ##       ##  #### 
-% ##                ##    ## ##       ##   ### 
-% #########          ######  ######## ##    ## 
+%  ######  ########  ######     ########  ######  #### 
+% ##    ## ##       ##    ##    ##       ##    ##  ##  
+% ##       ##       ##          ##       ##        ##  
+%  ######  ######   ##          ######   ##        ##  
+%       ## ##       ##          ##       ##        ##  
+% ##    ## ##       ##    ##    ##       ##    ##  ##  
+%  ######  ########  ######     ##        ######  #### 
 % 
-\subsection{Two-sensor Secure Fast Covariance Intersection} \label{sec:secfci}
+
+\subsection{Secure Fast Covariance Intersection}
+
+% 
+% ..#######...........######..########.##....##
+% .##.....##.........##....##.##.......###...##
+% ........##.........##.......##.......####..##
+% ..#######..#######..######..######...##.##.##
+% .##......................##.##.......##..####
+% .##................##....##.##.......##...###
+% .#########..........######..########.##....##
+% 
+
+\subsubsection{Two-sensor Case} \label{sec:secfci}
 In this section, we will introduce the Secure FCI (SecFCI) fusion algorithm for the two-sensor case, before extending it to the $n$ sensor case in section [sec:multi\_secfci]. The network model we consider is described in section [subsec:problem\_formulation], where sensors are capable of running local estimators, as well as the PHE and ORE encryption schemes from section [sec:encryption]. Each sensor $i$ computes its state estimate $\mean{\vec{x}}_i$ and covariance matrix $\mP_i$ and sends relevant encrypted information to an untrusted cloud fusion center. The querying party is the key holding party and generates the PHE public key $pk$, secret key $sk$, and ORE symmetric key $k$. $pk$ is made available to all parties in the network, and $k$ is made available to the sensors only, via any standard public-key scheme such as RSA [rivestMethodObtainingDigital1978]. When encrypting with ORE key $k$, individual sensors are limited to using only $L$ or $R$ ORE encryption to reduce local information leakage. Thus, consecutive ORE encryptions from any sensor cannot be used to infer local information directly, and can only be compared to encryptions from sensors using the alternate ORE encryption.
 
 From [eqn:ci\_cov\_estimate], we can see that both CI fusion equations can be computed on PHE encryptions of sensor information vectors and information matrices, given valid unencrypted values for each $\omega_i$. For this reason, we allow the leakage of all weights $\omega_i$. Thus, in the two-sensor case, homomorphic fusion is computed by
@@ -155,15 +155,16 @@ In the case a comparison returns equality, the exact value of $\omega^{(x)}$ can
 The fusion center can then use its values for $\omega_1$ and $\omega_2 = 1-\omega_1$ and the received PHE encryptions of local information vectors and information matrices to compute \eqref{eqn:paillier_ci_cov} and \eqref{eqn:paillier_ci_estimate}.
 
 % 
-% ##    ##          ######  ######## ##    ## 
-% ###   ##         ##    ## ##       ###   ## 
-% ####  ##         ##       ##       ####  ## 
-% ## ## ## #######  ######  ######   ## ## ## 
-% ##  ####               ## ##       ##  #### 
-% ##   ###         ##    ## ##       ##   ### 
-% ##    ##          ######  ######## ##    ## 
+% .##....##..........######..########.##....##
+% .###...##.........##....##.##.......###...##
+% .####..##.........##.......##.......####..##
+% .##.##.##.#######..######..######...##.##.##
+% .##..####...............##.##.......##..####
+% .##...###.........##....##.##.......##...###
+% .##....##..........######..########.##....##
 % 
-\subsection{Multi-sensor Secure Fast Covariance Intersection} \label{sec:multi_secfci}
+
+\subsubsection{Multi-sensor Case} \label{sec:multi_secfci}
 When computing the SecFCI fusion for $n$ sensors, we solve \eqref{eqn:ci_cov_estimate} homomorphically by computing
 \begin{equation}
    \mathcal{E}(\mP^{-1}) = \mathcal{E}(\mP^{-1}_1)^{\omega_1}\cdots\mathcal{E}(\mP^{-1}_n)^{\omega_n} \label{eqn:n_sen_paillier_ci_cov}
@@ -290,6 +291,7 @@ Briefly considering the security of our scheme, we note that any leaked informat
 % ##    ## ##     ## ##     ## ##        
 %  ######   #######  ##     ## ##        
 % 
+
 \subsection{Computational Complexity} \label{subsec:complexity}
 Given the state estimates and estimate errors at each sensor, we wish to show the computational complexity of the SecFCI algorithm for the $n$ sensor case. We will assume that both Lewi ORE and Paillier PHE schemes use the same length security parameter (and equivalently key size), such that $\lambda_{Lewi} = \lambda_{Paillier} = \log{N}$, where $\lambda_{s}$ represents encryption scheme $s$'s security parameter, and $N$ the Paillier modulus and encryptable integer limit. We also note the distinction between floating-point or small integer operations, which are typically treated as having $O(1)$ runtime, and large integer operations whose complexities are dependent on bit length. While architectures exist for speeding up encryption operations [gueronIntelAdvancedEncryption2010], we consider software implementations and treat large integer operations in terms of bit operations explicitly.
 
@@ -330,6 +332,18 @@ Finally, applying the operations from Table \ref{tab:complex_ops} to the SecFCI 
 \end{table}
 
 % 
+%  ######  ########  ######  
+% ##    ## ##       ##    ## 
+% ##       ##       ##       
+%  ######  ######   ##       
+%       ## ##       ##       
+% ##    ## ##       ##    ## 
+%  ######  ########  ######  
+% 
+
+\subsection{Security Analysis}
+
+% 
 %  ######  #### ##     ## 
 % ##    ##  ##  ###   ### 
 % ##        ##  #### #### 
@@ -338,7 +352,8 @@ Finally, applying the operations from Table \ref{tab:complex_ops} to the SecFCI 
 % ##    ##  ##  ##     ## 
 %  ######  #### ##     ## 
 % 
-\subsection{Simulation Results} \label{sec:results}
+
+\subsection{Simulation} \label{sec:results}
 We have implemented a simulation to demonstrate the accuracy of SecFCI approximating FCI. Three sensors independently measure a constant-speed linear process and simultaneously run a Kalman filter on their measurements. Estimates are sent both encrypted and unencrypted to a fusion centre that computes the SecFCI and FCI fusions on the received data respectively. Encrypted estimates are comprised of PHE encryptions of the information vector and information matrix, $\mathcal{E}(\mP^{-1}_i\mean{\vec{x}}_i)$ and $\mathcal{E}(\mP^{-1}_i)$, in addition to the ORE list given by \eqref{eqn:sensor_lists} with discretization step $s=0.1$. Unencrypted estimates consist of the state estimate $\mean{\vec{x}}_i$ and covariance $\mP_i$. The trajectory and fused estimates are shown in Fig. \ref{fig:fci_secfci_traj}.
 \begin{figure}[tb]
    \begin{center}
@@ -382,7 +397,8 @@ Finally, components of $\omega_{i,SecFCI}$, $\omega_{i,FCI}$ and the errors $|\v
 %                                                                                           
 %                                                                                           
 % 
-\section{Confidential Cloud Fusion Without Leakage}
+
+\section{Confidential Cloud Fusion Without Leaking Fusion Weights}
 
 With the problem and preliminaries introduced, we can now present our encrypted FCI method that leaks no estimator information to the fusing cloud. The core idea behind the method is to postpone the evaluation of operations that cannot be performed homomorphically until partial results are queried and decrypted by the key-holding third party. The remaining operations can then be evaluated on unencrypted inputs to produce the correct results.
 
@@ -473,7 +489,8 @@ combine information from individual estimators $i$ and are computable homomorphi
 % ##    ## ##     ## ##     ## ##        
 %  ######   #######  ##     ## ##        
 % 
-\subsection{Complexity}\label{sec:complexity}
+
+\subsection{Computational Complexity}\label{sec:complexity}
 The method described provides a level of security when relying on an untrusted cloud for fusing estimates. However, the added reliance on an encryption scheme and the additional computations at the third party intuitively increase the computational complexity of the algorithm and the required capabilities of participating parties. Here, we present the complexity of operations during fusion, required by each party at every timestep $k$. We assume encoding and decoding operations have complexity $O(1)$ (due to their comparative insignificance when compared to associated encryption and decryption operations) and use \cite{paillierPublicKeyCryptosystemsBased1999} to obtain the encryption complexities of the Paillier encryption scheme in table \ref{tab:enc_cmplx}, with security parameter $\lambda = \log{N}$.
 \begin{table}[tb]
     \centering
@@ -506,6 +523,16 @@ In table \ref{tab:fus_cmplx}, we compare the complexities of the unencrypted FCI
     \end{tabular}
  \end{table}
 It can be seen that the burden of computation is greatly increased at the estimators and the third party, in particular when dimension $n$ is large and when a long encryption key $N$ is used. Naturally, an application of the proposed method would need to consider these requirements in terms of computation time and required hardware.
+
+% 
+%  ######  ########  ######  
+% ##    ## ##       ##    ## 
+% ##       ##       ##       
+%  ######  ######   ##       
+%       ## ##       ##       
+% ##    ## ##       ##    ## 
+%  ######  ########  ######  
+% 
 
 \subsection{Security Analysis}\label{subsec:security}
 The provable security of the presented method is relatively straightforward. Our aim for IND-CPA security of all information received by the cloud, sent by the estimators or observable by eavesdroppers is achieved by the homomorphic Paillier encryption scheme. Since all transmitted information is encrypted and the cloud, estimators and eavesdroppers do not hold the secret key $\mathsf{sk}$, IND-CPA is met at all parties.
@@ -587,11 +614,6 @@ The fusion results of $1000$ simulation runs are shown in figure \ref{fig:sim_er
 \end{figure}
 From the figure, we can see the expected similarity in performance between the encrypted and unencrypted FCI methods. Additionally, we note that the current recommended key length for the Paillier encryption scheme is $2048$ bits [barkerRecommendationPairWiseKey2019], easily supporting a modulus $N$ and fractional precision $\phi$ that guarantee similar performance.
 
-
-
-
-
-
 % 
 %  .d8888b.   .d88888b.  888b    888  .d8888b.  
 % d88P  Y88b d88P" "Y88b 8888b   888 d88P  Y88b 
@@ -605,7 +627,8 @@ From the figure, we can see the expected similarity in performance between the e
 %                                               
 %                                               
 % 
-\section{Conclusions}
+
+\section{Conclusions on Confidential Estimate Fusion}
 
 %FCI is a commonly used, and efficiently computable, approximation to the CI optimization problem that requires the sharing of local sensor estimates to compute their fusion. We propose a secure approximation to FCI, SecFCI, to compute the fused estimate homomorphically. The novel encrypted fusion approach may find uses in various security-critical applications or over untrusted networks subject to eavesdroppers and malicious participants. Possible future work includes run-time comparisons with FHE implementations, giving a computational bound for its practicality, and quantification of fusion weight leakages via formal security proofs.
 

@@ -1,6 +1,6 @@
 
-\chapter{Preliminaries}
-When introducing the novel estimation and cryptographic methods in this thesis, we make use of several existing algorithms. In this section, an overview of these methods is given
+\chapter{Preliminaries}\label{ch:prelims}
+When introducing novel methods throughout this thesis, we make use of several existing algorithms and constructs. In this chapter, we present these relevant preliminaries grouped by the fields they pertain to; estimation and cryptography.
 
 % 
 % 8888888888 .d8888b. 88888888888      8888888b.  8888888b.  8888888888 888      8888888 888b     d888 
@@ -15,8 +15,9 @@ When introducing the novel estimation and cryptographic methods in this thesis, 
 %                                                                                                      
 %                                                                                                      
 % 
-\section{Estimation Preliminaries}
-As introduced in section .., the estimation and fusion algorithms considered are Bayesian and based on the Kalman filter and derivatives. The linear KF and linearising EKF are used explicitly and are the focus of the presented preliminaries.
+
+\section{Estimation Preliminaries}\label{sec:prelims:est_prelims}
+Sensor and estimate data that we consider is primarily Bayesian in nature and typically consists of estimates and associated estimate uncertainties. The linear Kalman filter (KF) and the linearising extended Kalman filter (EKF), along with their information filter equivalents, are particularly useful in the estimation and fusion of such data. A general fusion algorithm, the covariance intersection (CI), used when data cross-correlations are unknown, is also introduced.
 
 % 
 % ##    ## ######## 
@@ -27,7 +28,8 @@ As introduced in section .., the estimation and fusion algorithms considered are
 % ##   ##  ##       
 % ##    ## ##       
 % 
-\subsection{Kalman Filter}
+
+\subsection{Kalman Filter}\label{subsec:prelims:kf}
 
 % 
 % ##    ## ########     #######  ########  ######## 
@@ -38,6 +40,7 @@ As introduced in section .., the estimation and fusion algorithms considered are
 % ##   ##  ##          ##     ## ##           ##    
 % ##    ## ##           #######  ##           ##    
 % 
+
 \subsection{Kalman Filter Optimality}
 
 % 
@@ -49,6 +52,7 @@ As introduced in section .., the estimation and fusion algorithms considered are
 % ##       ##   ##  ##       
 % ######## ##    ## ##       
 % 
+
 \subsection{Extended Kalman Filter}
 
 % 
@@ -60,6 +64,7 @@ As introduced in section .., the estimation and fusion algorithms considered are
 %  ##  ##       
 % #### ##       
 % 
+
 \subsection{Information Filter}
 
 % 
@@ -71,6 +76,7 @@ As introduced in section .., the estimation and fusion algorithms considered are
 % ##        ##  ##       
 % ######## #### ##       
 % 
+
 \subsection{Extended Information Filter}
 
 % 
@@ -82,6 +88,7 @@ As introduced in section .., the estimation and fusion algorithms considered are
 % ##       ##    ##  ##  
 % ##        ######  #### 
 % 
+
 \subsection{Fast Covariance Intersection}
 Covariance Intersection (CI), introduced in [julierNondivergentEstimationAlgorithm1997], provides a consistent state estimate fusion algorithm when cross-correlations are not known. The resulting fused estimate $\mean{\vec{x}}$ and covariance $\mP$ can be easily derived from its equations
 \begin{equation}
@@ -151,6 +158,7 @@ Our proposed filter aims to solve FCI fusion, namely \eqref{eqn:ci_cov_estimate}
 %                                                                                                      
 %                                                                                                      
 % 
+
 \section{Encryption Preliminaries}
 Used cryptographic notions and schemes are summarised here. In addition, the encoding of floating point numbers to integers suitable for encryption by the presented schemes is introduced as well.
 
@@ -163,6 +171,7 @@ Used cryptographic notions and schemes are summarised here. In addition, the enc
 % ##   ### ##     ##    ##     ##  ##     ## ##   ### ##    ## 
 % ##    ##  #######     ##    ####  #######  ##    ##  ######  
 % 
+
 \subsection{Meeting Cryptographic Notions}
 
 % 
@@ -174,6 +183,7 @@ Used cryptographic notions and schemes are summarised here. In addition, the enc
 % ##        ##     ## ##       
 % ##        ##     ## ######## 
 % 
+
 \subsection{Paillier Homomorphic Encryption Scheme}
 The Paillier encryption scheme [paillierPublicKeyCryptosystemsBased1999] is an additively homomorphic encryption scheme that bases its security on the decisional composite residuosity assumption (DCRA) and meets the security notion of IND-CPA. Key generation of the Paillier scheme is performed by choosing two sufficiently large primes $p$ and $q$, and computing $N=pq$. A generator $g$ is also required for encryption, which is often set to $g=N+1$ when $p$ and $q$ are of equal bit length [katzIntroductionModernCryptography2008]. The public key is defined by $(N, g)$ and the secret key by $(p, q)$.
 
@@ -203,6 +213,7 @@ In addition to encryption and decryption, the following homomorphic functions ar
 % ##     ## ##    ##  ##    ##  
 % ##     ##  ######    ######   
 % 
+
 \subsection{Joye-Libert Aggregation Scheme}
 The Joye-Libert privacy-preserving aggregation scheme [joyeScalableSchemePrivacyPreserving2013] is a scheme defined on time-series data and meets the security notion of Aggregator Obliviousness (AO) [shiPrivacyPreservingAggregationTimeSeries2011]. Similarly to the Paillier scheme, it bases its security on the DCRA. A notable difference to a public-key encryption scheme is its need for a trusted party to perform the initial key generation and distribution.
 
@@ -246,6 +257,7 @@ removing all noise terms.
 % ##     ## ##    ##  ##     ## ##       ##    ##  
 %  #######  ##     ## ########  ######## ##     ## 
 % 
+
 \subsection{Lewi Order-Revealing Encryption Scheme}
 For ORE, we use the Lewi symmetric-key Left-Right ORE scheme as it has the added property of only allowing certain comparisons between cyphertexts. This property can be used to decide which values may not be compared, which will be shown in the section ... It is described as follows: two encryption functions allow integers to be encrypted as either a ``Left'' ($L$) or ``Right'' ($R$) encryption by
 \begin{equation}
@@ -269,6 +281,7 @@ Note that no decryption function is provided as only encryptions are required to
 % ##       ##   ### ##    ## 
 % ######## ##    ##  ######  
 % 
+
 \subsection{Encoding Numbers for Encryption}
 In both the Paillier and Joye-Libert schemes, as well as the one we introduce, meaningful inputs $a$ are bounded to $a \in \mathbb{Z}_N$. For this reason, real-valued estimation variables require quantisation and integer mapping for encryption and aggregation. We will rely on a generalised Q number encoding [oberstarFixedPointRepresentationFractional2007] due to implementation simplicity and applicability.
 

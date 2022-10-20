@@ -1,6 +1,19 @@
 
 \chapter{Distributed Non-Linear Measurement Fusion with Untrusted Participants}
 
+% 
+% 8888888b.  8888888b.   .d88888b.  888888b.   
+% 888   Y88b 888   Y88b d88P" "Y88b 888  "88b  
+% 888    888 888    888 888     888 888  .88P  
+% 888   d88P 888   d88P 888     888 8888888K.  
+% 8888888P"  8888888P"  888     888 888  "Y88b 
+% 888        888 T88b   888     888 888    888 
+% 888        888  T88b  Y88b. .d88P 888   d88P 
+% 888        888   T88b  "Y88888P"  8888888P"  
+%                                              
+%                                              
+%                                              
+% 
 
 \section{Problem Formulation}
 In this work, we consider the context of privacy-preserving range sensor navigation, where we want no sensor to learn any information about the navigator or other sensors beyond their local measurements, and the navigator not to learn any information about individual sensors beyond its location estimate. The problem is two-fold, in that we require explicit cryptographic requirements with a suitable encryption scheme meeting them as well as an estimation scheme that can use the encryption in the context of range-only navigation.
@@ -16,6 +29,7 @@ To give a formal cryptographic requirement in a distributed setting, we must fir
 % ##    ## ##    ##     ##    ##           ##    ##     ##    ##        ##    ##  ##     ## ##     ## 
 %  ######  ##     ##    ##    ##           ##     #######     ##        ##     ##  #######  ########  
 % 
+
 \subsection{Formal Cryptographic Problem} \label{subsec:crypto_problem}
 The communication between the navigator and sensors in our estimation problem will be decomposed into a simple two-step bi-directional protocol that will simplify defining formal security. In section \ref{sec:priv_localisation}, we will show how this protocol is sufficient to compute the location estimate at a navigator while meeting our desired privacy goals. The communication protocol is as follows.
 
@@ -109,6 +123,7 @@ While indistinguishable weights can be achieved by encrypting weights with an en
 % ##       ##    ##    ##       ##        ##    ##  ##     ## ##     ## 
 % ########  ######     ##       ##        ##     ##  #######  ########  
 % 
+
 \subsection{Estimation problem} \label{subsec:est_problem}
 The estimation problem we consider, for which we will reformulate communication to the protocol above, is localisation with range-only sensors. In this work, we will focus on the two-dimensional case for simplicity but will derive methods suitable for extension to a three-dimensional equivalent. The state that we wish to estimate must capture the navigator position, $x$ and $y$, and may contain any other components relevant to the system. It is of the form
 \begin{equation}
@@ -148,34 +163,30 @@ is the location of sensor $i$.
 We aim to provide a filter that estimates the navigator's state $\vec{x}_k$, at every timestep $k$, without learning sensor positions $\vec{s}_i$, measurements $z_{k,i}$ and measurement variances $r_{k,i}$ beyond the information in the corresponding aggregation leakage function. Similarly, sensors should not learn any information about current state estimates or any other sensor information. Leakage will be further discussed in section \ref{subsec:leakage}, but we note that from any sequential state estimates, following known models, some sensor information leakage can be computed by the navigator. In the context of our leakage function, we will show that this corresponds to the global sums of private sensor information, while individual, or subsets of sensors', information remains private. Similarly, corrupted sensors with access to one or more measurements can produce state estimates of their own, leaking information about navigator state estimates, however, the most accurate estimates, requiring all measurements, will always remain private to the navigator.
 
 % 
-% 888      8888888 88888888888 
-% 888        888       888     
-% 888        888       888     
-% 888        888       888     
-% 888        888       888     
-% 888        888       888     
-% 888        888       888     
-% 88888888 8888888     888     
-%                              
-%                              
-%                              
+% 8888888b.  888b    888  .d8888b.       888      .d88888b.   .d8888b.  
+% 888   Y88b 8888b   888 d88P  Y88b      888     d88P" "Y88b d88P  Y88b 
+% 888    888 88888b  888 888    888      888     888     888 888    888 
+% 888   d88P 888Y88b 888 888             888     888     888 888        
+% 8888888P"  888 Y88b888 888  88888      888     888     888 888        
+% 888 T88b   888  Y88888 888    888      888     888     888 888    888 
+% 888  T88b  888   Y8888 Y88b  d88P      888     Y88b. .d88P Y88b  d88P 
+% 888   T88b 888    Y888  "Y8888P88      88888888 "Y88888P"   "Y8888P"  
+%                                                                       
+%                                                                       
+%                                                                       
 % 
-\section{Related Literature}
+
+\section{Confidential Range-Only Localisation}
 
 % 
-% 8888888b.         .d88888b.  888b    888 888    Y88b   d88P      888      .d88888b.   .d8888b.  
-% 888   Y88b       d88P" "Y88b 8888b   888 888     Y88b d88P       888     d88P" "Y88b d88P  Y88b 
-% 888    888       888     888 88888b  888 888      Y88o88P        888     888     888 888    888 
-% 888   d88P       888     888 888Y88b 888 888       Y888P         888     888     888 888        
-% 8888888P"        888     888 888 Y88b888 888        888          888     888     888 888        
-% 888 T88b  888888 888     888 888  Y88888 888        888          888     888     888 888    888 
-% 888  T88b        Y88b. .d88P 888   Y8888 888        888          888     Y88b. .d88P Y88b  d88P 
-% 888   T88b        "Y88888P"  888    Y888 88888888   888          88888888 "Y88888P"   "Y8888P"  
-%                                                                                                 
-%                                                                                                 
-%                                                                                                 
+% ##        ######     ###        ######   ######  ##     ## ######## ##     ## ######## 
+% ##       ##    ##   ## ##      ##    ## ##    ## ##     ## ##       ###   ### ##       
+% ##       ##        ##   ##     ##       ##       ##     ## ##       #### #### ##       
+% ##       ##       ##     ##     ######  ##       ######### ######   ## ### ## ######   
+% ##       ##       #########          ## ##       ##     ## ##       ##     ## ##       
+% ##       ##    ## ##     ##    ##    ## ##    ## ##     ## ##       ##     ## ##       
+% ########  ######  ##     ##     ######   ######  ##     ## ######## ##     ## ######## 
 % 
-\section{Confidential Range-Only Localisation}
 
 \subsection{Private Linear Combination Aggregation Scheme} \label{sec:lcao_scheme}
 In this section, we introduce an encryption scheme meeting the desired security properties in section \ref{subsec:crypto_problem}. The scheme is a combination of the Paillier and Joye-Libert schemes and provides encrypted weights meeting IND-CPA and encrypted aggregation meeting the notion of LCAO defined in section~\ref{subsec:crypto_problem}. Similarly to its constituents, the scheme bases its security on the DCRA and, as with the Joye-Libert scheme, requires a trusted party for initial key generation and distribution. 
@@ -253,6 +264,7 @@ The security proof of this scheme must both show that encrypted weights meet IND
 % ##        ##    ##   ##    ## ##      ##       ##     ## ##    ## 
 % ##        ##     ## ####    ###       ########  #######   ######  
 % 
+
 \subsection{Privacy-Preserving Localisation} \label{sec:priv_localisation}
 With a concrete scheme meeting the LCAO notion, we can now put forward a localisation filter with communication that can be reformulated to the required protocol. To produce an estimate of the state $\vec{x}_k$, we make use of an algebraic reformulation of the Extended Kalman Filter (EKF), the Extended Information Filter (EIF) [maybeckStochasticModelsEstimation1982], which reduces the filter update step to a single summation. The EIF update step requires the predicted state estimate $\hat{\vec{x}}_{k|k-1}$ and estimate covariance $\mat{P}_{k|k-1}$ in the information vector and matrix forms
 \begin{equation}
@@ -286,13 +298,13 @@ and the measurement matrix
 namely, their measurements $z_{k,i}$, measurement variances $r_{k,i}$ and locations $\vec{s}_i$; captured in measurement functions $h_i$ and Jacobians $\mat{H}_{k,i}$. To compute $\vec{i}_{k,i}$ and $\mat{I}_{k,i}$, however, the current predicted state estimate $\hat{\vec{x}}_{k|k-1}$ is also required (in $h_i$ and $\mat{H}_{k,i}$). Therefore, our goal is to rearrange \eqref{eqn:measurement_vec} and \eqref{eqn:measurement_mat} as a linear combination of functions of $\hat{\vec{x}}_{k|k-1}$ (the navigator weights) computable at each sensor $i$, to be subsequently aggregated at the navigator. Application of the linear combination aggregation scheme proposed in turn guarantees that sensors do not learn the navigator state, and the navigator learns only the aggregation required for updating its state estimate in \eqref{eqn:eif_info_vec_update} and \eqref{eqn:eif_info_mat_update}.
 
 % 
-% ########     ###    ##    ##  ######   ########    ##     ##  #######  ########  
-% ##     ##   ## ##   ###   ## ##    ##  ##          ###   ### ##     ## ##     ## 
-% ##     ##  ##   ##  ####  ## ##        ##          #### #### ##     ## ##     ## 
-% ########  ##     ## ## ## ## ##   #### ######      ## ### ## ##     ## ##     ## 
-% ##   ##   ######### ##  #### ##    ##  ##          ##     ## ##     ## ##     ## 
-% ##    ##  ##     ## ##   ### ##    ##  ##          ##     ## ##     ## ##     ## 
-% ##     ## ##     ## ##    ##  ######   ########    ##     ##  #######  ########  
+% .########.....###....##....##..######...########....##.....##..#######..########.
+% .##.....##...##.##...###...##.##....##..##..........###...###.##.....##.##.....##
+% .##.....##..##...##..####..##.##........##..........####.####.##.....##.##.....##
+% .########..##.....##.##.##.##.##...####.######......##.###.##.##.....##.##.....##
+% .##...##...#########.##..####.##....##..##..........##.....##.##.....##.##.....##
+% .##....##..##.....##.##...###.##....##..##..........##.....##.##.....##.##.....##
+% .##.....##.##.....##.##....##..######...########....##.....##..#######..########.
 % 
 
 \subsubsection{Range Measurement Modification} \label{subsec:range_measurement_mod}
@@ -369,13 +381,13 @@ at each sensor $i$.
 The modified measurement model \eqref{eqn:modified_measurement_model} can now be used for localisation, when measurements are modified by \eqref{eqn:modified_measurement} and their new variance estimated with \eqref{eqn:modified_measurement_variance_estimate}.
 
 % 
-% ##        #######   ######  
-% ##       ##     ## ##    ## 
-% ##       ##     ## ##       
-% ##       ##     ## ##       
-% ##       ##     ## ##       
-% ##       ##     ## ##    ## 
-% ########  #######   ######  
+% .##........#######...######.
+% .##.......##.....##.##....##
+% .##.......##.....##.##......
+% .##.......##.....##.##......
+% .##.......##.....##.##......
+% .##.......##.....##.##....##
+% .########..#######...######.
 % 
 
 \subsubsection{Localisation} \label{subsec:localisation}
@@ -456,13 +468,13 @@ respectively.
 \end{remark}
 
 % 
-%    ###    ##        ######   
-%   ## ##   ##       ##    ##  
-%  ##   ##  ##       ##        
-% ##     ## ##       ##   #### 
-% ######### ##       ##    ##  
-% ##     ## ##       ##    ##  
-% ##     ## ########  ######   
+% ....###....##........######..
+% ...##.##...##.......##....##.
+% ..##...##..##.......##.......
+% .##.....##.##.......##...####
+% .#########.##.......##....##.
+% .##.....##.##.......##....##.
+% .##.....##.########..######..
 % 
 
 \subsubsection{Pseudocode} \label{subsec:pseudocode}
@@ -633,16 +645,28 @@ Algorithms \ref{alg:nav_prediction}, \ref{alg:measurement_info} and \ref{alg:nav
 \end{figure}
 
 % 
-% ##       ########    ###    ##    ##    ###     ######   ######## 
-% ##       ##         ## ##   ##   ##    ## ##   ##    ##  ##       
-% ##       ##        ##   ##  ##  ##    ##   ##  ##        ##       
-% ##       ######   ##     ## #####    ##     ## ##   #### ######   
-% ##       ##       ######### ##  ##   ######### ##    ##  ##       
-% ##       ##       ##     ## ##   ##  ##     ## ##    ##  ##       
-% ######## ######## ##     ## ##    ## ##     ##  ######   ######## 
+%  ######      ######  ##          ###     ######   ######  
+% ##    ##    ##    ## ##         ## ##   ##    ## ##    ## 
+% ##          ##       ##        ##   ##  ##       ##       
+%  ######     ##       ##       ##     ##  ######   ######  
+%       ##    ##       ##       #########       ##       ## 
+% ##    ##    ##    ## ##       ##     ## ##    ## ##    ## 
+%  ######      ######  ######## ##     ##  ######   ######  
 % 
 
-\subsubsection{Leakage} \label{subsec:leakage}
+\subsection{Solvable Sub-Class of Non-Linear Measurement Models}
+
+% 
+%  ######  ########  ######  
+% ##    ## ##       ##    ## 
+% ##       ##       ##       
+%  ######  ######   ##       
+%       ## ##       ##       
+% ##    ## ##       ##    ## 
+%  ######  ########  ######  
+% 
+
+\subsection{Security Analysis} \label{subsec:leakage}
 With the privacy-preserving EIF defined in the previous section, we can now interpret the aggregation leakage of an LCAO scheme in the context of range sensor localisation. The leakage function from the $\mathsf{AggDec}$ algorithm corresponds to the information vector and matrix sums, $\sum_{i=1}^n\vec{i}'_{k,i}$ and $\sum_{i=1}^n\mat{I}'_{k,i}$, respectively. However, recalling that a compromised navigator can learn the individual sums weighted by the same weight, $\{\sum_{i=1}^n2r^{-1}_{k,i},\ \sum_{i=1}^n-r^{-1}_{k,i}s_{x,i},\ \sum_{i=1}^n-2r^{-1}_{k,i}s_{x,i},\ \dots\}$ can be leaked as well. From this leakage, we can see that private sensor information, $z'_{k,i}$, $r'_{k,i}$ and $\vec{s}_i$, is present only in their complete sums
 \begin{equation}
     \sum_{i=1}^nz'_{k,i}\,,\ \sum_{i=1}^nr'_{k,i}\,,\ \sum_{i=1}^ns_{x,i}\ \textrm{and}\ \sum_{i=1}^ns_{y,i}\,,\label{eqn:localisation_leakage}
@@ -658,7 +682,8 @@ which in practice correspond to their averages. Therefore, in the context of our
 % ##    ##  ##  ##     ## 
 %  ######  #### ##     ## 
 % 
-\subsection{Simulation and Results} \label{sec:sim_and_results}
+
+\subsection{Simulation} \label{sec:sim_and_results}
 As well as having shown the theoretical backing for the security of our scheme, we have simulated the proposed localisation method to evaluate its performance. A two-dimensional, linear, constant velocity process model,
 \begin{equation*}
     \vec{x}_{k} = 
@@ -707,22 +732,6 @@ In addition to filter error, computational performance is important to consider 
 \end{figure}
 We can see that the predominant computational costs stem from cryptographic computations and are directly dependent on the chosen key size. In practice, choosing a key size should take into account the duration of secrecy and the secret key lifetime. When relying on the DCRA for security, the current recommendation for encrypting government documents is the use of $2048$ bit length keys [barkerRecommendationPairwiseKey2019]. For our implementation and aforementioned hardware, this results in a filter update roughly every $1.7s$. In a scenario where sensors are mobile and past navigations can be made public, reduced key sizes can be considered, while a further decrease in computation time could be achieved with code optimisations and more powerful hardware.
 
-%\subsection{Unidirectional Alternative}
-% 
-%  .d8888b.        .d8888b.  888             d8888  .d8888b.   .d8888b.  
-% d88P  Y88b      d88P  Y88b 888            d88888 d88P  Y88b d88P  Y88b 
-% Y88b.           888    888 888           d88P888 Y88b.      Y88b.      
-%  "Y888b.        888        888          d88P 888  "Y888b.    "Y888b.   
-%     "Y88b.      888        888         d88P  888     "Y88b.     "Y88b. 
-%       "888      888    888 888        d88P   888       "888       "888 
-% Y88b  d88P      Y88b  d88P 888       d8888888888 Y88b  d88P Y88b  d88P 
-%  "Y8888P"        "Y8888P"  88888888 d88P     888  "Y8888P"   "Y8888P"  
-%                                                                        
-%                                                                        
-%                                                                        
-% 
-\subsection{Solvable Sub-Class of Non-Linear Measurement Models}
-
 % 
 %  .d8888b.   .d88888b.  888b    888  .d8888b.  
 % d88P  Y88b d88P" "Y88b 8888b   888 d88P  Y88b 
@@ -736,5 +745,6 @@ We can see that the predominant computational costs stem from cryptographic comp
 %                                               
 %                                               
 % 
-\section{Conclusions}
+
+\section{Conclusions on Confidential Distributed Non-Linear Measurement Fusion}
 We have presented a localisation filter in the presence of range-only sensors, which preserves both navigator and sensor privacies. A suitable cryptographic scheme has been introduced and a filter implementation compared and evaluated. Privacy-preserving range-only localisation is suitable for use in environments where sensor networks are untrusted or location is considered private and we hope to extend the method to broader measurement models in the future. Additional future work includes exploring more computationally efficient encryption schemes, the security implications of sensors that are not only honest-but-curious and expanding the LCAO notion to enforce the consistent broadcast assumption.

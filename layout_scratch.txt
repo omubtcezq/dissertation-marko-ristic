@@ -6,9 +6,6 @@ Introduction
 		Confidential Distributed Non-Linear Measurmeent Models
 		Provable Estimation Performances
 	Contributions
-		Estimate Fusion on an Untrusted Cloud
-		Distributed Non-Linear Measurement Fusion with Untrusted Participants
-		Provable Estimation Performance
 	Thesis Structure
 
 Preliminaries
