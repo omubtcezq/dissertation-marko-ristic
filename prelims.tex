@@ -30,6 +30,31 @@ Sensor and estimate data that we consider is primarily Bayesian in nature and ty
 % 
 
 \subsection{Kalman Filter}\label{subsec:prelims:kf}
+The Kalman filter [orig kf] is a popular and well studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^n$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{n \times n}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ [kf uses]. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^n$ at each timestep $k$, following the linear process model
+\begin{equation}\label{eq:prelims:lin_gauss_process_model}
+    \vec{x}_k = \mat{F}_k \vec{x}_{k-1} + \vec{w}_k\,,
+\end{equation}
+where $\vec{w}_k \sim \mathcal{N}(\vec{0}, \mat{Q}_k)$ with known covariance $\mat{Q}_k \in \mathbb{R}^{n \times n}$. Similarly, measurements $\vec{z}_k \in \mathbb{R}^m$ are assumed to follow the linear measurement model
+\begin{equation}\label{eq:prelims:lin_gauss_measurement_model}
+    \vec{z}_k = \mat{H}_k \vec{x}_k + \vec{v}_k\,,
+\end{equation}
+where $\vec{v}_k \sim \mathcal{N}(\vec{0}, \mat{R}_k)$ with known covariance $\mat{R}_k \in \mathbb{R}^{m \times m}$. The filter requires initialisation with some known values $\hat{\vec{x}}_{0|0}$ and $\mat{P}_{0|0}$ and is computed recursively in two steps. First, the estimate for the next timestep is predicted without new measurement information, known as the \textit{prediction} step, and is given by
+\begin{equation}\label{eq:prelims:kf_est_predict}
+    \hat{\vec{x}}_{k|k-1} = \mat{F}_k \hat{\vec{x}}_{k-1|k-1}
+\end{equation}
+and
+\begin{equation}\label{eq:prelims:kf_cov_predict}
+    \mat{P}_{k|k-1} = \mat{F}_k \mat{P}_{k-1|k-1} \mat{F}_k^\top + \mat{Q}_k\,.
+\end{equation}
+Next, this prediction is updated with current measurement information, known as the \textit{update} step, and given by
+\begin{equation}\label{eq:prelims:kf_est_update}
+    \hat{\vec{x}}_{k|k} = \hat{\vec{x}}_{k|k-1}+\mat{P}_{k|k-1}\mat{H}_k^\top\left(\mat{H}_k\mat{P}_{k|k-1}\mat{H}_k^\top + \mat{R}_k\right)^{-1}\left(z_k-\mat{H}_k\hat{\vec{x}}_{k|k-1}\right)
+\end{equation}
+and
+\begin{equation}\label{eq:prelims:kf_cov_update}
+    \mat{P}_{k|k} = \mat{P}_{k|k-1}-\mat{P}_{k|k-1}\mat{H}_k^\top\left(\mat{H}_k\mat{P}_{k|k-1}\mat{H}_k^\top + \mat{R}_k\right)^{-1}\mat{H}\mat{P}_{k|k-1}\,.
+\end{equation}
+In addition to alternating prediction and update steps as time progresses, the update step \eqref{eq:prelims:kf_est_update} and \eqref{eq:prelims:kf_cov_update} can be skipped at timesteps when no measurements are available. Similarly, when multiple independent measurements are present at the same timestep, the update step can be repeated for each measurement individually. Detailed derivations of the KF and discussions on its properties can be found in [huag+chap].
 
 % 
 % ##    ## ########     #######  ########  ######## 
@@ -41,7 +66,12 @@ Sensor and estimate data that we consider is primarily Bayesian in nature and ty
 % ##    ## ##           #######  ##           ##    
 % 
 
-\subsection{Kalman Filter Optimality}
+\subsection{Kalman Filter Optimality}\label{subsec:prelims:kf_opt}
+One of the reasons for the ubiquity and popularity of the KF introduced in section \ref{subsec:prelims:kf} is its optimality in terms of mean square error (MSE) [huag+chap]. That is, the estimate's error covariances, defined by the expectation capturing mean square error,
+\begin{equation}
+    \mat{P}_{k|k} = \mathbb{E}\left\{\left(\vec{x}_k - \hat{\vec{x}}_{k|k}\right)\left(\vec{x}_k - \hat{\vec{x}}_{k|k}\right)^\top\right\}\,,
+\end{equation}
+and computed by \eqref{eq:prelims:kf_cov_predict} and \eqref{eq:prelims:kf_cov_update}, can be shown to equal the theoretical lower bound on the covariance of an unbiased estimator when process and measurement models \eqref{eq:prelims:lin_gauss_process_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, respectively, capture the estimated environment exactly [huag refs for crlb]. This property will be used in later cryptographic discussions in this thesis to guarantee estimator performances in terms of MSE. Further reading on the definitions and proofs of KF optimality can be found in [crlb,huag,etc].
 
 % 
 % ######## ##    ## ######## 
@@ -53,7 +83,10 @@ Sensor and estimate data that we consider is primarily Bayesian in nature and ty
 % ######## ##    ## ##       
 % 
 
-\subsection{Extended Kalman Filter}
+\subsection{Extended Kalman Filter}\label{subsec:prelims:ekf}
+
+Unlike the linear KF, optimality is not guaranteed with the EKF due to the approximation of 
+A highly non-linear process or measurement function would naturally lead to greater errors
 
 % 
 % #### ######## 

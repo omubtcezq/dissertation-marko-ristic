@@ -3,7 +3,7 @@ Introduction
 	..
 	State-of-the-art and Research Questions
 		Confidential Estimate Fusion
-		Confidential Distributed Non-Linear Measurmeent Models
+		Confidential Distributed Non-Linear Measurment Models
 		Provable Estimation Performances
 	Contributions
 	Thesis Structure
