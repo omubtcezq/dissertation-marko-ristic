@@ -17,7 +17,7 @@ When introducing novel methods throughout this thesis, we make use of several ex
 % 
 
 \section{Estimation Preliminaries}\label{sec:prelims:est_prelims}
-Sensor and estimate data that we consider is primarily Bayesian in nature and typically consists of estimates and associated estimate uncertainties. The linear Kalman filter (KF) and the linearising extended Kalman filter (EKF), along with their information filter equivalents, are particularly useful in the estimation and fusion of such data. A general fusion algorithm, the covariance intersection (CI), used when data cross-correlations are unknown, is also introduced.
+Sensor and estimate data that we consider is primarily Bayesian in nature and typically consists of estimates and associated estimate uncertainties. The linear Kalman filter and the linearising extended Kalman filter, along with their information filter equivalents, are particularly useful in the estimation and fusion of such data. A general fusion algorithm, the covariance intersection, used when data cross-correlations are unknown, is also introduced.
 
 % 
 % ##    ## ######## 
@@ -30,7 +30,7 @@ Sensor and estimate data that we consider is primarily Bayesian in nature and ty
 % 
 
 \subsection{Kalman Filter}\label{subsec:prelims:kf}
-The Kalman filter [orig kf] is a popular and well studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^n$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{n \times n}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ [kf uses]. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^n$ at each timestep $k$, following the linear process model
+The Kalman filter (KF) [orig kf] is a popular and well studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^n$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{n \times n}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ [kf uses]. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^n$ at each timestep $k$, following the linear process model
 \begin{equation}\label{eq:prelims:lin_gauss_process_model}
     \vec{x}_k = \mat{F}_k \vec{x}_{k-1} + \vec{w}_k\,,
 \end{equation}
@@ -84,9 +84,39 @@ and computed by \eqref{eq:prelims:kf_cov_predict} and \eqref{eq:prelims:kf_cov_u
 % 
 
 \subsection{Extended Kalman Filter}\label{subsec:prelims:ekf}
-
-Unlike the linear KF, optimality is not guaranteed with the EKF due to the approximation of 
-A highly non-linear process or measurement function would naturally lead to greater errors
+The extended Kalman filter (EKF) is a recursive state estimation filter applicable to non-linear models and closely related to the linear KF [ekf paper,huag+chap]. The filter produces estimates and their covariances at each timestep by linearising models at the current estimate and evaluating the filter similarly to the KF. As in the KF, a true state $\vec{x}_k$ is assumed to follow known models. The process model is now non-linear and given by
+\begin{equation}\label{eq:prelims:nonlin_gauss_process_model}
+    \vec{x}_k = f_k(\vec{x}_{k-1}) + \vec{w}_k\,,
+\end{equation}
+where again $\vec{w}_k \sim \mathcal{N}(\vec{0}, \mat{Q}_k)$ with known covariance $\mat{Q}_k$. Similarly, measurements are assumed to follow the non-linear measurement model
+\begin{equation}\label{eq:prelims:nonlin_gauss_measurement_model}
+    \vec{z}_k = h_k(\vec{x}_k) + \vec{v}_k\,,
+\end{equation}
+with $\vec{v}_k \sim \mathcal{N}(\vec{0}, \mat{R}_k)$ and known covariance $\mat{R}_k$. The EKF \textit{prediction} step is given by
+\begin{equation}\label{eq:prelims:ekf_est_predict}
+    \hat{\vec{x}}_{k|k-1} = \hat{\mat{F}}_k \hat{\vec{x}}_{k-1|k-1}
+\end{equation}
+and
+\begin{equation}\label{eq:prelims:ekf_cov_predict}
+    \mat{P}_{k|k-1} = \hat{\mat{F}}_k \mat{P}_{k-1|k-1} \hat{\mat{F}}_k^\top + \mat{Q}_k\,,
+\end{equation}
+with Jacobian
+\begin{equation}\label{eq:prelims:ekf_predict_jacobian}
+    \hat{\mat{F}}_k = \left.\frac{\partial f}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k-1|k-1}}
+\end{equation}
+linearising the non-linear process model at the latest estimate. The EKF \textit{update} step is given by
+\begin{equation}\label{eq:prelims:ekf_est_update}
+    \hat{\vec{x}}_{k|k} = \hat{\vec{x}}_{k|k-1}+\mat{P}_{k|k-1}\hat{\mat{H}}_k^\top\left(\hat{\mat{H}}_k\mat{P}_{k|k-1}\hat{\mat{H}}_k^\top + \mat{R}_k\right)^{-1}\left(z_k-h_k(\hat{\vec{x}}_{k|k-1})\right)
+\end{equation}
+and
+\begin{equation}\label{eq:prelims:ekf_cov_update}
+    \mat{P}_{k|k} = \mat{P}_{k|k-1}-\mat{P}_{k|k-1}\hat{\mat{H}}_k^\top\left(\hat{\mat{H}}_k\mat{P}_{k|k-1}\hat{\mat{H}}_k^\top + \mat{R}_k\right)^{-1}\hat{\mat{H}}\mat{P}_{k|k-1}\,,
+\end{equation}
+with Jacobian
+\begin{equation}\label{eq:prelims:ekf_update_jacobian}
+    \hat{\mat{H}}_k = \left.\frac{\partial h}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k|k-1}}
+\end{equation}
+linearising the measurement model. Unlike the linear KF, by linearising the models the EKF propagates Gaussian model noises in its estimates that may not be Gaussian in reality, even when process and measurement models \eqref{eq:prelims:nonlin_gauss_process_model} and \eqref{eq:prelims:nonlin_gauss_measurement_model}, respectively, are exactly correct. For this reason, the EKF does not hold the same guarantees on optimality as the KF does. To a similar effect, highly non-linear models or inaccurate models can lead to greater inaccuracies and divergence of estimates from true states in EKF estimates. Despite these downsides, its scalability and efficiency have made the EKF an industry-standard estimation filter for non-linear systems [smth on uses of ekf]. More details on the EKF and its derivation can be found in [huag+chap].
 
 % 
 % #### ######## 
@@ -98,7 +128,10 @@ A highly non-linear process or measurement function would naturally lead to grea
 % #### ##       
 % 
 
-\subsection{Information Filter}
+\subsection{Information Filter}\label{subsec:prelims:if}
+The information filter (IF) is an algebraic reformulation of the KF introduced in the section \ref{subsec:prelims:kf}. The information form of the filter is such that the 
+
+and is therefore particularly well suited to distributed environments where communication between sensors or the computational cost of performing intermediate update steps needs to be reduced.
 
 % 
 % ######## #### ######## 
