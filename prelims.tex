@@ -129,9 +129,66 @@ linearising the measurement model. Unlike the linear KF, by linearising the mode
 % 
 
 \subsection{Information Filter}\label{subsec:prelims:if}
-The information filter (IF) is an algebraic reformulation of the KF introduced in the section \ref{subsec:prelims:kf}. The information form of the filter is such that the 
+The information filter (IF) is an algebraic reformulation of the KF from section \ref{subsec:prelims:kf} [mutambara,another]. The information form of the filter simplifies the update step of the filter making it more suitable when multiple independent measurements are present at the same timestep. The key difference of the IF is the storing and propagation of the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ rather than the estimate and its error covariance, $\hat{\vec{x}}_{k|k'}$ and $\mat{P}_{k|k'}$, respectively, stored by the KF. When assuming the same linear and Gaussian models \eqref{eq:prelims:lin_gauss_process_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, the information vector and matrix are related to the estimate and its covariance by
+\begin{equation}\label{eq:prelims:if_vec_from_est}
+    \hat{\vec{y}}_{k|k'} = \mat{P}_{k|k'}^{-1}\hat{\vec{x}}_{k|k'}
+\end{equation}
+and
+\begin{equation}\label{eq:prelims:if_mat_from_cov}
+    \mat{Y}_{k|k'} = \mat{P}_{k|k'}^{-1}\,,
+\end{equation}
+for an estimated timestep $k$ and measurements from timesteps up to and including $k'$. The estimation of the information vector and information matrix requires an initialisation of $\hat{\vec{y}}_{0|0}$ and $\mat{Y}_{0|0}$, similarly to the KF, and is also performed by iterating distinct predict and update filter steps. The prediction step is given by
+\begin{equation}
+    \mat{Y}_{k|k-1} = \mat{L}_k\mat{M}_k\mat{L}_k^\top + \mat{C}_k\mat{Q}_k^{-1}\mat{C}_k^\top
+\end{equation}
+and
+\begin{equation}
+    \hat{\vec{y}}_{k|k-1} = \mat{L}_k\left(\mat{F}_k^{-1}\right)^\top\hat{\vec{y}}_{k-1|k-1}
+\end{equation}
+with
+\begin{align}
+    \mat{M}_k &= \left(\mat{F}_k^{-1}\right)^\top\mat{Y}_{k-1|k-1}\mat{F}_k^{-1}\\
+    \mat{C}_k &= \mat{M}_k\left(\mat{M}_k + \mat{Q}_k^{-1}\right)^{-1}\\
+    \mat{L}_k &= \mat{I} - \mat{C}_k\,.
+\end{align}
+The update step is given by
+\begin{equation}\label{eq:prelims:if_vec_update_single}
+    \hat{\vec{y}}_{k|k} = \hat{\vec{y}}_{k|k-1} + \vec{i}_k
+\end{equation}
+and
+\begin{equation}\label{eq:prelims:if_mat_update_single}
+    \mat{Y}_{k|k} = \mat{Y}_{k|k-1} + \mat{I}_k\,,
+\end{equation}
+where added terms $\vec{i}_k$ and $\mat{I}_k$ are known as the measurement vector and measurement matrix, respectively, and are defined as
+\begin{equation}\label{eq:prelims:if_single_m_vec_defn}
+    \vec{i}_k = \mat{H}_k^\top\mat{R}_k^{-1}z_k
+\end{equation}
+and
+\begin{equation}\label{eq:prelims:if_single_m_mat_defn}
+    \mat{I}_k = \mat{H}_k^\top\mat{R}_k^{-1}\mat{H}_k\,.
+\end{equation}
 
-and is therefore particularly well suited to distributed environments where communication between sensors or the computational cost of performing intermediate update steps needs to be reduced.
+Since all information related to a measurement and its sensor are captured in $\vec{i}_k$ and $\mat{I}_k$, namely the measured value $z_k$, measurement model $\mat{H}_k$ and measurement error $\mat{R}_k$, sequential IF update steps required in the presence of multiple sensors are easily computed as a summation of this information from each sensor. That is, if we consider the same process model \eqref{eq:prelims:lin_gauss_process_model} and multiple sensors $i$, $1\leq i\leq n$, making independent measurements that follow models
+\begin{equation}
+    \vec{z}_{k,i} = \mat{H}_{k,i} \vec{x}_k + \vec{v}_{k,i}\,,
+\end{equation}
+with $\vec{v}_{k,i}\sim\mathcal{N}(\vec{0},\mat{R}_{k,i})$ and known covariances $\mat{R}_{k,i}$, the update step of the filter using all measurements at timestep $k$ can be written as
+\begin{equation}\label{eq:prelims:if_vec_update}
+    \hat{\vec{y}}_{k|k} = \hat{\vec{y}}_{k|k-1} + \sum_{i=1}^n\vec{i}_{k,i}
+\end{equation}
+and
+\begin{equation}\label{eq:prelims:if_mat_update}
+    \mat{Y}_{k|k} = \mat{Y}_{k|k-1} + \sum_{i=1}^n\mat{I}_{k,i}\,,
+\end{equation}
+where information vectors $\vec{i}_{k,i}$ and information matrices $\mat{I}_{k,i}$ are now dependent on sensor $i$ and given by
+\begin{equation}\label{eq:prelims:if_m_vec_defn}
+    \vec{i}_{k,i} = \mat{H}_{k,i}^\top\mat{R}_{k,i}^{-1}z_{k,i}
+\end{equation}
+and
+\begin{equation}\label{eq:prelims:if_m_mat_defn}
+    \mat{I}_{k,i} = \mat{H}_{k,i}^\top\mat{R}_{k,i}^{-1}\mat{H}_{k,i}\,.
+\end{equation}
+The easily computed summation has led to the IF being particularly suited to distributed estimation environments, where multiple sensors are present and communicational costs need to be reduced [if egs]. In addition, since the IF is strictly a rearrangement of terms in the KF, it holds the same optimality properties as the KF, described in section \ref{subsec:prelims:kf_opt}. For additional reading on the IF, see [mutambara+chap].
 
 % 
 % ######## #### ######## 
@@ -144,6 +201,13 @@ and is therefore particularly well suited to distributed environments where comm
 % 
 
 \subsection{Extended Information Filter}
+The extended information filter (EIF) is an algebraic reformulation of the EKF and represents a non-linear model extension to the linear IF. 
+
+
+
+Similarly to the EKF, the linearisation of models leads to estimation errors making optimality guarantees of the KF and IF not hold for the EIF.
+
+
 
 % 
 % ########  ######  #### 
