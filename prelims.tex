@@ -244,7 +244,7 @@ Similarly to the EKF, the linearisation of models leads to estimation errors mak
 % 
 
 \subsection{Covariance Intersection and Fast Covariance Intersection}\label{subsec:prelims:fci}
-In the filters presented in the previous sections, measurements from the same timestep $k$ must be independent for sequential update steps to fuse them correctly. That is, non-zero cross-correlations between measurements can lead to overly confident estimate error covariances and estimation track divergence [crosscor paper]. In some cases, this independence of measurements cannot be guaranteed and a conservative fusion method is required to obtain a final estimate and its error covariance using all available measurements. A typical scenario is the fusion of local estimator estimates themselves, such as those produced by separate KF or EKF instances, that may contain cross-correlations due to shared process model assumptions during estimation [ci and dependence ref]. Covariance intersection (CI), is a conservative fusion algorithm that produces such a fused estimate and its error covariance from estimates and their error covariances (or measurements with known error covariances) with unknown cross-correlations [julierNondivergentEstimation]. The CI fusion of $n$ estimates $\hat{\vec{x}}_i$, $1\leq i \leq n$, and their error covariances $\mat{P}_i$, $1\leq i \leq n$, produces a fused estimate $\hat{\vec{x}}_{\mathsf{fus}}$ and its error covariance $\mat{P}_{\mathsf{fus}}$, and is given by
+In the filters presented in the previous sections, measurements from the same timestep must be independent for sequential update steps to fuse them correctly. That is, non-zero cross-correlations between measurements can lead to overly confident estimate error covariances and estimation track divergence [crosscor paper]. In some cases, this independence of measurements cannot be guaranteed and a conservative fusion method is required to obtain a final estimate and its error covariance using all available measurements. A typical scenario is the fusion of local estimator estimates themselves, such as those produced by separate KF or EKF instances, that may contain cross-correlations due to shared process model assumptions during estimation [ci and dependence ref]. Covariance intersection (CI), is a fusion algorithm that fuses estimates and their error covariances (or measurements and their known error covariances) when cross-correlations are unknown [julierNondivergentEstimation] and produces estimates that are guaranteed to be conservative, that is, not overly confident in the error of resulting fused estimates. The CI fusion of $n$ estimates $\hat{\vec{x}}_i$, $1\leq i \leq n$, and their error covariances $\mat{P}_i$, $1\leq i \leq n$, produces a fused estimate $\hat{\vec{x}}_{\mathsf{fus}}$ and its error covariance $\mat{P}_{\mathsf{fus}}$, and is given by
 \begin{equation}\label{eq:prelims:ci_est}
     \hat{\vec{x}}_{\mathsf{fus}} = \mat{P}_{\mathsf{fus}}\sum_{i=1}^n \omega_i \mat{P}_i^{-1} \hat{\vec{x}}_i
 \end{equation}
@@ -256,59 +256,42 @@ for some weights $0\leq \omega_i \leq 1$, $1\leq i \leq n$, such that
 \begin{equation}
     \sum_{i=1}^n \omega_i = 1\,.
 \end{equation}
-
-
-
-They are chosen in a way to speed up convergence and minimize the error by minimizing a certain specified property of the resulting fused estimate covariance. One such property, the covariance trace, requires the solution to
+The weights $\omega_i$ are chosen in a way to speed up the convergence of estimate errors over time and to minimise fusion estimate error by minimising some property of the fused estimate error covariance. A common choice is to minimise the trace of the covariance [ci example with trace], requiring a solution to
 \begin{equation}\label{eq:prelims:ci_min_trace}
-   \argmin_{\omega_1,\dots,\omega_n} \{\tr(\mP)\}\! =\! \argmin_{\omega_1,\dots,\omega_n} \left\{\tr\left(\!\left(\sum_{i=1}^{n}\omega_i \mP_i^{-1}\!\right)^{-1}\right)\!\right\} 
+    \argmin_{\omega_1,\dots,\omega_n} \left\{\tr\left(\mat{P}_{\mathsf{fus}}\right)\right\}\,.
+ \end{equation}
+However, minimising the non-linear cost function \eqref{eq:prelims:ci_min_trace} can be computationally costly and has led to the development of faster approximation techniques. The Fast Covariance Intersection (FCI) algorithm [niehsenInformationFusionBased] is one such method, that approximates \eqref{eq:prelims:ci_min_trace} non-iteratively, while still guaranteeing consistency. It is defined by adding new constraints
+\begin{equation}\label{eq:prelims:fci_added_constraints}
+   \omega_i \tr(\mat{P}_i) - \omega_{i+1} \tr(\mat{P}_{i+1}) = 0\,,
 \end{equation}
-for computing weights $\omega_i$. However, minimizing this non-linear cost function can be very computationally costly and has led to the development of faster approximation techniques.
-
-
-note the form of info filters
-
-
-The Fast Covariance Intersection (FCI) algorithm from [niehsenInformationFusionBased2002] is a non-iterative method for approximating the solution to \eqref{eq:prelims:ci_min_trace} without the loss of guaranteed consistency. It is computed by defining a new constraint
-\begin{equation}
-   \omega_i \tr(\mP_i) - \omega_j \tr(\mP_j) = 0,\ i,j=1,2,\dots,n \label{eqn:fci_eq_big}
+for $1\leq i\leq n-1$, leading to the linear problem
+\begin{equation}\label{eq:prelims:fci_matrix_equation}
+    \begin{bmatrix}
+        \mathcal{P}_1 & -\mathcal{P}_2 & 0 & \cdots & 0 \\
+        0 & \mathcal{P}_2 & -\mathcal{P}_3 & \ddots & \vdots \\
+        \vdots & \ddots & \ddots & \ddots & 0 \\
+        0 & \cdots & 0 & \mathcal{P}_{n-1} & -\mathcal{P}_n \\
+        1 & \cdots & 1 & 1 & 1
+    \end{bmatrix}
+    \begin{bmatrix}
+        \omega_1 \\
+        \vdots \\
+        \omega_{n-1} \\
+        \omega_n
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        0 \\
+        \vdots \\
+        0 \\
+        1
+    \end{bmatrix}
 \end{equation}
-on $\omega_i$ and solving the resulting equations instead. In the two sensor case, this results in the solving of
-\begin{equation}
-   \omega_1 \tr(\mP_1) - \omega_2 \tr(\mP_2) = 0,\ \omega_1 + \omega_2 = 1\enspace. \label{eqn:fci_2sen_omega_sum_eq}
+and its solution
+\begin{equation}\label{eq:prelims:fci_solution}
+    \omega_i = \frac{\frac{1}{\mathcal{P}_i}}{\sum_{j=1}^n \frac{1}{\mathcal{P}_j}}\,,
 \end{equation}
-When computed for $n$ sensors, the highly redundant \eqref{eqn:fci_eq_big} can have its largest linearly independent subset represented by
-\begin{equation}
-   \omega_i \tr(\mP_i) - \omega_{i+1} \tr(\mP_{i+1}) = 0,\ i=1,2,\dots,n-1\enspace, \label{eqn:fci_eq}
-\end{equation}
-and requires the solution to the linear problem
-\begin{equation}
-   \begingroup
-   \setlength\arraycolsep{2pt}
-   \begin{bmatrix}
-      \mathcal{P}_1 & -\mathcal{P}_2 & 0 & \cdots & 0 \\
-      \cdots & \cdots & \cdots & \cdots & \cdots & \\
-      0 & \cdots & 0 & \mathcal{P}_{n-1} & -\mathcal{P}_{n} \\
-      1 & \cdots & 1 & 1 & 1 &
-   \end{bmatrix}
-   \begin{bmatrix}
-      \omega_1 \\
-      \vdots \\
-      \omega_{n-1} \\
-      \omega_{n}
-   \end{bmatrix}
-   =
-   \begin{bmatrix}
-      0 \\
-      \vdots \\
-      0 \\
-      1
-   \end{bmatrix}\enspace, \label{eqn:fci_eq_sys}
-   \endgroup
-\end{equation}
-where we let $\mathcal{P}_i = \tr(\mP_i)$.
-
-Our proposed filter aims to solve FCI fusion, namely () and (), using only encrypted values from each sensor $i$, and leaking only the weight values $\omega_1,\dots,\omega_n$.
+for $1\leq i\leq n$, where $\mathcal{P}_i = \tr(\mat{P}_i)$. Yeilding similar results to the optimal CI, FCI has become a popular alternative due to its computational simplicity [uses of fci]. For further reading, and uses of CI and FCI, see [ci refs].
 
 % 
 %  .d8888b.  8888888888 .d8888b.       8888888b.  8888888b.  8888888888 888      8888888 888b     d888 
@@ -324,7 +307,7 @@ Our proposed filter aims to solve FCI fusion, namely () and (), using only encry
 %                                                                                                      
 % 
 
-\section{Encryption Preliminaries}
+\section{Encryption Preliminaries}\label{sec:prelims:crypto_prelims}
 Used cryptographic notions and schemes are summarised here. In addition, the encoding of floating point numbers to integers suitable for encryption by the presented schemes is introduced as well.
 
 % 
@@ -337,7 +320,10 @@ Used cryptographic notions and schemes are summarised here. In addition, the enc
 % ##    ##  #######     ##    ####  #######  ##    ##  ######  
 % 
 
-\subsection{Meeting Cryptographic Notions}
+\subsection{Meeting Cryptographic Notions}\label{subsec:prelims:crypto_notions}
+
+
+
 
 % 
 % ########  ##     ## ######## 

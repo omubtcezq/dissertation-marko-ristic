@@ -20,6 +20,8 @@
 
 %As we assume the querying party is the owner of all individual sensors, the threat model to be considered is that of network eavesdroppers and a malicious fusion centre, with no possible collusion between sensors and the fusion centre.
 
+%Our proposed filter aims to solve FCI fusion, namely () and (), using only encrypted values from each sensor $i$, and leaking only the weight values $\omega_1,\dots,\omega_n$.
+
 In this work, we consider an arbitrary time-varying process defined by its state $\vec{x}_k \in \mathbb{R}^n$ for all timesteps $k \in \mathbb{N}$. This process is estimated by $m$ individual estimators $i$, $1\leq i\leq m$, each producing a state estimate and an estimate error covariance,
 \begin{equation}\label{eqn:ests_and_covs}
     \hat{\vec{x}}_{k,i} \in \mathbb{R}^n \text{ and } \mat{P}_{k,i} \in \mathbb{R}^{n\times n}\,,
