@@ -321,22 +321,15 @@ Used cryptographic notions and schemes are summarised here. In addition, the enc
 % 
 
 \subsection{Meeting Cryptographic Notions}\label{subsec:prelims:crypto_notions}
-Cryptographic notions are formal mathematical constructs used to prove the security of cryptographic schemes. A cryptographic notion applies to a type of cryptographic scheme, typically defined by a tuple of algorithms, \textit{e.g.} $(\mathsf{Generate},\mathsf{Encrypt},\mathsf{Decrypt})$ [katzIntroductionModernCryptography2008], and captures the capabilities of attackers that are considered and the accepted leakage of information to these attackers, that is, what an attacker can do and what they can learn. When a scheme of an appropriate form is proved to meet a cryptographic notion it is mathematically guaranteed that any attacker with the capabilities specified by the notion is limited in what they can learn or compute as also specified by the notion.
+Cryptographic notions are formal mathematical constructs used to prove the security of cryptographic schemes. A cryptographic notion applies to a type of cryptographic scheme, typically defined by a tuple of algorithms, \textit{e.g.} $(\mathsf{Generate},\mathsf{Encrypt},\mathsf{Decrypt})$ [katzIntroductionModernCryptography2008], and captures the capabilities of attackers that are considered and the accepted leakage of information to these attackers, that is, what an attacker can do and what they can learn. When a scheme of an appropriate form is proved to meet a cryptographic notion it is mathematically guaranteed that any attacker with the capabilities specified by the notion is limited in scheme information leakage as also specified by the notion.
 
-
-
-Notion posed as game
-
-proofs typically contrapositive
-
-assumptions based on problem
-
-ind-cpa
-
-ao
-
-ind-ocpa?
-
+Notion capabilities and leakages are dependent on the goal of a particular encryption scheme and are typically defined as a \textit{cryptographic game} (or \textit{experiment}) involving an adversary and the encryption scheme algorithms []. Proofs that schemes meet these notions are often based on existing proofs or assumptions believed to hold, and proved by contrapositive. Below, some cryptographic notions relevant to this thesis are introduced.
+\begin{description}
+    \item[Indistinguishability under a Chosen Plaintext Attack (IND-CPA)] This notion targets encryption schemes of the form $(\mathsf{Generate},\mathsf{Encrypt},\mathsf{Decrypt})$ and states that an attacker cannot distinguish between encryptions of unknown messages when they can encrypt chosen messages of their own. For detailed definitions and the formal cryptographic game, see [].
+    \item[Aggregator Obliviousness (AO)] The AO notion considers an environment of multiple participants where a single \textit{aggregator} computes the summation of input from all other participants. The encryption scheme for this interaction is of the form $(\mathsf{Setup},\mathsf{NoisyEnc},\mathsf{AggrDec})$. The notion states that no subset of colluding malicious participants can distinguish ...
+    \item[Indistinguishability under an Ordered Chosen Plaintext Attack (IND-OCPA)] 
+\end{description}
+For additional reading on the structure of and proving of cryptographic notions, see [].
 
 % 
 % ########  ##     ## ######## 
