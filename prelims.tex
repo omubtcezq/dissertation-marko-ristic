@@ -326,7 +326,7 @@ Cryptographic notions are formal mathematical constructs used to prove the secur
 Notion capabilities and leakages are dependent on the goal of a particular encryption scheme and are typically defined as a \textit{cryptographic game} (or \textit{experiment}) involving an adversary and the encryption scheme algorithms []. Proofs that schemes meet these notions are often based on existing proofs or assumptions believed to hold, and proved by contrapositive. Below, some cryptographic notions relevant to this thesis are introduced.
 \begin{description}
     \item[Indistinguishability under a Chosen Plaintext Attack (IND-CPA)] This notion targets encryption schemes of the form $(\mathsf{Generate},\mathsf{Encrypt},\mathsf{Decrypt})$ and states that an attacker cannot distinguish between encryptions of unknown messages when they can encrypt chosen messages of their own. For detailed definitions and the formal cryptographic game, see [].
-    \item[Aggregator Obliviousness (AO)] The AO notion considers an environment of multiple participants where a single \textit{aggregator} computes the summation of input from all other participants. An encryption scheme for this interaction is of the form $(\mathsf{Setup},\mathsf{NoisyEnc},\mathsf{AggrDec})$. The notion states that no subset of colluding participants with access to all encryptions and the final summation can compute any more than a party with access to only the colluding participant inputs and the final summation can. The notion of AO and the relevant game are given can be found in [shiPrivacyPreservingAggregationTimeSeries2011].
+    \item[Aggregator Obliviousness (AO)] The AO notion considers an environment of multiple participants where a single \textit{aggregator} computes the summation of input from all other participants. An encryption scheme for this interaction is of the form $(\mathsf{Setup},\mathsf{Encrypt},\mathsf{AggregateDecrypt})$. The notion states that no subset of colluding participants with access to all encryptions and the final summation can compute any more than a party with access to only the colluding participant inputs and the final summation can. The notion of AO and the relevant game are given can be found in [shiPrivacyPreservingAggregationTimeSeries2011].
     \item[Indistinguishability under an Ordered Chosen Plaintext Attack (IND-OCPA)] IND-OCPA is the ideal notion of security for order-revealing encryption, stating that no attacker can distinguish between two sequences of encryptions when the numerical order of messages in the sequences is identical. The associated encryption scheme for the notion is of the form $(\mathsf{Setup},\mathsf{Encrypt},\mathsf{Compare})$. Additional details and the cryptographic game are given in [boldyreva order-preserving symmetric encryption].
 \end{description}
 As novel encryption schemes and cryptographic games are presented in this thesis, additional information on creating and proving cryptographic notions may be beneficial. For introductory methods and the structure of proofs, see [], while more advanced proofs can be found in [].
@@ -416,18 +416,26 @@ removing all noise terms.
 % 
 
 \subsection{Lewi Order-Revealing Encryption Scheme}
-For ORE, we use the Lewi symmetric-key Left-Right ORE scheme as it has the added property of only allowing certain comparisons between cyphertexts. This property can be used to decide which values may not be compared, which will be shown in the section ... It is described as follows: two encryption functions allow integers to be encrypted as either a ``Left'' ($L$) or ``Right'' ($R$) encryption by
-\begin{equation}
-   \begin{aligned} \label{eqn:lewi_l_r}
-      &\operatorfont{enc}^L_{ORE}(k, x) = \mathcal{E}^L_{ORE,k}(x)\enspace, \\
-      &\operatorfont{enc}^R_{ORE}(k, y) = \mathcal{E}^R_{ORE,k}(y)\enspace,
-   \end{aligned}
+The Lewi order-revealing encryption scheme is a symmetric encryption scheme that allows for message values to be compared numerically after encryption. The scheme does not meet the ideal notion of security for order-revealing encryption, IND-OCPA, due to the inherent difficulty of this problem [chenettePracticalOrderRevealingEncryption2016] but rather meets a weaker simulation-based security given in [chenettePracticalOrderRevealingEncryption2016] that allows for some leakage.
+
+To allow additional control over which encrypted values can be compared, the scheme provides two encryption functions, namely a \textit{left} encryption and \textit{right} encryption, such that comparisons can only take place between left and right encryptions. As complete equations for the scheme are lengthy and unnecessary for following this thesis, only notation will be introduced here. The two encryption equations provided can encrypt plaintexts $a_1,a_2\in\mathbb{Z}$ with a secret key $sk$ and functions
+\begin{equation}\label{eq:prelims:lewi_enc}
+    \mathcal{E}^{\mathsf{L}}_{sk}\left(a_1\right)\text{ and }\mathcal{E}^{\mathsf{R}}_{sk}\left(a_2\right)
 \end{equation}
-and only comparisons between an $L$ and an $R$ encryption are possible, by
-\begin{equation}
-   \operatorfont{cmp}_{ORE}(\mathcal{E}^L_{ORE}(x),\ \mathcal{E}^R_{ORE}(y)) = \operatorfont{cmp}(x, y)\enspace. \label{eqn:lewi_cmp}
+denoting left and right encryption, respectively. Their comparison can be computed with a function
+\begin{equation}\label{eq:prelims:lewi_comp}
+    \mathcal{C}\left(\mathcal{E}^{\mathsf{L}}_{sk}(a_1), \mathcal{E}^{\mathsf{R}}_{sk}(a_2)\right) = \mathsf{cmp}(a_1, a_2)\,,
 \end{equation}
-Note that no decryption function is provided as only encryptions are required to provide a secure comparison. The Lewi ORE encryption scheme provides security against the simulation-based security model [chenettePracticalOrderRevealingEncryption2016] but is not secure against the IND-OCPA model.
+where
+\begin{equation*}
+    \mathsf{cmp}(a_1, a_2)=
+    \begin{cases}
+        -1 & a_1 < a_2\\
+        0 & a_1 = a_2\\
+        1 & a_1 > a_2
+    \end{cases}\,.
+\end{equation*}
+For details on implementation, see [lewi order revealing].
 
 % 
 % ######## ##    ##  ######  
