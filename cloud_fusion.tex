@@ -1,5 +1,5 @@
 
-\chapter{Estimate Fusion on an Untrusted Cloud}
+\chapter{Estimate Fusion on an Untrusted Cloud}\label{ch:cloud_fusion}
 
 % 
 % 8888888b.  8888888b.   .d88888b.  888888b.   
@@ -15,7 +15,7 @@
 %                                              
 % 
 
-\section{Problem Formulation}
+\section{Problem Formulation}\label{sec:cloud_fusion:problem}
 %Our paper is motivated by a key step in multi-sensor fusion, the requirement of transmitting local sensor state estimates and covariance information over a network for the computation of their fused result. In particular, we consider centralized FCI fusion, where a party responsible for many networked sensors capable of computing their local state estimates, wishes to have their fused state estimate and covariance computed securely on an untrusted cloud. The same party may query the cloud fusion centre for the fused result at any time. To preserve the privacy of local sensor measurements and state estimates, we aim to provide a secure FCI algorithm such that the fusion centre does not learn individual sensor measurements, state estimates, or covariances. This will be achieved by encrypted homomorphic fusion, whereby the untrusted cloud learns only the FCI aggregation weights, which will be shown in section [sec:secfci].
 
 %As we assume the querying party is the owner of all individual sensors, the threat model to be considered is that of network eavesdroppers and a malicious fusion centre, with no possible collusion between sensors and the fusion centre.
