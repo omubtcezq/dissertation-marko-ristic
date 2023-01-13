@@ -448,45 +448,42 @@ For details on implementation, see [lewi order revealing].
 % 
 
 \subsection{Encoding Numbers for Encryption}\label{subsec:prelims:encoding}
-In both the Paillier and Joye-Libert schemes, as well as the one we introduce, meaningful inputs $a$ are bounded to $a \in \mathbb{Z}_N$. For this reason, real-valued estimation variables require quantisation and integer mapping for encryption and aggregation. We will rely on a generalised Q number encoding [oberstarFixedPointRepresentationFractional2007] due to implementation simplicity and applicability.
+The Paillier encryption scheme and the Joye-Libert aggregation scheme in sections \ref{subsec:prelims:paillier} and \ref{subsec:prelims:joye_libert_agg}, respectively, both provide encryption on integer inputs in the modulo group $\mathbb{Z}_N$ given a large $N$. In addition, they provide homomorphic operations on these inputs after encryption, namely, the Paillier scheme provides addition and scalar multiplication with \eqref{eq:prelims:paillier_hom_add}, \eqref{eq:prelims:paillier_hom_add_plain} and \eqref{eq:prelims:paillier_hom_mult} while the Joye-Libert scheme provides addition with \eqref{eq:prelims:joye_libert_agg_sum}. For this reason, real-valued estimation variables that may require encryption with these schemes, such as those introduced in section \ref{sec:prelims:est_prelims}, require quantisation and integer mapping such that the operations are preserved after encryption. Throughout this thesis, we will rely on a generalised Q number encoding [oberstarFixedPointRepresentationFractional2007], applying scalar encoding and encryption operations elementwise on multidimensional data, due to applicability and implementation simplicity.
 
-We will consider a subset of rational numbers in terms of a range $M \in \mathbb{N}$ and fractional precision $\phi \in \mathbb{N}$. This contrasts with the common definition in terms of total and fractional bits [oberstarFixedPointRepresentationFractional2007, schulzedarupEncryptedCooperativeControl2019, farokhiSecurePrivateControl2017], but allows for a direct mapping to integer ranges which are not a power of two. A rational subset $\mathbb{Q}_{M,\phi}$ is then given by
+Quantisation to a subset of rational numbers is performed in terms of an output range $M \in \mathbb{N}$ and fractional precision $\phi \in \mathbb{N}$. This contrasts with the common definition in terms of total bits and fractional bits [oberstarFixedPointRepresentationFractional2007, schulzedarupEncryptedCooperativeControl2019, farokhiSecurePrivateControl2017] but allows for a direct mapping to integer ranges which are not a power of two, such as the group $\mathbb{Z}_N$. This rational subset, $\mathbb{Q}_{M,\phi}$, is defined by
 \begin{equation}
     \mathbb{Q}_{M,\phi} = \left\{o \,\middle|\, \phi o \in \mathbb{N} \wedge -\left\lfloor\frac{M}{2}\right\rfloor \leq \phi o < \left\lfloor\frac{M}{2}\right\rfloor \right\}\,,
 \end{equation}
-and we can quantize any real number $a$ by taking the nearest rational $o \in \mathbb{Q}_{M,\phi}$, that is, $\argmin_{o\in\mathbb{Q}_{M,\phi}} |a-o|$. In this form, mapping rationals $\mathbb{Q}_{M,\phi}$ to an encryption range $\mathbb{Z}_N$ is achieved by choosing $M=N$ and handling negatives by modulo arithmetic. Additionally, we note that the Q number format requires a precision factor $\phi$ to be removed after each encoded multiplication. This is captured by a third parameter $d$; the number of additional precision factors present in encodings.
+and can be used to quantise any real number $a \in \mathbb{R}$ by taking the nearest rational $o \in \mathbb{Q}_{M,\phi}$, that is, $\argmin_{o\in\mathbb{Q}_{M,\phi}} |a-o|$. Mapping the rationals $\mathbb{Q}_{M,\phi}$, both positive and negative, to a group $\mathbb{Z}_M$ can then be achieved by modulo arithmetic. Additionally, we note that the Q number format requires a precision factor $\phi$ to be removed after each encoded multiplication. This is captured by a third parameter $d$; the number of additional precision factors present in encodings.
 
-The function for \textit{combined} quantisation and encoding, $\mathsf{E}_{M,\phi,d}(a)$, of a given number $a \in \mathbb{R}$ and with an integer range $\mathbb{Z}_M$, precision $\phi$ and scaling for $d$ prior encoded multiplications is given by
-\begin{equation}
-    \mathsf{E}_{M,\phi,d}(a) = \left\lfloor \phi^{d+1} a \right\rceil \pmod{M}\,. \label{eqn:encode}
+The function for \textit{combined} quantisation and encoding, $\mathsf{E}_{M,\phi,d}(a)$, of a given number $a \in \mathbb{R}$ and with output integer range $\mathbb{Z}_M$, precision $\phi$ and scaling for $d$ prior encoded multiplications, is given by
+\begin{equation}\label{eq:prelims:encoding_encode}
+    \mathsf{E}_{M,\phi,d}(a) = \left\lfloor \phi^{d+1} a \right\rceil \pmod{M}\,.
 \end{equation}
-Decoding of an integer $u \in \mathbb{Z}_M$, is given by
-\begin{equation}
-    \mathsf{E}^{-1}_{M,\phi,d}(u) \!=\! 
+Decoding of an integer $u \in \mathbb{Z}_M$ is given by
+\begin{equation}\label{eq:prelims:encoding_decode}
+    \mathsf{E}^{-1}_{M,\phi,d}(u)=
     \begin{dcases}
-        \frac{u\hspace{-8pt}\pmod{M}}{\phi^{d+1}}, &\hspace{-6pt}u\hspace{-8pt}\pmod{M} \leq \left\lfloor\frac{M}{2}\right\rfloor \\
-        -\frac{M - u\hspace{-8pt}\pmod{M}}{\phi^{d+1}}, &\hspace{-6pt}\text{otherwise} \\
-    \end{dcases}\!\!.\label{eqn:decode}
+        \frac{u \pmod{M}}{\phi^{d+1}}, & u \pmod{M} \leq \left\lfloor\frac{M}{2}\right\rfloor \\
+        -\frac{M - u \pmod{M}}{\phi^{d+1}}, & \text{otherwise}
+    \end{dcases}.
 \end{equation}
 
-This encoding scheme provides the following homomorphic operations,
-\begin{equation}
-    \begin{split}
-        \mathsf{E}_{M,\phi,d}(a_1) + \mathsf{E}_{M,\phi,d}(a_2)& \pmod{M} =\\
-        &\mathsf{E}_{M,\phi,d}(a_1+a_2)
-    \end{split}\label{eqn:encoding_homomorphic_add}
+Encoding with \eqref{eq:prelims:encoding_encode} additionally provides two useful properties when used with homomorphic operations,
+\begin{equation}\label{eq:prelims:encoding_add}
+    \mathsf{E}_{M,\phi,d}(a_1) + \mathsf{E}_{M,\phi,d}(a_2) \pmod{M} \approx \mathsf{E}_{M,\phi,d}(a_1+a_2)
 \end{equation}
 and
-\begin{equation}
-    \begin{split}
-        \mathsf{E}_{M,\phi,d}(a_1)\mathsf{E}_{M,\phi,d}(a_2)& \pmod{M} =\\
-        &\mathsf{E}_{M,\phi,d+1}(a_1a_2)\,,
-    \end{split}
+\begin{equation}\label{eq:prelims:encoding_mult}
+        \mathsf{E}_{M,\phi,d}(a_1)\mathsf{E}_{M,\phi,d}(a_2) \pmod{M} \approx \mathsf{E}_{M,\phi,d+1}(a_1a_2)\,,
 \end{equation}
-noting that when $M=N$, the operations and modulus correspond with those in the Paillier homomorphic operations \eqref{eqn:paillier_hom_add}, \eqref{eqn:paillier_hom_plain_add} and \eqref{eqn:paillier_hom_mult}, and the Joye-Libert sum \eqref{eqn:agg_decryption}.
+where deviation from equality stems from quantisation and its associated error
+\begin{equation}
+    \left|\mathsf{E}^{-1}_{M,\phi,d}\left(\mathsf{E}_{M,\phi,d}(a)\right) - a\right| \leq \frac{1}{\phi}\,.
+\end{equation}
 
-In general, the choice of a large precision parameter $\phi$ may reduce quantisation errors introduced in \eqref{eqn:encode}, but risks overflow after too many multiplications. Given the largest number of encoded multiplications, $d_{max}$, and the largest value to be encoded $a_{max}$, the parameter should be chosen such that
-\begin{equation}
-    \left|\phi^{d_{max}+1}a_{max}\right| < \left\lfloor \frac{M}{2} \right\rfloor\,.
+In general, choosing a large precision parameter $\phi$ reduces quantisation errors but risks overflow after too many multiplications. When the total number of encoded multiplications, $d_{\mathsf{max}}$, and the largest value to be encoded, $a_{\mathsf{max}}$, are known, $\phi$ can be chosen to avoid overflow by satisfying
+\begin{equation}\label{eq:prelims:encoding_overflow_limit}
+    \left|\phi^{d_{\mathsf{max}}+1}a_{\mathsf{max}}\right| < \left\lfloor \frac{M}{2} \right\rfloor\,.
 \end{equation}
-In practice, $N$ is typically very large ($N>2^{1024}$) and this condition can be ignored when $M=N$, as $\phi$ can be made sufficiently large to make quantisation errors negligible.
+In practice, we set $M=N$ to use the Paillier or Joye-Libert schemes, such that the properties \eqref{eq:prelims:encoding_add} and \eqref{eq:prelims:encoding_mult} can be used with the homomorphic operations of the schemes. Equation \eqref{eq:prelims:encoding_overflow_limit} can then be ignored as $N$ is typically very large ($N>2^{1024}$) and $\phi$ can be made sufficiently large to make quantisation errors negligible.
