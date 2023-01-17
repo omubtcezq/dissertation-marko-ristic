@@ -22,6 +22,12 @@
 
 %Our proposed filter aims to solve FCI fusion, namely () and (), using only encrypted values from each sensor $i$, and leaking only the weight values $\omega_1,\dots,\omega_n$.
 
+%The problem of centralised fusion on a cloud server is a general
+
+% TODO add a sentence or two that follows well after the introduction section on the problem
+% Then go straight into the definition
+
+The details of the confidential estimate fusion problem that we consider are
 In this work, we consider an arbitrary time-varying process defined by its state $\vec{x}_k \in \mathbb{R}^n$ for all timesteps $k \in \mathbb{N}$. This process is estimated by $m$ individual estimators $i$, $1\leq i\leq m$, each producing a state estimate and an estimate error covariance,
 \begin{equation}\label{eqn:ests_and_covs}
     \hat{\vec{x}}_{k,i} \in \mathbb{R}^n \text{ and } \mat{P}_{k,i} \in \mathbb{R}^{n\times n}\,,
@@ -86,6 +92,8 @@ Simultaneously, we consider the desired security of the fusion process. The fusi
 % 
 
 \section{Confidential Cloud Fusion Leaking Fusion Weights}
+% TODO method that allows full computation of the fusion results on the cloud at the cost of relative sensor performance leakage. This leakage, however, is entirely a downside. In bandwidth-limited environments, a preference for communication with better sensors is beneficial for estimation and therefore the accuracy of the final fusion results.
+% The method, secfci, makes use of paillier and ore, with the only leakage being enherntly captures by the leakage expected from the using ore. Further analysis of the security of the scheme discussed later.
 
 % 
 %  ######  ########  ######     ########  ######  #### 
@@ -98,6 +106,7 @@ Simultaneously, we consider the desired security of the fusion process. The fusi
 % 
 
 \subsection{Secure Fast Covariance Intersection}
+%Method introduced in a 2 sensor environment before expansion to multiple sensor environments.
 
 % 
 % ..#######...........######..########.##....##
