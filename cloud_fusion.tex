@@ -27,20 +27,16 @@
 % TODO add a sentence or two that follows well after the introduction section on the problem
 % Then go straight into the definition
 
-The details of the confidential estimate fusion problem that we consider are
-In this work, we consider an arbitrary time-varying process defined by its state $\vec{x}_k \in \mathbb{R}^n$ for all timesteps $k \in \mathbb{N}$. This process is estimated by $m$ individual estimators $i$, $1\leq i\leq m$, each producing a state estimate and an estimate error covariance,
-\begin{equation}\label{eqn:ests_and_covs}
+The concrete problem that we consider for cloud estimate fusion has been chosen for its broad applicability. We consider a discrete time-varying process defined by its state $\vec{x}_k \in \mathbb{R}^n$ at every timestep $k$. This process is estimated by sensors (or estimators) $i$, $1\leq i\leq m$, each producing a state estimate and estimate error covariance,
+\begin{equation}\label{eq:cloud_fusion:sen_ests_and_covs}
     \hat{\vec{x}}_{k,i} \in \mathbb{R}^n \text{ and } \mat{P}_{k,i} \in \mathbb{R}^{n\times n}\,,
 \end{equation}
-respectively, at every timestep $k$. Our aim at every timestep is for all estimates $\hat{\vec{x}}_{k,i}$ and errors $\mat{P}_{k,i}$, $1\leq i\leq m$, to be sent to a cloud server where a fused estimate and error covariance,
-\begin{equation}\label{eqn:fus_ests_and_covs}
+respectively, at each timestep $k$. Our aim is for these estimates and their error covariances to be sent to a cloud server and fused, resulting in a fused estimate and estimate error covariance
+\begin{equation}\label{eq:cloud_fusion:fus_ests_and_covs}
     \hat{\vec{x}}_{k,\mathsf{fus}} \in \mathbb{R}^n \text{ and } \mat{P}_{k,\mathsf{fus}} \in \mathbb{R}^{n\times n}\,,
 \end{equation}
-respectively, are computed and are consistent with the estimates in \eqref{eqn:ests_and_covs}.
-
-Simultaneously, we consider the desired security of the fusion process. The fusing cloud and estimators are treated as \textit{honest-but-curious}, that is, they follow protocols correctly but may use learned information for malicious gain, and a trusted third party exists that can query the cloud at any timestep $k$ to obtain the fusion results in \eqref{eqn:fus_ests_and_covs}. We aim for the cloud, estimators and eavesdroppers to learn no additional information from observed estimates and fusions, \eqref{eqn:ests_and_covs} and \eqref{eqn:fus_ests_and_covs}, respectively, beyond their local estimates. To guarantee this, cryptographic \textit{Indistinguishability under the Chosen Plaintext Attack} (IND-CPA) [katzIntroductionModernCryptography2008] is desired for all transmitted and processed information. This is in line with common security goals in the field and is suitable for homomorphic encryption. The communications of this scenario are summarised graphically in figure [fig:layout].
-
-\begin{figure}[t]
+respectively, that are consistent with the estimates in \eqref{eq:cloud_fusion:sen_ests_and_covs}. That is, fused estimate error covariance is a conservative estimate of the optimal fused error covariance. In addition to the sensors and cloud fuser, a trusted third party can query the cloud for the fusion result \eqref{eq:cloud_fusion:fus_ests_and_covs} at any timestep $k$. The interactions between participants of the problem have been graphically summarised in figure \ref{fig:cloud_fusion:problem_layout}.
+\begin{figure}[htbp]
     \centering
     \begin{tikzpicture}
         % Bounding box
@@ -71,11 +67,14 @@ Simultaneously, we consider the desired security of the fusion process. The fusi
         % Estimator arrows
         \draw [-latex]  plot coordinates {(3,5)  (4.25,4)};
         \draw [-latex]  plot coordinates {(6.5,5)  (5.25,4)};
-        % Third party arrows
+        % Third-party arrows
         \draw [latex-latex]  plot coordinates {(4.75,2.3)  (4.75,1.65)};
     \end{tikzpicture}
-    \label{fig:layout}
+    \caption{Participants and communications in the considered cloud fusion problem.}
+    \label{fig:cloud_fusion:problem_layout}
 \end{figure}
+
+In addition to the fusion of estimates, we specify the security goals of data fusion on an untrusted cloud. Both the cloud and sensors are considered \textit{honest-but-curious}, meaning they follow protocols correctly but may use any learned information for external malicious gain. The desire is for transmitted data accessible to the cloud and eavesdroppers to leak no additional information that is already known by the participants beyond formally specified leakage. Similarly, sensors should learn no additional information about transmitted data beyond their local estimates \eqref{eq:cloud_fusion:sen_ests_and_covs}. To achieve these goals, two methods are proposed in this chapter. The first allows complete homomorphic computation of the fusion results by the cloud but requires mutually trusted sensors and the leakage of relative error covariance sizes. The second method leaks no information in transmitted data and allows malicious collaborations, but requires additional computations by the trusted party when querying the cloud.
 
 % 
 % 8888888888 888     888  .d8888b. 8888888 .d88888b.  888b    888      888      
@@ -91,9 +90,8 @@ Simultaneously, we consider the desired security of the fusion process. The fusi
 %                                                                               
 % 
 
-\section{Confidential Cloud Fusion Leaking Fusion Weights}
-% TODO method that allows full computation of the fusion results on the cloud at the cost of relative sensor performance leakage. This leakage, however, is entirely a downside. In bandwidth-limited environments, a preference for communication with better sensors is beneficial for estimation and therefore the accuracy of the final fusion results.
-% The method, secfci, makes use of paillier and ore, with the only leakage being enherntly captures by the leakage expected from the using ore. Further analysis of the security of the scheme discussed later.
+\section{Confidential Cloud Fusion Leaking Fusion Weights}\label{sec:cloud_fusion:fusion_with_leakage}
+In this section, we present the method for computing the fusion result \eqref{eq:cloud_fusion:fus_ests_and_covs} at the fusion cloud while leaking the order of sensor error covariances to the cloud and eavesdroppers. In addition to the layout in figure \ref{fig:cloud_fusion:problem_layout}, we assume that sensors are computationally capable of running both the Paillier \ref{subsec:prelims:paillier} and Lewi \ref{subsec:prelims:lewi_ore} encryption schemes locally, and require a key distribution step before the beginning of the algorithm. Here, the trusted third party generates a public key $pk$ and secret key $sk$ for the Paillier scheme as well as a shared symmetric key $sk_o$ for the Lewi ORE scheme. The public key $pk$ is made available to all participants in the fusion process, namely the cloud and sensors, while the shared ORE key $sk_o$ is made available only to the sensors. The sharing of these keys can be performed by any public-key encryption scheme such as RSA [rivestMethodObtainingDigital1978].
 
 % 
 %  ######  ########  ######     ########  ######  #### 
@@ -105,8 +103,10 @@ Simultaneously, we consider the desired security of the fusion process. The fusi
 %  ######  ########  ######     ##        ######  #### 
 % 
 
-\subsection{Secure Fast Covariance Intersection}
-%Method introduced in a 2 sensor environment before expansion to multiple sensor environments.
+\subsection{Secure Fast Covariance Intersection}\label{subsec:cloud_fusion:secfci}
+% TODO put somewhere:
+%When encrypting with ORE key $k$, individual sensors are limited to using only $L$ or $R$ ORE encryption to reduce local information leakage. Thus, consecutive ORE encryptions from any sensor cannot be used to infer local information directly, and can only be compared to encryptions from sensors using the alternate ORE encryption.
+
 
 % 
 % ..#######...........######..########.##....##
@@ -118,8 +118,8 @@ Simultaneously, we consider the desired security of the fusion process. The fusi
 % .#########..........######..########.##....##
 % 
 
-\subsubsection{Two-sensor Case} \label{sec:secfci}
-In this section, we will introduce the Secure FCI (SecFCI) fusion algorithm for the two-sensor case, before extending it to the $n$ sensor case in section [sec:multi\_secfci]. The network model we consider is described in section [subsec:problem\_formulation], where sensors are capable of running local estimators, as well as the PHE and ORE encryption schemes from section [sec:encryption]. Each sensor $i$ computes its state estimate $\mean{\vec{x}}_i$ and covariance matrix $\mP_i$ and sends relevant encrypted information to an untrusted cloud fusion center. The querying party is the key holding party and generates the PHE public key $pk$, secret key $sk$, and ORE symmetric key $k$. $pk$ is made available to all parties in the network, and $k$ is made available to the sensors only, via any standard public-key scheme such as RSA [rivestMethodObtainingDigital1978]. When encrypting with ORE key $k$, individual sensors are limited to using only $L$ or $R$ ORE encryption to reduce local information leakage. Thus, consecutive ORE encryptions from any sensor cannot be used to infer local information directly, and can only be compared to encryptions from sensors using the alternate ORE encryption.
+\subsubsection{Two-sensor Case} \label{subsubsec:cloud_fusion:secfci_2_sen}
+The Secure Fast Covariance Intersection (SecFCI) fusion algorithm will first be introduced in the special case of two sensors, before an extension to the $n$-sensor case. Recalling the FCI fusion algorithm in section \ref{subsec:prelims:fci}, 
 
 From [eqn:ci\_cov\_estimate], we can see that both CI fusion equations can be computed on PHE encryptions of sensor information vectors and information matrices, given valid unencrypted values for each $\omega_i$. For this reason, we allow the leakage of all weights $\omega_i$. Thus, in the two-sensor case, homomorphic fusion is computed by
 \begin{equation}
@@ -352,7 +352,7 @@ Finally, applying the operations from Table \ref{tab:complex_ops} to the SecFCI 
 %  ######  ########  ######  
 % 
 
-\subsection{Security Analysis}
+\subsection{Security Analysis}\label{subsec:cloud_fusion:secfci_security}
 
 % 
 %  ######  #### ##     ## 
