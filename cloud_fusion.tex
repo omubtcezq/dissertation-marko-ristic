@@ -130,7 +130,7 @@ and
 \end{equation}
 and note the suitability of addition and scalar multiplication to the Paillier additive homomorphic scheme when the weight $\omega_1$ is known. To compute the fused information vector $\mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}}$ and information matrix $\mat{P}_{k,\mathsf{fus}}^{-1}$ homomorphically, local estimate information must first be encoded as integers before encryption at the sensors. Using the Q number format from section \ref{subsec:prelims:encoding}, we let $M=N$, chose an appropriate precision $\phi$ and denote elementwise encoding with $d$ previous multiplications as $\mathsf{E}_d(\cdot)$. Encryption and fusion with Paillier homomorphic properties \eqref{eq:prelims:paillier_hom_add} and \eqref{eq:prelims:paillier_hom_mult} is given by
 \begin{equation}\label{eq:cloud_fusion:secfci_2sen_paillier_fuse_ests}
-    \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_1\left(\mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}\right)\right) \approx \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_0\left(\mat{P}^{-1}_{k,1}\hat{\vec{x}}_1\right)\right)^{\mathsf{E}_0(\omega_1)}\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_0\left(\mat{P}^{-1}_{k,2}\hat{\vec{x}}_2\right)\right)^{\mathsf{E}_0(1 - \omega_1)}\pmod{N}
+    \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_1\left(\mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}}\right)\right) \approx \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_0\left(\mat{P}^{-1}_{k,1}\hat{\vec{x}}_{k,1}\right)\right)^{\mathsf{E}_0(\omega_1)}\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_0\left(\mat{P}^{-1}_{k,2}\hat{\vec{x}}_{k,2}\right)\right)^{\mathsf{E}_0(1 - \omega_1)}\pmod{N}
 \end{equation}
 and
 \begin{equation}\label{eq:cloud_fusion:secfci_2sen_paillier_fuse_covs}
@@ -180,16 +180,42 @@ In this way, computing fusion on the cloud homomorphically can be performed when
 % .##....##..........######..########.##....##
 % 
 
-\subsubsection{Multi-sensor Case}\label{subsubsec:cloud_fusion:secfci_n_sen}
-When computing the SecFCI fusion for $n$ sensors, we solve \eqref{eqn:ci_cov_estimate} homomorphically by computing
+\subsubsection{$n$-sensor Case}\label{subsubsec:cloud_fusion:secfci_n_sen}
+To compute the fusion of $n$ sensor estimates in the information form we want the solutions to
 \begin{equation}
-   \mathcal{E}(\mP^{-1}) = \mathcal{E}(\mP^{-1}_1)^{\omega_1}\cdots\mathcal{E}(\mP^{-1}_n)^{\omega_n} \label{eqn:n_sen_paillier_ci_cov}
+    \mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}} = \sum_{i=1}^n\omega_i\mat{P}_{k,i}^{-1}\hat{\vec{x}}_{k,i}
 \end{equation}
 and
 \begin{equation}
-   \mathcal{E}(\mP^{-1}\mean{\vec{x}}) = \mathcal{E}(\mP^{-1}_1\mean{\vec{x}}_1)^{\omega_1}\cdots\mathcal{E}(\mP^{-1}_n\mean{\vec{x}}_n)^{\omega_n}\enspace. \label{eqn:n_sen_paillier_ci_estimate}
+    \mat{P}_{k,\mathsf{fus}}^{-1} = \sum_{i=1}^n\omega_i\mat{P}_{k,i}^{-1}\,.
 \end{equation}
-As with the two-sensor case, encoded results from \eqref{eqn:n_sen_paillier_ci_cov} and \eqref{eqn:n_sen_paillier_ci_estimate} contain exactly one multiplication factor to remove and can be decoded exactly with [eqn:qmn\_mult\_decode]. Again we are just left with the task of computing the plaintext weights $\omega_1,\dots,\omega_n$.
+When the fusion weights $\omega_i$, $1\leq i\leq n$, are known, we can again use the appropriate integer encoding and Paillier homomorphic properties to compute the fusion homomorphically as
+\begin{equation}\label{eq:cloud_fusion:secfci_nsen_paillier_fuse_ests}
+    \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_1\left(\mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}}\right)\right) \approx \prod_{i=1}^n\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_0\left(\mat{P}^{-1}_{k,i}\hat{\vec{x}}_{k,i}\right)\right)^{\mathsf{E}_0(\omega_i)}\pmod{N}
+\end{equation}
+and
+\begin{equation}\label{eq:cloud_fusion:secfci_nsen_paillier_fuse_covs}
+    \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_1\left(\mat{P}_{k,\mathsf{fus}}^{-1}\right)\right) \approx \prod_{i=1}^n\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_0\left(\mat{P}^{-1}_{k,i}\right)\right)^{\mathsf{E}_0(\omega_i)}\,.
+\end{equation}
+What remains is to compute the weights $\omega_i$ at the cloud such that the $n$-sensor FCI condition \eqref{eq:prelims:fci_matrix_equation} is met. 
+
+Similar to the two-sensor case, we can use sequences of order-revealing encryptions to leak an approximation to this result. 
+
+these weights by considering each constraint in 
+as an independent partial solution before taking their intersection.
+
+use the order-revealing method to solve each row of \eqref{eq:prelims:fci_matrix_equation} independently obtaining a linear subspace that is a partial solution of the total constraints. Taking the intersection of all partial solutions produces an estimate of the total solution to \eqref{eq:prelims:fci_matrix_equation}, namely the weights $\omega_i$
+
+\begin{equation}\label{eq:cloud_fusion:secfci_nsen_partial_sol_subspace}
+    \omega_i\tr(\mat{P}_{k,i}) = \omega_{i+1}\tr(\mat{P}_{k,i+1})\,,
+\end{equation}
+for $1\leq i<n$, $\omega_i+\omega_{i+1} = 1-\sum_{j\notin \{i,i+1\}}\omega_j$
+
+The total solution subspace of \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_subspace} can be defined by n-1 independent solutions. Solutions $\omega_j=1$ when $j\neq i,i+1$ are trivial (all others $0$). Remaining solution uses ORE
+
+Remark that reversal of lists or alternative FCI matrix condition can account for each sensor not sending a reverse of its list as well
+
+--
 
 Our approach to the $n$ sensor case is to solve all $n-1$ conditions in \eqref{eqn:fci_eq} using the two-sensor method, and combining partial solutions to compute the final result. When we consider a Euclidean dimension for each $\omega_i$, partial solutions can be considered geometrically as hyperplanes of $n-2$ dimension, over the $n-1$ dimensional solution space given by \eqref{eqn:ci_omega_sum_bound}. 
 
