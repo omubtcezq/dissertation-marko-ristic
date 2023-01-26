@@ -92,7 +92,7 @@ In addition to the fusion of estimates, we specify the security goals of data fu
 % 
 
 \section{Confidential Cloud Fusion Leaking Fusion Weights}\label{sec:cloud_fusion:fusion_with_leakage}
-In this section, we present the method for computing the fusion result \eqref{eq:cloud_fusion:fus_ests_and_covs} at the fusion cloud while leaking the order of sensor error covariances to the cloud and eavesdroppers. In addition to the layout in figure \ref{fig:cloud_fusion:problem_layout}, we assume that sensors are computationally capable of running both the Paillier \ref{subsec:prelims:paillier} and Lewi \ref{subsec:prelims:lewi_ore} encryption schemes locally, and require a key distribution step before the beginning of the algorithm. Here, the trusted third party generates a Paillier scheme public key $\mathsf{pk}=N$ and secret key $\mathsf{sk}=(p,q)$ as well as a shared symmetric key $\mathsf{sk}_{\mathsf{o}}$ for the Lewi ORE scheme. The public key $\mathsf{pk}$ is made available to all participants in the fusion process, namely the cloud and sensors, while the shared ORE key $\mathsf{sk}_{\mathsf{o}}$ is made available only to the sensors. The sharing of these keys can be performed by any public-key encryption scheme such as RSA [rivestMethodObtainingDigital1978].
+In this section, we present the method for computing the fusion result \eqref{eq:cloud_fusion:fus_ests_and_covs} at the fusion cloud while leaking the order of sensor error covariances to the cloud and eavesdroppers. In addition to the layout in figure \ref{fig:cloud_fusion:problem_layout}, we assume that sensors are computationally capable of running both the Paillier \ref{subsec:prelims:paillier} and Lewi \ref{subsec:prelims:lewi_ore} encryption schemes locally, and require a key distribution step before the beginning of the algorithm. Here, the trusted third party generates a Paillier scheme public key $\mathsf{pk}=N$ and secret key $\mathsf{sk}=(p,q)$ as well as a shared symmetric key $\mathsf{sk}_{\mathsf{o}}$ for the Lewi ORE scheme. The public key $\mathsf{pk}$ is made available to all participants in the fusion process, namely the cloud and sensors, while the shared ORE key $\mathsf{sk}_{\mathsf{o}}$ is made available only to the sensors and thus implies a trust between the sensors in this scenario. The sharing of these keys can be performed by any public-key encryption scheme such as RSA [rivestMethodObtainingDigital1978].
 % TODO add discussion on the added assumption that sensors trust each other and that only the cloud is considered malicious
 
 %As we assume the querying party is the owner of all individual sensors, the threat model to be considered is that of network eavesdroppers and a malicious fusion centre, with no possible collusion between sensors and the fusion centre.
@@ -138,11 +138,11 @@ and
 \end{equation}
 with approximation errors caused by encoding and dependent on precision parameter $\phi$. The trusted querying party can now request encryptions \eqref{eq:cloud_fusion:secfci_2sen_paillier_fuse_ests} and \eqref{eq:cloud_fusion:secfci_2sen_paillier_fuse_covs} at any timestep $k$ and decrypt them to obtain current fusion information vector and information matrix and therefore the fused estimate and its error covariance.
 
-All that remains for computing \eqref{eq:cloud_fusion:secfci_2sen_paillier_fuse_ests} and \eqref{eq:cloud_fusion:secfci_2sen_paillier_fuse_covs} in the two-sensor case is the calculation of parameter $\omega_1$ at the cloud. Since $\omega_1$ depends on the estimate errors of both sensors it cannot be computed locally and requires some leakage of the result to the cloud. We achieve this by using the Lewi order-revealing encryption scheme and encrypting discretised sequences whose intersection can be used to compute the FCI fusion weight constraint \eqref{eq:prelims:fci_added_constraints}, and therefore
+All that remains for computing \eqref{eq:cloud_fusion:secfci_2sen_paillier_fuse_ests} and \eqref{eq:cloud_fusion:secfci_2sen_paillier_fuse_covs} in the two-sensor case is the calculation of parameter $\omega_1$ at the cloud. Since $\omega_1$ depends on the estimate errors of both sensors it cannot be computed locally and requires some leakage of the result to the cloud. We achieve this by using the Lewi ORE and encrypting discretised sequences whose intersection can be used to compute the two-sensor FCI fusion weight constraint \eqref{eq:prelims:fci_added_constraints} or equivalently
 \begin{equation}\label{eq:cloud_fusion:secfci_2sen_intersect_cond}
-    \omega_1\tr(\mat{P}_{k,1}) = (1-\omega_1)\tr(\mat{P}_{k,2})\,,
+    \omega_1\tr(\mat{P}_{k,1}) = (1-\omega_1)\tr(\mat{P}_{k,2})\,.
 \end{equation}
-at the cloud. Given a stepsize $g\leq 1$, such that $1/g \in \mathbb{N}$, both sensors discretise possible values for weight $\omega_1$ and compute the resulting sequences of their respective side of the equality in \eqref{eq:cloud_fusion:secfci_2sen_intersect_cond}. This results in the sequence
+To evaluate \eqref{eq:cloud_fusion:secfci_2sen_intersect_cond} with ORE comparisons, we choose a stepsize $g\leq 1$, such that $1/g \in \mathbb{N}$, and both sensors discretise the weight $0\leq\omega_1\leq 1$ before computing the resulting sequences of either side of the equality in \eqref{eq:cloud_fusion:secfci_2sen_intersect_cond}. This results in the sequence
 \begin{equation}\label{eq:cloud_fusion_secfci_2sen_seq_1}
     \left\langle0, g\tr(\mat{P}_{k,1}), 2g\tr(\mat{P}_{k,1}),\dots,\tr(\mat{P}_{k,1})\right\rangle
 \end{equation}
@@ -150,7 +150,7 @@ at sensor $1$ and
 \begin{equation}\label{eq:cloud_fusion_secfci_2sen_seq_2}
     \left\langle\tr(\mat{P}_{k,2}), (1-g)\tr(\mat{P}_{k,2}), (1-2g)\tr(\mat{P}_{k,2}),\dots,0\right\rangle
 \end{equation}
-at sensor $2$. Due to the equality in \eqref{eq:cloud_fusion:secfci_2sen_intersect_cond}, the value of $\omega_1$ closest to the intersection of sequences \eqref{eq:cloud_fusion_secfci_2sen_seq_1} and \eqref{eq:cloud_fusion_secfci_2sen_seq_2} approximates the true solution of $\omega_1$. To obtain this intersection without disclosing the values of the sequences, and thus leaking $\tr(\mat{P}_{k,1})$ and $\tr(\mat{P}_{k,2})$ to the cloud, we use the Lewi encryption scheme. The sequences are encoded and encrypted with the order-revealing key $\mathsf{sk}_{\mathsf{o}}$. As no homomorphic operations are performed with the scheme an arbitrary precision integer encoding can be used and is neglected from the notation below. The sequence produced by sensor $1$ then is given by
+at sensor $2$. Comparison of same-index values in the sequences \eqref{eq:cloud_fusion_secfci_2sen_seq_1} and \eqref{eq:cloud_fusion_secfci_2sen_seq_2} leads to the bounds $xg<\omega_1<(x+1)g$, for some index $x$, that can be used to approximate the true solution as $\hat{\omega}_1 = xg+ g/2 \approx \omega_1$, or in the case of an equality, $\hat{\omega}_1 = xg = \omega_1$. To obtain this approximation without additional leakage, elements in \eqref{eq:cloud_fusion_secfci_2sen_seq_1} and \eqref{eq:cloud_fusion_secfci_2sen_seq_2} are encrypted with the ORE key $\mathsf{sk}_{\mathsf{o}}$. As no homomorphic operations are performed with the scheme an arbitrary precision integer encoding can be used and is neglected from the notation below. The sequence produced by sensor $1$ is given by
 \begin{equation}\label{eq:cloud_fusion:secfci_2sen_enc_seq_1}
     \left\langle\mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}(0), \mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}(g\tr(\mat{P}_{k,1})), \mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}(2g\tr(\mat{P}_{k,1})),\dots,\mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}(\tr(\mat{P}_{k,1}))\right\rangle
 \end{equation}
@@ -158,17 +158,17 @@ and that by sensor $2$ by
 \begin{equation}\label{eq:cloud_fusion:secfci_2sen_enc_seq_2}
     \left\langle\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(\tr(\mat{P}_{k,2})), \mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}((1-g)\tr(\mat{P}_{k,2})), \mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}((1-2g)\tr(\mat{P}_{k,2})),\dots,\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(0)\right\rangle\,,
 \end{equation}
-where we note the difference between \textit{left} and \textit{right} encryptions between the sensors allowing comparison between elements of one sequence with the other. Comparison of same-index elements in the sequences now reveals the bounds of the solution (where comparison changes sign) or the exact solution (in the case of equality). Efficiently findable using a binary search, the approximate solution can be seen graphically in figure \ref{fig:cloud_fusion:secfci_2sen_intersect}, where the approximation is taken as the halfway point between consecutive comparisons that change sign.
+where we note the difference between \textit{left} and \textit{right} encryptions between the sensors allowing comparisons between sequences. Efficiently findable using a binary search, the approximate solution when comparing elements of the two sequences can be seen graphically in figure \ref{fig:cloud_fusion:secfci_2sen_intersect}, where the approximation halfway between consecutive comparisons that change sign.
 \begin{figure}[htbp]
     \begin{center}
        \includegraphics{figures/2_sensors.pdf}
     \end{center}
     \caption{Approximation of $\omega_1$ with stepsize $g=0.1$. Comparisons are only possible when $\omega_1$ is a multiple of $g$ (points on the graphs).}
     \label{fig:cloud_fusion:secfci_2sen_intersect}
-    % TODO to figure. Y-axis should have 2 points, for trP1 and trP2. Omega^x should be omega_1. Make larger
+    % TODO to figure. Y-axis should have 2 points, for trP1 and trP2. Omega^x should be omega_1. Make larger. Add a hat to the approximation of omega
  \end{figure}
 
-In this way, computing fusion on the cloud homomorphically can be performed when having access to only local encryptions of information vectors \eqref{eq:cloud_fusion:secfci_2sen_paillier_fuse_ests} and information matrices \eqref{eq:cloud_fusion:secfci_2sen_paillier_fuse_covs} in addition to the sequences of order-revealing encryptions \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_1} and \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_2} that leak an approximation of $\omega_1$.
+In this way, computing fusion on the cloud homomorphically can be performed when having access to only local encryptions of information vectors and information matrices, \eqref{eq:cloud_fusion:secfci_2sen_paillier_fuse_covs} and \eqref{eq:cloud_fusion:secfci_2sen_paillier_fuse_ests}, in addition to the sequences of order-revealing encryptions \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_1} and \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_2} that leak an approximation $\hat{\omega}_1 \approx \omega_1$.
 
 % 
 % .##....##..........######..########.##....##
@@ -180,7 +180,7 @@ In this way, computing fusion on the cloud homomorphically can be performed when
 % .##....##..........######..########.##....##
 % 
 
-\subsubsection{$n$-sensor Case}\label{subsubsec:cloud_fusion:secfci_n_sen}
+\subsubsection{Multi-sensor Case}\label{subsubsec:cloud_fusion:secfci_n_sen}
 To compute the fusion of $n$ sensor estimates in the information form we want the solutions to
 \begin{equation}
     \mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}} = \sum_{i=1}^n\omega_i\mat{P}_{k,i}^{-1}\hat{\vec{x}}_{k,i}
@@ -189,7 +189,7 @@ and
 \begin{equation}
     \mat{P}_{k,\mathsf{fus}}^{-1} = \sum_{i=1}^n\omega_i\mat{P}_{k,i}^{-1}\,.
 \end{equation}
-When the fusion weights $\omega_i$, $1\leq i\leq n$, are known, we can again use the appropriate integer encoding and Paillier homomorphic properties to compute the fusion homomorphically as
+When the fusion weights $\omega_i$, $1\leq i\leq n$, $\sum_{i=1}^n\omega_i=1$, are known, we can again use the appropriate integer encoding and Paillier homomorphic properties to compute the fusion homomorphically as
 \begin{equation}\label{eq:cloud_fusion:secfci_nsen_paillier_fuse_ests}
     \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_1\left(\mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}}\right)\right) \approx \prod_{i=1}^n\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_0\left(\mat{P}^{-1}_{k,i}\hat{\vec{x}}_{k,i}\right)\right)^{\mathsf{E}_0(\omega_i)}\pmod{N}
 \end{equation}
@@ -199,142 +199,88 @@ and
 \end{equation}
 What remains is to compute the weights $\omega_i$ at the cloud such that the $n$-sensor FCI conditions \eqref{eq:prelims:fci_added_constraints} are met. Similar to the two-sensor case, we can use sequences of order-revealing encryptions to leak an approximation to this result. 
 
-Each condition \eqref{eq:prelims:fci_added_constraints} is considered along with \eqref{eq:prelims:ci_weight_sum} as a partial problem, that is,
+Each condition \eqref{eq:prelims:fci_added_constraints} is considered as a partial problem, that is,
 \begin{equation}\label{eq:cloud_fusion:secfci_nsen_partial_sol_subspace}
     \omega_i\tr(\mat{P}_{k,i}) = \omega_{i+1}\tr(\mat{P}_{k,i+1})\,,
 \end{equation}
-with $1\leq i< n$ and $\sum_{i=1}^n\omega_i=1$, and its solution space, a linear subspace of $\vec{\omega}=\begin{bsmallmatrix}\omega_1 & \cdots & \omega_n\end{bsmallmatrix}^\top$, approximated. The intersection of these subspaces naturally results in an approximation to the final solution to $\vec{\omega}$. The solution space to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_subspace} can be defined by $n-1$ contained and linearly independent solutions for $\vec{\omega}$. 
-
-$n-2$ of these are trivially obtained as the points (when $i$ and $i+1$ are zero, for example ..)
-\begin{equation}
-    \vec{\omega} \bar \omega_i=0,\omega_{i+1}=0,
+with $1\leq i< n$ and $\sum_{i=1}^n\omega_i=1$, and their solution spaces, linear subspaces $\mathcal{S}_i$ over possible values of $\vec{\omega}=\begin{bsmallmatrix}\omega_1 & \cdots & \omega_n\end{bsmallmatrix}^\top$, desired. The intersection of these subspaces naturally results in the final solution to $\vec{\omega}$ in \eqref{eq:prelims:fci_matrix_equation}. Each solution space $\mathcal{S}_i$ can be defined by $n-1$ contained and linearly independent solutions $\vec{\omega}_i^{(s)}$, $1\leq s\leq n-1$. $n-2$ of these solutions can be trivially obtained as the points where a single $\omega_j=1$, $j\neq i\neq i+1$ while the final point, $\vec{\omega}_i^{(n-1)}$, can be obtained as the solution to
+\begin{equation}\label{eq:cloud_fusion:secfci_nsen_partial_sol_point}
+    \omega_i\tr(\mat{P}_{k,i}) = (1-\omega_i)\tr(\mat{P}_{k,i+1})\,,
 \end{equation}
-The final solution can be found when .. and noting that .. becomes
-
-with .., and can be approximated similarly 
-
-encrypted sequences
-
-
-
-The subspaces over $\vec{\omega}$ for each partial problem \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_subspace} can be rewritten in parametric form as $n-2$ dimensional subspaces
-
-lastly, the intersection of these $n-1$ subspaces provides an estimate of $\vec{omega}$ with which .. can be computed at the cloud. This solution, as well as the parameters .. in .., can be obtained as a solution to the linear system
-
-
-
-Remark that reversal of lists or alternative FCI matrix condition can account for each sensor not sending a reverse of its list as well
-
-
---
-
-
-Our approach to the $n$ sensor case is to solve all $n-1$ conditions in \eqref{eqn:fci_eq} using the two-sensor method, and combining partial solutions to compute the final result. When we consider a Euclidean dimension for each $\omega_i$, partial solutions can be considered geometrically as hyperplanes of $n-2$ dimension, over the $n-1$ dimensional solution space given by \eqref{eqn:ci_omega_sum_bound}. 
-
-This can be visualized in the three sensor case, which requires solving partial solutions
-\begin{equation}
-   \omega_1 \tr(\mP_1) - \omega_2 \tr(\mP_2) = 0,\ \omega_1+\omega_2=1-\omega_3 \label{eqn:3_sensor_partial_sol_1}
+$\omega_j=0$, $j\neq i\neq i+1$, noting equivalence to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_subspace} and $\omega_{i+1}=1-\omega_i$. The solutions $\vec{\omega}_i^{(s)}$ and the $n-2$ dimensional subspace they define can be rewritten in parametric form as
+\begin{equation}\label{eq:cloud_fusion:secfci_nsen_partial_subspace}
+    \mathcal{S}_i(\vec{\gamma}_i)=\vec{\omega}_i^{(1)} + 
+    \begin{bmatrix}
+        \bar{\vec{\omega}}_i^{(2)} & \cdots & \bar{\vec{\omega}}_i^{(n-1)}
+    \end{bmatrix}
+    \vec{\gamma}_i\,,
 \end{equation}
-and
-\begin{equation}
-   \omega_2 \tr(\mP_2) - \omega_3 \tr(\mP_3) = 0,\ \omega_2+\omega_3=1-\omega_1\enspace. \label{eqn:3_sensor_partial_sol_2}
+where $\bar{\vec{\omega}}_i^{(x)}=\vec{\omega}_i^{(x)}-\vec{\omega}_i^{(1)}$ denotes the direction vectors. The intersection of these $n-1$ subspaces gives the solution to $\vec{\omega}$ in \eqref{eq:prelims:fci_matrix_equation}. This solution, as well as the parameters $\vec{\gamma}_i$, can be obtained as a solution to the linear system
+\begin{equation}\label{eq:cloud_fusion:secfci_nsen_omega_solution}
+    \begin{bmatrix}
+        -\mat{I} & \bar{\vec{\omega}}_1^{(2)} & \cdots & \bar{\vec{\omega}}_1^{(n-1)} & 0 & \cdots & 0\\
+        \vdots & 0 &  & \ddots &  & \ddots & \vdots\\
+        \vdots & \vdots & \ddots &  & \ddots &  & 0\\
+        -\mat{I} & 0 & \cdots & 0 & \bar{\vec{\omega}}_{n-1}^{(2)} & \cdots & \bar{\vec{\omega}}_{n-1}^{(n-1)}
+    \end{bmatrix}
+    \begin{bmatrix}
+        \vec{\omega}\\
+        \vec{\gamma}_1\\
+        \vdots\\
+        \vec{\gamma}_{n-1}\\
+    \end{bmatrix}=
+    \begin{bmatrix}
+        -\vec{\omega}_1^{(1)}\\
+        \vdots\\
+        -\vec{\omega}_{n-1}^{(1)}\\
+    \end{bmatrix}\,.
 \end{equation}
-We can use the two-sensor method from section \ref{sec:secfci} to solve \eqref{eqn:3_sensor_partial_sol_1} exactly when $\omega_3=0$, and know that when $\omega_3=1$, then $\omega_1=\omega_2=0$. These two points are enough to define the two-dimensional partial solution \eqref{eqn:3_sensor_partial_sol_1} which can be seen plotted over the possible solution space in Fig. \ref{fig:3_sensor_partial_sol}. Fig. \ref{fig:3_sensor_partial_sols} shows both partial solutions \eqref{eqn:3_sensor_partial_sol_1} and \eqref{eqn:3_sensor_partial_sol_2} plotted over the solution space.
-\begin{figure*}[tb]
-   \begin{subfigure}[t]{0.3\textwidth}
+
+Therefore, to compute \eqref{eq:cloud_fusion:secfci_nsen_omega_solution} at the cloud without leaking more than comparisons, we approximate the solutions to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_point} with ORE sequences similar to the two-sensor case. Each sensor $i$ uses $\mathsf{sk}_{\mathsf{o}}$ to encrypt the discretisation 
+\begin{equation}\label{eq:cloud_fusion:secfci_nsen_enc_seqs}
+    \begin{split}
+        \left\langle\mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}(0), \mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}(g\tr(\mat{P}_{k,i})), \mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}(2g\tr(\mat{P}_{k,i})),\dots,\mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}(\tr(\mat{P}_{k,i}))\right\rangle\,,\ & \text{if } i \text{ is odd, or}\\
+        \left\langle\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(0), \mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(g\tr(\mat{P}_{k,i})), \mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(2g\tr(\mat{P}_{k,i})),\dots,\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(\tr(\mat{P}_{k,i}))\right\rangle\,,\ & \text{if } i \text{ is even,}
+    \end{split}
+\end{equation}
+allowing for comparison between sequences from consecutive sensors $i$ and $i+1$. To approximate the solution to each \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_point}, the sequence from sensor $i+1$ is reversed, resulting in the discretisation
+\begin{equation}\label{eq:cloud_fusion:secfci_nsen_enc_seqs_reversed}
+    \begin{split}
+        \left\langle\mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}(\tr(\mat{P}_{k,i})),\mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}((1-g)\tr(\mat{P}_{k,i})), \mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}((1-2g)\tr(\mat{P}_{k,i})),\dots,\mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}(0)\right\rangle\,,\ & \text{if } i \text{ is odd, or}\\
+        \left\langle\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(\tr(\mat{P}_{k,i})), \mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}((1-g)\tr(\mat{P}_{k,i})), \mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}((1-2g)\tr(\mat{P}_{k,i})),\dots,\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(0)\right\rangle\,,\ & \text{if } i \text{ is even,}
+    \end{split}
+\end{equation}
+resulting in sequences of the same form as \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_1} and \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_2}. The value $\hat{\omega}_i = xg + g/2 \approx \omega_i$, or in the case of an equality $\hat{\omega}_i = xg = \omega_i$, for some index $x$, is used to approximate the solution $\hat{\vec{\omega}}_i^{(n-1)} \approx \vec{\omega}_i^{(n-1)}$. A visualisation of solving \eqref{eq:cloud_fusion:secfci_nsen_omega_solution} with approximations to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_point} in the three-sensor has case is graphically displayed in figure \ref{fig:cloud_fusion:secfci_nsen_partial_sols_and_intersect}.
+\begin{figure}[htbp]
+   \begin{subfigure}[htbp]{\textwidth}
       \begin{center}
          \includegraphics{figures/partial_sol1.pdf}
       \end{center}
-      \caption{Partial solution to \eqref{eqn:3_sensor_partial_sol_1}.}
+      \caption{Approximated solution space \eqref{eq:cloud_fusion:secfci_nsen_partial_subspace} when $i=1$.}
       \label{fig:3_sensor_partial_sol}
    \end{subfigure}
-   ~
-   \begin{subfigure}[t]{0.3\textwidth}
+   \hfill
+   \begin{subfigure}[htbp]{\textwidth}
       \begin{center}
          \includegraphics{figures/partial_sols.pdf}
       \end{center}
-      \caption{Partial solutions to \eqref{eqn:3_sensor_partial_sol_1} and \eqref{eqn:3_sensor_partial_sol_2}.}
+      \caption{Approximated solution space \eqref{eq:cloud_fusion:secfci_nsen_partial_subspace} when $i=2$.}
       \label{fig:3_sensor_partial_sols}
    \end{subfigure}
-   ~
-   \begin{subfigure}[t]{0.3\textwidth}
+   \hfill
+   \begin{subfigure}[htbp]{\textwidth}
       \begin{center}
          \includegraphics{figures/partial_sol_planes.pdf}
       \end{center}
-      \caption{Partial solutions as planes.}
+      \caption{Intersection of partial solutions spaces gives fusion weights $\vec{\omega}$ in \eqref{eq:prelims:fci_matrix_equation}.}
       \label{fig:3sen_planes}
    \end{subfigure}
-   \caption{Partial solutions over $\omega_1$, $\omega_2$, and $\omega_3$ solution space.}
-   \label{fig:partial_sols_and_planes}
-\end{figure*}
-The final solution from all partial solutions is computed by finding their intersection. This can be seen in Fig. \ref{fig:3_sensor_partial_sols} as the intersection of the $(\omega_1,\omega_2)$ and $(\omega_2,\omega_3)$ partial solution lines.
+   \caption{Solving fusion weights $\vec{\omega}$ with approximations to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_point}.}
+   \label{fig:cloud_fusion:secfci_nsen_partial_sols_and_intersect}
+   % TODO Label which points are approximated. Turn axis labels the right way around. Label solution space correctly; it is the plane of the sum equalling one.
+\end{figure}
 
-To simplify computing the partial solution intersection, we define equivalent planes for each of the partial solutions, perpendicular to the solution space, in the form
-\begin{equation}
-   a_1\omega_1 + a_2\omega_2 +a_3\omega_3 + a_4 = 0\enspace, \label{eqn:3sen_plane_eq}
-\end{equation}
-and solve the resulting linear system for finding the intersection of all planes and the solution space. This is given by
-\begin{equation}
-   \begin{bmatrix}
-      a_1^{(1)} & a_2^{(1)} & a_3^{(1)} \\
-      a_1^{(2)} & a_2^{(2)} & a_3^{(2)} \\
-      1 & 1 & 1
-   \end{bmatrix}
-   \begin{bmatrix}
-      \omega_1 \\
-      \omega_2 \\
-      \omega_3
-   \end{bmatrix}
-   =
-   \begin{bmatrix}
-      a_3^{(1)} \\
-      a_4^{(2)} \\
-      1
-   \end{bmatrix}\enspace, \label{eqn:3sen_plane_sol_eq}
-\end{equation}
-where $a_i^{(j)}$ denotes parameter $i$ of partial solution $j$, and has been shown visually in Fig. \ref{fig:3sen_planes}.
-
-In the $n$ sensor case, we can similarly solve partial solutions by first using the method from section \ref{sec:secfci} to solve equations with two parameters $\omega_k$ and $\omega_{k+1}$ when letting all $\omega_i=0,\ i\neq k,k+1$. For each equation we can then compute remaining partial solution points at $\omega_i=1,\ i\neq k,k+1$ with $\omega_j=0,\ j\neq i$. Perpendicular hyperplanes can then be similarly defined in the form 
-\begin{equation}
-   a_1\omega_1 + \dots +a_n\omega_n + a_{n+1} = 0\enspace. \label{eqn:nsen_plane_eq}
-\end{equation}
-Due to their inherent orthogonality, and that all meaningful covariance traces are strictly positive, the $n-1$ partial solution hyperplanes are guaranteed to intersect at exactly one point. The hyperplane intersection results in the linear system 
-\begin{equation}
-   \begingroup
-   \setlength\arraycolsep{2pt}
-   \begin{bmatrix}
-      a_1^{(1)} & a_2^{(1)} & \cdots & a_{n}^{(1)} \\
-      \vdots & \vdots & \ddots & \vdots \\
-      a_1^{(n-1)} & a_2^{(n-1)} & \cdots & a_{n}^{(n-1)} \\
-      1 & 1 & \cdots & 1
-   \end{bmatrix}
-   \begin{bmatrix}
-      \omega_1 \\
-      \vdots \\
-      \omega_{n-1} \\
-      \omega_{n}
-   \end{bmatrix}
-   \!=\!
-   \begin{bmatrix}
-      a_{n+1}^{(1)} \\
-      \vdots \\
-      a_{n+1}^{(n-1)} \\
-      1
-   \end{bmatrix}\enspace, \label{eqn:hyperplane_sol_eq}
-   \endgroup
-\end{equation}
-and gives the solution to the SecFCI $\omega_i$ weights.
-
-As all $O(n\log{p})$ ORE comparisons are done between sequential sensors $i$ and $i+1$, $L$ and $R$ ORE encryptions can be used to the same effect as for the two-sensor case. The ORE ordered list sent from each sensor $i$ is given by
-\begin{equation}
-   \begin{aligned} \label{eqn:sensor_lists}
-      &[\mathcal{E}^L_{ORE}(\omega^{(1)}\tr(\mP_i)),\dots,\mathcal{E}^L_{ORE}(\omega^{(p)}\tr(\mP_i))],\,i\text{ odd} \\
-      &[\mathcal{E}^R_{ORE}(\omega^{(1)}\tr(\mP_i)),\dots,\mathcal{E}^R_{ORE}(\omega^{(p)}\tr(\mP_i))],\,i\text{ even}.
-   \end{aligned}
-\end{equation}
-When combining \eqref{eqn:sensor_lists} with PHE encryptions of local information vectors and information matrices, SecFCI can be computed entirely homomorphically by \eqref{eqn:n_sen_paillier_ci_cov} and \eqref{eqn:n_sen_paillier_ci_estimate}.
-
-Briefly considering the security of our scheme, we note that any leaked information from ORE lists \eqref{eqn:sensor_lists}, as described in [chenettePracticalOrderRevealingEncryption2016], can be considered a subset of knowing the estimated fusion weights $\omega_1,\dots,\omega_n$, which specify relative sizes of sensor covariance traces, and we already consider public. Thus only IND-CPA and IND-OCPA (after accounting for leakage through public weights) encryptions are made available to the fusion centre.
+The resulting estimate $\hat{\vec{\omega}} \approx \vec{\omega}$ can then be used with \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_ests} and \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_covs} to compute the fusion of estimates in information form at the cloud.
 
 % 
 %  ######   #######  ##     ## ########  
@@ -396,6 +342,7 @@ Finally, applying the operations from Table \ref{tab:complex_ops} to the SecFCI 
 % 
 
 \subsection{Security Analysis}\label{subsec:cloud_fusion:secfci_security}
+Briefly considering the security of our scheme, we note that any leaked information from ORE lists \eqref{eqn:sensor_lists}, as described in [chenettePracticalOrderRevealingEncryption2016], can be considered a subset of knowing the estimated fusion weights $\omega_1,\dots,\omega_n$, which specify relative sizes of sensor covariance traces, and we already consider public. Thus only IND-CPA and IND-OCPA (after accounting for leakage through public weights) encryptions are made available to the fusion centre.
 
 % 
 %  ######  #### ##     ## 
