@@ -363,35 +363,73 @@ Due to leaking relative sensor uncertainties, this method leaks confidential inf
 % 
 
 \subsection{Simulation}\label{subsec:cloud_fusion:secfci_simulation}
-We have implemented a simulation to demonstrate the accuracy of SecFCI approximating FCI. Three sensors independently measure a constant-speed linear process and simultaneously run a Kalman filter on their measurements. Estimates are sent both encrypted and unencrypted to a fusion centre that computes the SecFCI and FCI fusions on the received data respectively. Encrypted estimates are comprised of PHE encryptions of the information vector and information matrix, $\mathcal{E}(\mP^{-1}_i\mean{\vec{x}}_i)$ and $\mathcal{E}(\mP^{-1}_i)$, in addition to the ORE list given by \eqref{eqn:sensor_lists} with discretization step $s=0.1$. Unencrypted estimates consist of the state estimate $\mean{\vec{x}}_i$ and covariance $\mP_i$. The trajectory and fused estimates are shown in Fig. \ref{fig:fci_secfci_traj}.
-\begin{figure}[tb]
-   \begin{center}
-      \includegraphics{figures/fci_secfci_cmp.pdf}
-   \end{center}
-   \caption{Tracking simulation comparing SecFCI and FCI.}
-   \label{fig:fci_secfci_traj}
-\end{figure}
-
-To derive an upper bound on the accuracy difference between SecFCI and FCI, we note the two factors which introduce inconsistency between the two methods: the encoding method from section \ref{subsec:complexity}, and the difference in fusion weights. Due to the possibility of choosing sufficiently large integer and fractional bit lengths $i$ and $f$, we will only consider the error caused by the difference in weights. We will treat this error as the distance between respective weight vectors
-\begin{equation}
-   \begin{aligned}
-      &\vec{\omega}_{SecFCI} = (\omega_{1,SecFCI},\dots,\omega_{n,SecFCI}) \\
-      &\vec{\omega}_{FCI} = (\omega_{1,FCI},\dots,\omega_{n,FCI})\enspace,
-   \end{aligned}
+Lastly, along with the discussions above, we have implemented a simulation of the method to demonstrate its fusion accuracy when compared to the FCI algorithm on a trusted cloud. A constant-speed linear system, 
+\begin{equation}\label{eq:cloud_fusion:secfci_system_model}
+    \vec{x}_{k+1} = 
+    \begin{bmatrix}
+        1 & 0.5 & 0 & 0\\
+        0 & 1 & 0 & 0\\
+        0 & 0 & 1 & 0.5\\
+        0 & 0 & 0 & 1
+    \end{bmatrix}\vec{x}_k + \vec{w}_k\,,\qquad \vec{w}_k\sim\mathcal{N}\left(\vec{0},
+    \begin{bmatrix}
+        0.4 & 1.3 & 0 & 0\\
+        1.3 & 5.0 & 0 & 0\\
+        0 & 0 & 0.4 & 1.3\\
+        0 & 0 & 1.3 & 5.0
+    \end{bmatrix}
+    \right)\,,
 \end{equation}
-where $\omega_{i,s}$ denotes weight $\omega_i$ from algorithm $s$. From section \ref{sec:secfci} we see that the largest difference $|\omega_{i,FCI} - \omega_{i,SecFCI}|$ is strictly bounded by $s/2$. As shown in section \ref{sec:multi_secfci}, when more sensors are involved, a tighter bound on this difference is dependent on the value of $\vec{\omega}_{i,FCI}$, but will remain strictly bounded by $s/2$. Therefore, we can give a strict upper bound on the distance between weight vectors as
-\begin{equation}
-   |\vec{\omega}_{FCI} - \vec{\omega}_{SecFCI}| < 0.5\sqrt{ns^2}\enspace. \label{eqn:accuracy_error_bound}
+is simulated and measured by three independent position sensors $1\leq i\leq 3$, producing measurements 
+\begin{equation}\label{eq:cloud_fusion:secfci_measurement_model}
+    \vec{z}_{k,i} = 
+    \begin{bmatrix}
+        1 & 0 & 0 & 0\\
+        0 & 0 & 1 & 0
+     \end{bmatrix}\vec{x}_k + \vec{v}_{k,i}\,,\qquad \vec{v}_{k,i}\sim\mathcal{N}\left(\vec{0},\mat{R}_i\right)\,,
 \end{equation}
+with
+\begin{equation}
+    \mat{R}_1=
+    \begin{bmatrix}
+        5 & 2\\
+        2 & 5
+    \end{bmatrix}\,,\ 
+    \mat{R}_2=
+    \begin{bmatrix}
+        7 & 2\\
+        2 & 4
+    \end{bmatrix}\text{ and }
+    \mat{R}_3=
+    \begin{bmatrix}
+        5 & 4\\
+        4 & 8
+    \end{bmatrix}\,.
+\end{equation}
+Each sensor runs a local linear Kalman Filter (KF) from section \ref{subsec:prelims:kf} before its information is sent to a server for fusion and in encrypted cases decrypted by a querying party. Figure \ref{fig:cloud_fusion:secfci_sim_error} shows the average estimation error of $1000$ simulations when using our algorithm with varying stepsizes $g$ alongside the standard FCI algorithm. 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics{figures/fci_secfci_cmp.pdf}
+    \caption{Estimation error with varying stepsize $g$.}
+    \label{fig:cloud_fusion:secfci_sim_error}
+    % TODO figure to display MSE of 1000 simulations for FCI and our method with g=0.1, 0.2, 0.33, 0.5
+    % latex y-axis label for MSE
+ \end{figure}
+ In all cases, resulting plaintext information vectors and matrices are converted to estimates and estimate error covariances before comparison with the true simulated state. From the figure, it can be seen that the estimation error of our method is similar to the normal FCI method when stepsize $g$ is small, $g\leq 2$, but grows as expected when $g$, and thus the possible error in weights $\omega_i$, is increased.
 
-Finally, components of $\omega_{i,SecFCI}$, $\omega_{i,FCI}$ and the errors $|\vec{\omega}_{FCI} - \vec{\omega}_{SecFCI}|$, have been plotted over time in Fig. \ref{fig:fci_secfci_omegas}, and show the computed error bound when $n=3$ and $s=0.1$.
-\begin{figure}[tb]
-   \begin{center}
-      \includegraphics{figures/omegas_cmp.pdf}
-   \end{center}
-   \caption{$\vec{\omega}_{SecFCI}$ and $\vec{\omega}_{FCI}$ components.}
-   \label{fig:fci_secfci_omegas}
+Since the system described by \eqref{eq:cloud_fusion:secfci_system_model}, \eqref{eq:cloud_fusion:secfci_measurement_model} and estimated by the KF reaches an estimation steady-state, fusion weights $\omega_i$ do as well. Figure \ref{fig:cloud_fusion:secfci_omega_error} shows the steady state error of estimated weights when compared to the true FCI weights. 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics{figures/omegas_cmp.pdf}
+    \caption{Error of estimated weights $\hat{\vec{\omega}}$ with varying stepsize $g$.}
+    \label{fig:cloud_fusion:secfci_omega_error}
+    % TODO plot steady-state error of weights g=0.1,0,2,0.33,0.5
+    % Y-axis is weight error (not simulation error) and X-axis is g
 \end{figure}
+Here, the maximum errors in fusion weights naturally depend on the stepsize $g$ and support the results seen in figure \ref{fig:cloud_fusion:secfci_sim_error}. Further, an upper bound on this error can be derived by considering the maximum error of each approximation \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_point} and is given by
+\begin{equation}
+    \left|\hat{\vec{\omega}} - \vec{\omega}\right| \leq \frac{g}{2}\sqrt{n}\,.
+\end{equation}
 
 % 
 % 8888888888 888     888  .d8888b. 8888888 .d88888b.  888b    888      888b    888 888      
