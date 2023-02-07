@@ -297,12 +297,12 @@ The resulting estimate $\hat{\vec{\omega}} \approx \vec{\omega}$ can then be use
 % 
 
 \subsection{Computational Complexity}\label{subsec:cloud_fusion:secfci_comp_complexity}
-The method introduced allows the computation of FCI at a cloud by homomorphically fusing $n$ sensor state estimated with leaked fusion weights using the Paillier and Lewi encryption schemes. Naturally, relying on encryption and homomorphic operations increases the complexity of computing this fusion at the sensor, cloud and querying party. Here, we look at the computational complexity of the method in terms of the required operations at each party. We assume that both the Lewi and Paillier schemes use the same key size, typically measured in bits, $\log{N}$ where $N$ is the Paillier modulus in section \ref{subsec:prelims:paillier}. In addition, we note the distinction between floating-point or small integer operations, treated as having runtime $O(1)$, and large integer operations with runtime dependent on bit length. While hardware architecture exists for faster encryption operations [gueronIntelAdvancedEncryption2010], we consider software implementations and treat large integer operations in terms of bit operations explicitly.
+The method introduced allows the computation of FCI at a cloud by homomorphically fusing $n$ sensor states estimated with leaked fusion weights using the Paillier and Lewi encryption schemes. Naturally, relying on encryption and homomorphic operations increases the complexity of computing this fusion at the sensor, cloud and querying party. Here, we look at the computational complexity of the method in terms of the required operations at each party for each timestep $k$. We assume that both the Lewi and Paillier schemes use the same key size, typically measured in bits, $\log{N}$, where $N$ is the Paillier modulus in section \ref{subsec:prelims:paillier}. In addition, we note the distinction between floating-point or small integer operations, treated as having runtime $O(1)$, and large integer operations with runtime dependent on bit length. While hardware architecture exists for faster encryption operations [gueronIntelAdvancedEncryption2010], we consider software implementations and treat large integer operations in terms of bit operations explicitly.
 
 Individual encryption operation complexities with the assumptions made above have been summarised in table \ref{tab:cloud_fusion:secfci_op_complexity}. 
 \begin{table}[htbp]
     \centering
-    \caption{Computation complexity of encryption operations.}
+    \caption{Computation complexity of involved encryption operations.}
     \label{tab:cloud_fusion:secfci_op_complexity}
     \begin{tabular}{|c|c|}
         \hline
@@ -321,14 +321,14 @@ Individual encryption operation complexities with the assumptions made above hav
 Applying operation complexities to the fusion algorithm we get the computational complexity for the sensors, cloud and querying party. These can be seen in table \ref{tab:cloud_fusion:secfci_complexity}, where unencrypted FCI algorithm complexities are also shown for reference. 
 \begin{table}[htbp]
    \centering
-   \caption{Computation complexity at each party.}
+   \caption{Computation complexity at each timestep $k$ for each party.}
    \label{tab:cloud_fusion:secfci_complexity}
    \begin{tabular}{|c|c|c|}
       \hline
-       & \textbf{FCI} & \textbf{Homomorphic Method Leaking Weights} \\ 
+       & \textbf{FCI} & \textbf{Confidential Fusion Leaking Weights} \\ 
       \hline
-      Sensor & $O(1)$ & $O\left(d^2\log^3{N} + \frac{1}{g}\log^2{N} + d\right)$ \\ 
-      Cloud & $O(d^2+n^3)$ & $O\left(nd^2\log^3{N} + n\log{\frac{1}{g}} + n^3\right)$ \\ 
+      Sensor & $O(1)$ & $O\left(d^2\log^3{N} + \frac{1}{g}\log^2{N}\right)$ \\ 
+      Cloud & $O(nd^2+n^3)$ & $O\left(nd^2\log^3{N} + n\log{\frac{1}{g}} + n^3\right)$ \\ 
       Querying Party & $O(1)$ & $O\left(d^2\log^3{N}\right)$ \\ 
       \hline
    \end{tabular}
@@ -467,8 +467,8 @@ combine information from individual sensors $i$ and are computable homomorphical
 \begin{algorithmic}[1]
     \setstretch{1.35}
     \Procedure{Estimate}{$i$, $k$, $\mathsf{pk}$}
-    \State Estimate $\hat{\vec{x}}_{k,i}$ locally
-    \State Estimate $\mat{P}_{k,i}$ locally
+    \State Estimate $\mat{P}_{k,i}^{-1}\hat{\vec{x}}_{k,i}$ locally
+    \State Estimate $\mat{P}_{k,i}^{-1}$ locally
     \LineComment{Encode and encrypt scaling, covariance and estimate components}
     \State $s_{k,i} \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_{k,i})}\right)\right)$
     \State $\mat{C}_{k,i} \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_{k,i})}\mat{P}_{k,i}^{-1}\right)\right)$
@@ -505,9 +505,9 @@ combine information from individual sensors $i$ and are computable homomorphical
     \State $\bar{\mat{C}}_k \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{sk}}\left(\mat{C}_k\right)\right)$
     \State $\bar{\vec{e}}_k \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{sk}}\left(\vec{e}_k\right)\right)$
     \LineComment Compute remaining fusion operations
-    \State $\mat{P}_{k,\mathsf{fus}} \gets \left(\bar{s}_k^{-1} \cdot \bar{\mat{C}}_k\right)^{-1}$
-    \State $\hat{\vec{x}}_{k,\mathsf{fus}} \gets \mat{P}_{k,\mathsf{fus}} \cdot \bar{s}_k^{-1} \cdot \bar{\vec{e}}_k$
-    \State \Return $\hat{\vec{x}}_{k,\mathsf{fus}}$, $\mat{P}_{k,\mathsf{fus}}$
+    \State $\mat{P}_{k,\mathsf{fus}}^{-1} \gets \bar{s}_k^{-1} \cdot \bar{\mat{C}}_k$
+    \State $\mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}} \gets \bar{s}_k^{-1} \cdot \bar{\vec{e}}_k$
+    \State \Return $\mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}}$, $\mat{P}_{k,\mathsf{fus}}^{-1}$
     \EndProcedure
 \end{algorithmic}
 \end{algorithm}
@@ -525,38 +525,38 @@ Along with allowing the summations to be performed homomorphically on the cloud,
 % 
 
 \subsection{Computational Complexity}\label{subsec:cloud_fusion:secfci2_comp_complexity}
-The method described provides a level of security when relying on an untrusted cloud for fusing estimates. However, the added reliance on an encryption scheme and the additional computations at the third party intuitively increase the computational complexity of the algorithm and the required capabilities of participating parties. Here, we present the complexity of operations during fusion, required by each party at every timestep $k$. We assume encoding and decoding operations have complexity $O(1)$ (due to their comparative insignificance when compared to associated encryption and decryption operations) and use \cite{paillierPublicKeyCryptosystemsBased1999} to obtain the encryption complexities of the Paillier encryption scheme in table \ref{tab:enc_cmplx}, with security parameter $\lambda = \log{N}$.
-\begin{table}[tb]
+As with the method in section \ref{sec:cloud_fusion:secfci}, this method allows the homomorphic computation of FCI fusion given $n$ sensor estimates at the computational cost of encryption and homomorphic operations. Here, we look at this additional cost when performing the confidential fusion method without leaking fusion weights. We again assume floating-point and small integer operations to have complexity $O(1)$, the Paillier scheme to have key size $\log{N}$ bits and repeat the Paillier operation complexities in table \ref{tab:cloud_fusion:secfci2_op_complexity} for convenience. 
+\begin{table}[htbp]
     \centering
-    \caption{Computation complexity of encryption operations.}
-    \label{tab:enc_cmplx}
+    \caption{Computation complexity of Paillier encryption operations.}
+    \label{tab:cloud_fusion:secfci2_op_complexity}
     \begin{tabular}{|c|c|}
-       \hline
-       \textbf{Operation} & \textbf{Complexity} \\ 
-       \hline
-       Encryption & $O(\log^3{N})$ \\ 
-       Decryption & $O(\log^3{N})$ \\ 
-       Addition & $O(\log^2{N})$ \\ 
-       Scalar mult. & $O(\log^3{N})$ \\ 
-       \hline
+        \hline
+        \textbf{Operation} & \textbf{Complexity} \\ 
+        \hline
+        Paillier Encryption & $O(\log^3{N})$ \\ 
+        Paillier Decryption & $O(\log^3{N})$ \\ 
+        Paillier Addition & $O(\log^2{N})$ \\ 
+        Paillier Scalar Multiplication & $O(\log^3{N})$ \\ 
+        \hline
     \end{tabular}
- \end{table}
-In table \ref{tab:fus_cmplx}, we compare the complexities of the unencrypted FCI algorithm and the method presented in this work.
+\end{table}
+In table \ref{tab:cloud_fusion:secfci2_complexity}, we apply the Paillier operation complexities to the presented method where the unencrypted FCI algorithm is again shown for reference.
 \begin{table}[tb]
     \centering
-    \caption{Computation complexity at parties during fusion.}
-    \label{tab:fus_cmplx}
-    \begin{tabular}{ |c|c|c| }
+    \caption{Computation complexity at each timestep $k$ for each party.}
+    \label{tab:cloud_fusion:secfci2_complexity}
+    \begin{tabular}{|c|c|c|}
        \hline
-        & \textbf{FCI} & \textbf{Our Method} \\ 
+        & \textbf{FCI} & \textbf{Confidential Fusion} \\ 
        \hline
-       Estimator & $O(1)$ & $O\left(n^2\log^3{N}\right)$ \\ 
-       Fusion & $O(mn^3)$ & $O\left(mn^2\log^2{N}\right)$ \\ 
-       Third party & $O(1)$ & $O\left(n^2\log^3{N} + n^3\right)$ \\ 
+       Sensor & $O(1)$ & $O\left(d^2\log^3{N}\right)$ \\ 
+       Cloud & $O(nd^2 + n^3)$ & $O\left(nd^2\log^2{N}\right)$ \\ 
+       Querying Party & $O(1)$ & $O\left(d^2\log^3{N}\right)$ \\ 
        \hline
     \end{tabular}
  \end{table}
-It can be seen that the burden of computation is greatly increased at the estimators and the third party, in particular when dimension $n$ is large and when a long encryption key $N$ is used. Naturally, an application of the proposed method would need to consider these requirements in terms of computation time and required hardware.
+Here we see that the burden of computation in the confidential fusion without leaking weights is reduced when compared to the method leaking weights in section \ref{sec:cloud_fusion:secfci}. This can be attributed to no longer requiring the Lewi ORE scheme and the computational simplicity of the final steps of fusion required at the querying party in comparison to the expensive decryption operations. Again, the presented computational requirements are a property that must be considered if this method were to be implemented on hardware and the security benefits desired.
 
 % 
 %  ######  ########  ######  
@@ -571,7 +571,7 @@ It can be seen that the burden of computation is greatly increased at the estima
 \subsection{Security Analysis}\label{subsec:security}
 The provable security of the presented method is relatively straightforward. Our aim for IND-CPA security of all information received by the cloud, sent by the estimators or observable by eavesdroppers is achieved by the homomorphic Paillier encryption scheme. Since all transmitted information is encrypted and the cloud, estimators and eavesdroppers do not hold the secret key $\mathsf{sk}$, IND-CPA is met at all parties.
 
-We note, however, an implicit assumption made when encrypting multidimensional data element-wise. While individual elements are indistinguishable, element-wise encryption does not encrypt the estimate's dimension $n$, which remains implicitly public. While existing methods allow the complete homomorphic encryption of vectors [alexandruPrivateWeightedSum2020], they are left for future work and considered beyond the scope of this work. Instead, we acknowledge the implicit leakage of $n$ and note that, while this may leak information about the fusion's use case, state estimates remain hidden. Additionally, intuitive extensions to the scheme, such as the dynamic joining and leaving of estimators in remark \ref{rem:seq_extension}, may introduce further implicit leakages that must be considered if security is analysed. In this example, the periodic estimation may leak to the cloud when estimators are within an estimation range or context, and a solution may be sending dummy measurements with $s_{k,i}=\mathcal{E}_{\mathsf{pk}}(\mathsf{E}_{N,\phi}(0))$ when estimator $i$ is out of range. This extension is presented only as an example of when care needs to be taken to maintain desired security goals, but in general, extensions and solutions are task-dependent and not a focus of this work.
+We note, however, an implicit assumption made when encrypting multidimensional data element-wise. While individual elements are indistinguishable, element-wise encryption does not encrypt the estimate's dimension $n$, which remains implicitly public. While existing methods allow the complete homomorphic encryption of vectors [alexandruPrivateWeightedSum2020], they are left for future work and considered beyond the scope of this work. Instead, we acknowledge the implicit leakage of $n$ and note that, while this may leak information about the fusion's use case, state estimates remain hidden. Additionally, intuitive extensions to the scheme, such as the dynamic joining and leaving of estimators in remark, may introduce further implicit leakages that must be considered if security is analysed. In this example, the periodic estimation may leak to the cloud when estimators are within an estimation range or context, and a solution may be sending dummy measurements with $s_{k,i}=\mathcal{E}_{\mathsf{pk}}(\mathsf{E}_{N,\phi}(0))$ when estimator $i$ is out of range. This extension is presented only as an example of when care needs to be taken to maintain desired security goals, but in general, extensions and solutions are task-dependent and not a focus of this work.
 
 
 % 
