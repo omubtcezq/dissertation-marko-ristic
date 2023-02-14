@@ -102,18 +102,6 @@ In this section, we present the method for computing the fusion result \eqref{eq
 % Desire IND-CPA except for leaked weights. Easier for the security section that follows.
 
 % 
-%  ######  ########  ######     ########  ######  #### 
-% ##    ## ##       ##    ##    ##       ##    ##  ##  
-% ##       ##       ##          ##       ##        ##  
-%  ######  ######   ##          ######   ##        ##  
-%       ## ##       ##          ##       ##        ##  
-% ##    ## ##       ##    ##    ##       ##    ##  ##  
-%  ######  ########  ######     ##        ######  #### 
-% 
-
-\subsection{Secure Fast Covariance Intersection}
-
-% 
 % ..#######...........######..########.##....##
 % .##.....##.........##....##.##.......###...##
 % ........##.........##.......##.......####..##
@@ -123,8 +111,8 @@ In this section, we present the method for computing the fusion result \eqref{eq
 % .#########..........######..########.##....##
 % 
 
-\subsubsection{Two-sensor Case}\label{subsubsec:cloud_fusion:secfci_2sen}
-The Secure Fast Covariance Intersection (SecFCI) fusion algorithm will first be introduced in the special case of two sensors, before an extension to the $n$-sensor case. Recalling FCI fusion \eqref{eq:prelims:ci_est}, \eqref{eq:prelims:ci_cov} and \eqref{eq:prelims:ci_weight_sum}, we can write the fusion of two estimates and their error covariances at timestep $k$ in the information form as
+\subsection{Two-sensor Case}\label{subsec:cloud_fusion:secfci_2sen}
+The confidential fusion algorithm will first be introduced in the special case of two sensors, before an extension to the $n$-sensor case. Recalling FCI fusion \eqref{eq:prelims:ci_est}, \eqref{eq:prelims:ci_cov} and \eqref{eq:prelims:ci_weight_sum}, we can write the fusion of two estimates and their error covariances at timestep $k$ in the information form as
 \begin{equation}
     \mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}} = \omega_1\mat{P}_{k,1}^{-1}\hat{\vec{x}}_{k,1} + (1 - \omega_1)\mat{P}_{k,2}^{-1}\hat{\vec{x}}_{k,2}
 \end{equation}
@@ -184,7 +172,7 @@ In this way, computing fusion on the cloud homomorphically can be performed when
 % .##....##..........######..########.##....##
 % 
 
-\subsubsection{Multi-sensor Case}\label{subsubsec:cloud_fusion:secfci_nsen}
+\subsection{Multi-sensor Case}\label{subsec:cloud_fusion:secfci_nsen}
 To compute the fusion of $n$ sensor estimates in the information form we want the solutions to
 \begin{equation}
     \mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}} = \sum_{i=1}^n\omega_i\mat{P}_{k,i}^{-1}\hat{\vec{x}}_{k,i}
@@ -348,7 +336,7 @@ These complexities show the additional computational cost required for providing
 \subsection{Security Analysis}\label{subsec:cloud_fusion:secfci_security}
 To discuss the security of the presented scheme we look at the assumptions on collusions between participants and the cryptographic guarantees of the used encryption schemes. As we require that all sensors share the ORE secret key $\mathsf{sk}_{\mathsf{o}}$, we assume trust between the sensors in the case of cloud fusion when leaking fusion weights. The cloud and eavesdroppers are not trusted by the sensors and can only gain access to the Paillier encryptions of estimates, \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_ests} and \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_covs}, and the Lewi ORE encrypted sequences \eqref{eq:cloud_fusion:secfci_nsen_enc_seqs}.
 
-Since Paillier encryptions \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_ests} and \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_covs} meet the IND-CPA notion, estimates themselves are indistinguishable to the cloud and eavesdroppers as desired by our security goals. The leakage from the Lewi encrypted sequences is captured by the simulation-based security met by the scheme. This is shown in section \ref{subsubsec:cloud_fusion:secfci_nsen} to be a function of leaking approximations to the weights $\omega_i$ and therefore the relative uncertainties of sensors, in addition to some leakage beyond ciphertext ordering, due to the relaxation of the IND-OCPA notion, which can be difficult to quantify. Lastly, we also acknowledge the implicit leakage of state dimension $d$ associated with elementwise encryption. Although methods for homomorphic encryption of vectors exist [alexandruPrivateWeightedSum2020], we leave this as future work on this topic and note that the dimension $d$ may leak information about the data fusion use case but that the state estimates themselves remain hidden.
+Since Paillier encryptions \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_ests} and \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_covs} meet the IND-CPA notion, estimates themselves are indistinguishable to the cloud and eavesdroppers as desired by our security goals. The leakage from the Lewi encrypted sequences is captured by the simulation-based security met by the scheme. This is shown in section \ref{subsec:cloud_fusion:secfci_nsen} to be a function of leaking approximations to the weights $\omega_i$ and therefore the relative uncertainties of sensors, in addition to some leakage beyond ciphertext ordering, due to the relaxation of the IND-OCPA notion, which can be difficult to quantify. Lastly, we also acknowledge the implicit leakage of state dimension $d$ associated with elementwise encryption. Although methods for homomorphic encryption of vectors exist [alexandruPrivateWeightedSum2020], we leave this as future work on this topic and note that the dimension $d$ may leak information about the data fusion use case but that the state estimates themselves remain hidden.
 
 Due to leaking relative sensor uncertainties, this method leaks confidential information that may lead to inferences about sensor hardware. However, this leakage also has the upside of benefitting fusion performance by allowing the cloud to prioritise the fusion of some sensor data over others. For example, in bandwidth-limited networks, communication with sensors of higher uncertainty may be dropped in favour of those that lead to better fusion results.
 
@@ -589,6 +577,7 @@ Regarding the ability of the presented method to compute FCI sequentially, and t
 % ##    ##  ##  ##     ## 
 %  ######  #### ##     ## 
 % 
+
 \subsection{Simulation}\label{subsec:cloud_fusion:secfci2_simulation}
 To demonstrate the accuracy of the method and compare it to the method in section \ref{sec:cloud_fusion:secfci} as well as the FCI algorithm it approximates, we implemented a simulation of the fusion scenario. Since errors in fusion are now only introduced during real number quantisation we expect the estimation error to be smaller than that in section \ref{sec:cloud_fusion:secfci}. We again use the $\mathsf{phe}$ Paillier encryption scheme library [PythonPaillier2013], choose the Paillier and Lewi key sizes $N$, and therefore encoding modulus $M$, to be $512$ bits long, and implement the constant-speed linear model \eqref{eq:cloud_fusion:secfci_system_model}. At each timestep $k$, the system state $\vec{x}_k$ is measured by $m=4$ sensors, $1\leq i \leq 4$, with measurements $\vec{z}_{k,i}$ following the measurement models \eqref{eq:cloud_fusion:secfci_measurement_model} and covariances \eqref{eq:cloud_fusion:secfci_measurement_model_covariances}. Using a linear IF, each sensor produces estimate information $\mat{P}_{k, i}^{-1}\hat{\vec{x}}_{k, i}$ and $\mat{P}_{k, i}^{-1}$, respectively, that are processed, encrypted and fused at the cloud and querying party. The fusion error results of $1000$ simulation runs are shown in figure \ref{fig:cloud_fusion:secfci2_sim_error}. 
 \begin{figure}[htbp]

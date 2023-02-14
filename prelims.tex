@@ -244,19 +244,19 @@ Similarly to the EKF, the linearisation of models leads to estimation errors mak
 % 
 
 \subsection{Covariance Intersection and Fast Covariance Intersection}\label{subsec:prelims:fci}
-In the filters presented in the previous sections, measurements from the same timestep must be independent for sequential update steps to fuse them correctly. That is, non-zero cross-correlations between measurements can lead to overly confident estimate error covariances and estimation track divergence [crosscor paper]. In some cases, this independence of measurements cannot be guaranteed and a conservative fusion method is required to obtain a final estimate and its error covariance using all available measurements. A typical scenario is the fusion of local estimator estimates themselves, such as those produced by separate KF or EKF instances, that may contain cross-correlations due to shared process model assumptions during estimation [ci and dependence ref]. Covariance intersection (CI), is a fusion algorithm that fuses estimates and their error covariances (or measurements and their known error covariances) when cross-correlations are unknown [julierNondivergentEstimation] and produces estimates that are guaranteed to be conservative, that is, not overly confident in the error of resulting fused estimates. The CI fusion of $n$ estimates $\hat{\vec{x}}_i$, $1\leq i \leq n$, and their error covariances $\mat{P}_i$, $1\leq i \leq n$, produces a fused estimate $\hat{\vec{x}}_{\mathsf{fus}}$ and its error covariance $\mat{P}_{\mathsf{fus}}$, and is given by
+In the filters presented in the previous sections, measurements from the same timestep must be independent for sequential update steps to fuse them correctly. That is, non-zero cross-correlations between measurements can lead to overly confident estimate error covariances and estimation track divergence [crosscor paper]. In some cases, this independence of measurements cannot be guaranteed and a conservative fusion method is required to obtain a final estimate and its error covariance using all available measurements. A typical scenario is the fusion of local estimator estimates themselves, such as those produced by separate KF, IF, EKF or EIF instances, that may contain cross-correlations due to shared process model assumptions during estimation [ci and dependence ref]. Covariance intersection (CI), is a fusion algorithm that fuses estimates or measurements and their error covariances when cross-correlations are unknown [julierNondivergentEstimation] and produces estimates that are guaranteed to be conservative, that is, not overly confident in the error of resulting fused estimates. CI is particularly well suited to fusing estimates $\hat{\vec{x}}_i$ and covariances $\mat{P}_i$ of sensor $i$ in the information form, as given in \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, such that the fusion of $n$ information vectors $\mat{P}_i^{-1}\hat{\vec{x}}_i$, $1\leq i\leq n$, and information matrices $\mat{P}_i^{-1}$, $1\leq i\leq n$, produces a fused information vector $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$ and matrix $\mat{P}_{\mathsf{fus}}^{-1}$, by
 \begin{equation}\label{eq:prelims:ci_est}
-    \hat{\vec{x}}_{\mathsf{fus}} = \mat{P}_{\mathsf{fus}}\sum_{i=1}^n \omega_i \mat{P}_i^{-1} \hat{\vec{x}}_i
+    \mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} = \sum_{i=1}^n \omega_i \mat{P}_i^{-1} \hat{\vec{x}}_i
 \end{equation}
 and
 \begin{equation}\label{eq:prelims:ci_cov}
-\mat{P}_{\mathsf{fus}}=\left(\sum_{i=1}^{n}\omega_i \mat{P}_i^{-1}\right)^{-1}\,,
+\mat{P}_{\mathsf{fus}}^{-1}=\sum_{i=1}^{n}\omega_i \mat{P}_i^{-1}\,,
 \end{equation}
 for some weights $0\leq \omega_i \leq 1$, $1\leq i \leq n$, such that
 \begin{equation}\label{eq:prelims:ci_weight_sum}
     \sum_{i=1}^n \omega_i = 1\,.
 \end{equation}
-The weights $\omega_i$ are chosen in a way to speed up the convergence of estimate errors over time and to minimise fusion estimate error by minimising some property of the fused estimate error covariance. A common choice is to minimise the trace of the covariance [ci example with trace], requiring a solution to
+The weights $\omega_i$ are chosen in a way to speed up the convergence of estimate errors over time and to minimise fusion estimate error by minimising some property of the fused estimate error covariance $\mat{P}_{\mathsf{fus}}$. A common choice is to minimise the trace of the covariance [ci example with trace], requiring a solution to
 \begin{equation}\label{eq:prelims:ci_min_trace}
     \argmin_{\omega_1,\dots,\omega_n} \left\{\tr\left(\mat{P}_{\mathsf{fus}}\right)\right\}\,.
  \end{equation}
@@ -291,7 +291,7 @@ and its solution
 \begin{equation}\label{eq:prelims:fci_solution}
     \omega_i = \frac{\frac{1}{\mathcal{P}_i}}{\sum_{j=1}^n \frac{1}{\mathcal{P}_j}}\,,
 \end{equation}
-for $1\leq i\leq n$, where $\mathcal{P}_i = \tr(\mat{P}_i)$. Yeilding similar results to the optimal CI, FCI has become a popular alternative due to its computational simplicity [uses of fci]. For further reading, and uses of CI and FCI, see [ci refs].
+for $1\leq i\leq n$, where $\mathcal{P}_i = \tr(\mat{P}_i)$. Yeilding similar results to the optimal CI \eqref{eq:prelims:ci_min_trace}, FCI has become a popular alternative due to its computational simplicity [uses of fci]. For further reading, and uses of CI and FCI, see [ci refs].
 
 % 
 %  .d8888b.  8888888888 .d8888b.       8888888b.  8888888b.  8888888888 888      8888888 888b     d888 
@@ -326,7 +326,7 @@ Cryptographic notions are formal mathematical constructs used to prove the secur
 Notion capabilities and leakages are dependent on the goal of a particular encryption scheme and are typically defined as a \textit{cryptographic game} (or \textit{experiment}) involving an adversary and the encryption scheme algorithms []. Proofs that schemes meet these notions are often based on existing proofs or assumptions believed to hold, and proved by contrapositive. Below, some cryptographic notions relevant to this thesis are introduced.
 \begin{description}
     \item[Indistinguishability under a Chosen Plaintext Attack (IND-CPA)] This notion targets encryption schemes of the form $(\mathsf{Generate},\mathsf{Encrypt},\mathsf{Decrypt})$ and states that an attacker cannot distinguish between encryptions of unknown messages when they can encrypt chosen messages of their own. For detailed definitions and the formal cryptographic game, see [].
-    \item[Aggregator Obliviousness (AO)] The AO notion considers an environment of multiple participants where a single \textit{aggregator} computes the summation of input from all other participants. An encryption scheme for this interaction is of the form $(\mathsf{Setup},\mathsf{Encrypt},\mathsf{AggregateDecrypt})$. The notion states that no subset of colluding participants with access to all encryptions and the final summation can compute any more than a party with access to only the colluding participant inputs and the final summation can. The notion of AO and the relevant game are given can be found in [shiPrivacyPreservingAggregationTimeSeries2011].
+    \item[Aggregator Obliviousness (AO)] The AO notion considers an environment of multiple participants where a single \textit{aggregator} computes the summation of input from all other participants. An encryption scheme for this interaction is of the form $(\mathsf{Setup},\mathsf{Encrypt},\mathsf{AggregateDecrypt})$. The notion states that no subset of colluding participants with access to all encryptions and the final summation can compute any more than a party with access to only the colluding participant inputs and the final summation can. The notion of AO and the relevant game are given in [shiPrivacyPreservingAggregationTimeSeries2011].
     \item[Indistinguishability under an Ordered Chosen Plaintext Attack (IND-OCPA)] IND-OCPA is the ideal notion of security for order-revealing encryption, stating that no attacker can distinguish between two sequences of encryptions when the numerical order of messages in the sequences is identical. The associated encryption scheme for the notion is of the form $(\mathsf{Setup},\mathsf{Encrypt},\mathsf{Compare})$. Additional details and the cryptographic game are given in [boldyreva order-preserving symmetric encryption].
 \end{description}
 As novel encryption schemes and cryptographic games are presented in this thesis, additional information on creating and proving cryptographic notions may be beneficial. For introductory methods and the structure of proofs, see [], while more advanced proofs can be found in [].
@@ -342,26 +342,32 @@ As novel encryption schemes and cryptographic games are presented in this thesis
 % 
 
 \subsection{Paillier Homomorphic Encryption Scheme}\label{subsec:prelims:paillier}
-The Paillier encryption scheme [paillierPublicKeyCryptosystemsBased1999] is an additively homomorphic encryption scheme that bases its security on the decisional composite residuosity assumption (DCRA) and meets the security notion of IND-CPA. Key generation of the Paillier scheme is performed by choosing two sufficiently large primes of an equal bit length, $p$ and $q$, and computing $N=pq$ [katzIntroductionModernCryptography2008]. The public key is defined by $N$ and the secret key by $(p, q)$.
+The Paillier encryption scheme [paillierPublicKeyCryptosystemsBased1999] is an additively homomorphic encryption scheme that bases its security on the decisional composite residuosity assumption (DCRA) and meets the security notion of IND-CPA. Key generation of the Paillier scheme is performed by choosing two sufficiently large primes of an equal bit length, $p$ and $q$, and computing $N=pq$ [katzIntroductionModernCryptography2008]. The public key is defined by $\mathsf{pk}=N$ and the secret key by $\mathsf{sk}=(p, q)$.
 
 Encryption of a plaintext message $a \in \mathbb{Z}_N$, producing ciphertext $c \in \mathbb{Z}^{*}_{N^2}$, is computed by
 \begin{equation}
-    c = (N+1)^a \rho^N \pmod{N^2}
+    c=\mathcal{E}_{\mathsf{pk}}(a) = (N+1)^a \rho^N \pmod{N^2}
 \end{equation}
-for a randomly chosen $\rho \in \mathbb{Z}_{N}$. Here, $\rho^N$ can be considered the noise term which hides the value $(N+1)^a \pmod{N^2}$, which due to the scheme construction, is an easily computable discrete logarithm. The decryption of a ciphertext is computed by
+for a randomly chosen $\rho \in \mathbb{Z}_{N}$. Here, $\rho^N$ can be considered the noise term which hides the value $(N+1)^a \pmod{N^2}$, which due to the scheme construction, is an easily computable discrete logarithm. The decryption of the ciphertext $c$ is computed by
 \begin{equation}
-    a = \frac{L(c^\lambda\pmod{N^2})}{L((N+1)^\lambda\pmod{N^2})} \pmod{N}
+    a=\mathcal{D}_{\mathsf{pk},\mathsf{sk}}(c) = \frac{L(c^\lambda\pmod{N^2})}{L((N+1)^\lambda\pmod{N^2})} \pmod{N}
 \end{equation}
 where $\lambda = \mathsf{lcm}(p-1, q-1)$ and $L(\psi) = \frac{\psi-1}{N}$.
 
-In addition to encryption and decryption, the following homomorphic functions are provided by the Paillier scheme. $\forall a_1,a_2 \in \mathbb{Z}_N$,
+In addition to encryption and decryption, the Paillier scheme provides the following homomorphic properties, $\forall a_1,a_2 \in \mathbb{Z}_N$,
 \begin{align}
-    \mathcal{D}(\mathcal{E}(a_1)\mathcal{E}(a_2) \hspace{-7pt} \pmod{N^2}) &= a_1+a_2 \hspace{-7pt} \pmod{N}\,, \label{eq:prelims:paillier_hom_add}\\
-    \mathcal{D}(\mathcal{E}(a_1)(N+1)^{a_2} \hspace{-7pt} \pmod{N^2}) &= a_1+a_2\hspace{-7pt}\pmod{N}\,, \label{eq:prelims:paillier_hom_add_plain}\\
-    \mathcal{D}(\mathcal{E}(a_1)^{a_2} \hspace{-7pt} \pmod{N^2}) &= a_1a_2 \hspace{-7pt} \pmod{N}\,. \label{eq:prelims:paillier_hom_mult}
+    \mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\mathcal{E}_{\mathsf{pk}}(a_1)\mathcal{E}_{\mathsf{pk}}(a_2) \pmod{N^2}\right) &= a_1+a_2 \pmod{N}\,, \label{eq:prelims:paillier_hom_add}\\
+    \mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\mathcal{E}_{\mathsf{pk}}(a_1)(N+1)^{a_2} \pmod{N^2}\right) &= a_1+a_2 \pmod{N}\,, \label{eq:prelims:paillier_hom_add_plain}\\
+    \mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\mathcal{E}_{\mathsf{pk}}(a_1)^{a_2} \pmod{N^2}\right) &= a_1a_2 \pmod{N}\,. \label{eq:prelims:paillier_hom_mult}
 \end{align}
-
-% Additionally, we note that the current recommended key length for the Paillier encryption scheme is $2048$ bits [barkerRecommendationPairWiseKey2019], easily supporting a modulus $N$ and fractional precision $\phi$ that guarantee similar performance.
+To simplify this notation, the shorthand operators $\oplus$ and $\otimes$ are used to denote homomorphic addition and multiplication, respectively, as
+\begin{equation}\label{eq:prelims:paillier_hom_add_op}
+    \mathcal{E}_{\mathsf{pk}}(a_1)\oplus\mathcal{E}_{\mathsf{pk}}(a_2) \equiv \mathcal{E}_{\mathsf{pk}}(a_1)\mathcal{E}_{\mathsf{pk}}(a_2) \pmod{N^2}
+\end{equation}
+and
+\begin{equation}
+    a_2\otimes\mathcal{E}_{\mathsf{pk}}(a_1) \equiv \mathcal{E}_{\mathsf{pk}}(a_1)^{a_2} \pmod{N^2}\,.
+\end{equation}
 
 % 
 %    ###     ######    ######   
@@ -374,34 +380,34 @@ In addition to encryption and decryption, the following homomorphic functions ar
 % 
 
 \subsection{Joye-Libert Aggregation Scheme}\label{subsec:prelims:joye_libert_agg}
-The Joye-Libert privacy-preserving aggregation scheme [joyeScalableSchemePrivacyPreserving2013] is a scheme defined on time-series data and meets the security notion AO. Similarly to the Paillier scheme in section \ref{subsec:prelims:paillier}, it bases its security on the DCRA, however, an aggregation scheme generates private keys for individual participants and the aggregating party, requiring an additional trusted party to perform the private key generation and distribution.
+The Joye-Libert privacy-preserving aggregation scheme [joyeScalableSchemePrivacyPreserving2013] is a scheme defined for $n+1$ parties, where $n$ participants have their data aggregated by an aggregator that performs the homomorphic summation. It is defined on time-series data, indexed by timestep $k$, and meets the security notion AO. Similarly to the Paillier scheme in section \ref{subsec:prelims:paillier}, it bases its security on the DCRA, however, an aggregation scheme generates secret keys for individual participants and the aggregating party, requiring an additional trusted party to perform an initial key generation and distribution step.
 
-Key generation is computed by choosing two equal-length and sufficiently large primes $p$ and $q$, and computing $N=pq$. A hash function $H:\mathbb{Z} \rightarrow \mathbb{Z}_{N^2}^*$ is defined and the public key is set to $(N, H)$. $n$ private keys are generated by choosing $\mathsf{sk}_i,\,i\in\{1,\dots,n\}$, uniformly from $\mathbb{Z}_{N^2}$ and distributing them to $n$ participants (whose values are to be aggregated), while the last key is set as
+Key generation is computed by choosing two equal-length and sufficiently large primes $p$ and $q$, and computing $N=pq$. A hash function $H:\mathbb{Z} \rightarrow \mathbb{Z}_{N^2}^*$ is defined and the scheme's public key is set to $\mathsf{pk}_{\mathsf{A}}=(N, H)$. $n$ secret keys are generated by choosing $\mathsf{sk}_{\mathsf{A}, i}$, $1\leq i\leq n$, uniformly from $\mathbb{Z}_{N^2}$ and distributing them to $n$ participants (whose data is to be aggregated). The last secret key is set as
 \begin{equation}
-    \mathsf{sk}_0 = -\sum^{n}_{i=1}\mathsf{sk}_i\,,
+    \mathsf{sk}_{\mathsf{A},0} = -\sum^{n}_{i=1}\mathsf{sk}_{\mathsf{A},i}\,,
 \end{equation}
 and sent to the aggregator.
 
 At any timestep $k$, a participant $i$ can encrypt time-series plaintext data $a^{(k)}_{i} \in \mathbb{Z}_N$ to ciphertext $c^{(k)}_{i} \in \mathbb{Z}_{N^2}$ with
 \begin{equation}
-    c^{(k)}_{i} = (N+1)^{a^{(k)}_{i}} H(k)^{\mathsf{sk}_i} \pmod{N^2}\,.
+    c^{(k)}_{i} = \mathcal{E}_{\mathsf{pk}_{\mathsf{A}},\mathsf{sk}_{\mathsf{A},i}}\left(a^{(k)}_{i}\right) = (N+1)^{a^{(k)}_{i}} H(k)^{\mathsf{sk}_i} \pmod{N^2}\,.
 \end{equation}
 Here, we can consider $H(k)^{\mathsf{sk}_i}$ the noise term which hides the easily computable discrete logarithm $(N+1)^{a^{(k)}_{i}} \pmod{N^2}$.
 
-When all encryptions $c^{(k)}_{i},\,i\in\{1,\dots,n\}$ are sent to the aggregator, summation and decryption of the aggregated sum are computed by the functions
-\begin{equation}
-    c^{(k)} = H(k)^{\mathsf{sk}_0}\prod^{n}_{i=1}c^{(k)}_{i} \pmod{N^2} \label{eq:prelims:joye_libert_agg_sum}
+When all encryptions $c^{(k)}_{i}$, $1\leq i\leq n$ are sent to the aggregator, summation and decryption of the aggregated sum are computed by
+\begin{equation}\label{eq:prelims:joye_libert_agg_sum}
+    c^{(k)} = \prod^{n}_{i=1}c^{(k)}_{i} \pmod{N^2} 
 \end{equation}
 and
-\begin{equation}
-    \sum^{n}_{i=1}a^{(k)}_{i} = \frac{c^{(k)}-1}{N} \pmod{N}\,. \label{eq:prelims:joye_libert_agg_dec}
+\begin{equation}\label{eq:prelims:joye_libert_agg_dec}
+    \sum^{n}_{i=1}a^{(k)}_{i} = \mathcal{D}_{\mathsf{pk}_{\mathsf{A}},\mathsf{sk}_{\mathsf{A},0}}\left(c^{(k)}\right) = \frac{H(k)^{\mathsf{sk}_{\mathsf{A},0}}c^{(k)}-1}{N} \pmod{N}\,.
 \end{equation}
-Correctness follows from $\sum^{n}_{i=0}\mathsf{sk}_i = 0$, and thus
+Correctness follows from $\sum^{n}_{i=0}\mathsf{sk}_{\mathsf{A},i} = 0$, and thus
 \begin{equation*}
     \begin{split}
-        &H(k)^{\mathsf{sk}_0}\prod^{n}_{i=1}c^{(k)}_{i} \pmod{N^2} \\
-        \equiv &H(k)^{\mathsf{sk}_0}\prod^{n}_{i=1}(N+1)^{a^{(k)}_{i}} H(k)^{\mathsf{sk}_i} \pmod{N^2} \\
-        \equiv &H(k)^{\sum^n_{j=0}\mathsf{sk}_j} \prod^{n}_{i=1}(N+1)^{a^{(k)}_{i}} \pmod{N^2} \\
+        &H(k)^{\mathsf{sk}_{\mathsf{A},0}}\prod^{n}_{i=1}c^{(k)}_{i} \pmod{N^2} \\
+        \equiv &H(k)^{\mathsf{sk}_{\mathsf{A},0}}\prod^{n}_{i=1}(N+1)^{a^{(k)}_{i}} H(k)^{\mathsf{sk}_{\mathsf{A},i}} \pmod{N^2} \\
+        \equiv &H(k)^{\sum^n_{j=0}\mathsf{sk}_{\mathsf{A},j}} \prod^{n}_{i=1}(N+1)^{a^{(k)}_{i}} \pmod{N^2} \\
         \equiv &(N+1)^{\sum^n_{i=1}a^{(k)}_{i}} \pmod{N^2}\,,
     \end{split}
 \end{equation*}
