@@ -16,66 +16,68 @@
 % 
 
 \section{Problem Formulation}\label{sec:cloud_fusion:problem}
-%Our paper is motivated by a key step in multi-sensor fusion, the requirement of transmitting local sensor state estimates and covariance information over a network for the computation of their fused result. In particular, we consider centralized FCI fusion, where a party responsible for many networked sensors capable of computing their local state estimates, wishes to have their fused state estimate and covariance computed securely on an untrusted cloud. The same party may query the cloud fusion centre for the fused result at any time. To preserve the privacy of local sensor measurements and state estimates, we aim to provide a secure FCI algorithm such that the fusion centre does not learn individual sensor measurements, state estimates, or covariances. This will be achieved by encrypted homomorphic fusion, whereby the untrusted cloud learns only the FCI aggregation weights, which will be shown in section [sec:secfci].
+Motivated by the key step in multi-sensor fusion, we are interested in transmitting local sensor state estimate and covariance information over a network to be fused by a fusion cloud. In particular, we consider centralised FCI fusion, as introduced in section \ref{subsec:prelims:fci}, over a public network and at an untrusted fusion cloud. The aim is for fusion to be computed by the cloud on encrypted sensor data to preserve individual and fused estimate confidentiality, that is, no estimate information should be made available to network eavesdroppers, sensors that did not produce it or the fusion cloud itself. A trusted querying third party, holding appropriate secret keys, is presumed to exist which can request and process the fused estimate information from the cloud.
 
-%Our proposed filter aims to solve FCI fusion, namely () and (), using only encrypted values from each sensor $i$, and leaking only the weight values $\omega_1,\dots,\omega_n$.
-
-%The problem of centralised fusion on a cloud server is a general
-
-
-% TODO Add a sentence or two that follows well after the introduction section on the problem
-% Then go straight into the definition
-
-% TODO We fuse the information form. Note that that is also a goal (here only estimate and covariance are shown)
-
-The concrete problem that we consider for cloud estimate fusion has been chosen for its broad applicability. We consider a discrete time-varying process defined by its state $\vec{x}_k \in \mathbb{R}^d$ at every timestep $k$. This process is estimated by sensors (or estimators) $i$, $1\leq i\leq n$, each producing a state estimate and estimate error covariance,
-\begin{equation}\label{eq:cloud_fusion:sen_ests_and_covs}
-    \hat{\vec{x}}_{k,i} \in \mathbb{R}^d \text{ and } \mat{P}_{k,i} \in \mathbb{R}^{d\times d}\,,
+The concrete estimation problem is captured by a time-independent process defined by its state $\vec{x} \in \mathbb{R}^d$ and is estimated by sensors $i$, $1\leq i\leq n$, each producing a state estimate and estimate error covariance,
+\begin{equation}
+    \hat{\vec{x}}_i \in \mathbb{R}^d \text{ and } \mat{P}_i \in \mathbb{R}^{d\times d}\,,
 \end{equation}
-respectively, at each timestep $k$. Our aim is for these estimates and their error covariances to be sent to a cloud server and fused, resulting in a fused estimate and estimate error covariance
-\begin{equation}\label{eq:cloud_fusion:fus_ests_and_covs}
-    \hat{\vec{x}}_{k,\mathsf{fus}} \in \mathbb{R}^d \text{ and } \mat{P}_{k,\mathsf{fus}} \in \mathbb{R}^{d\times d}\,,
+respectively. As we are interested in computing the FCI algorithm, we consider sensors that produce estimates in the information form, namely, the information vector and information matrix,
+\begin{equation}\label{eq:cloud_fusion:sen_info_vecs_and_mats}
+    \mat{P}_i^{-1}\hat{\vec{x}}_i \text{ and } \mat{P}_i^{-1}\,,
 \end{equation}
-respectively, that are consistent with the estimates in \eqref{eq:cloud_fusion:sen_ests_and_covs}. That is, fused estimate error covariance is a conservative estimate of the optimal fused error covariance. In addition to the sensors and cloud fuser, a trusted third party can query the cloud for the fusion result \eqref{eq:cloud_fusion:fus_ests_and_covs} at any timestep $k$. The interactions between participants of the problem have been graphically summarised in figure \ref{fig:cloud_fusion:problem_layout}.
+instead. Information \eqref{eq:cloud_fusion:sen_info_vecs_and_mats} is to be sent to the fusion cloud where FCI is computed and a fused information vector and information matrix,
+\begin{equation}\label{eq:cloud_fusion:fus_info_vec_and_mat}
+    \mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} \in \mathbb{R}^d \text{ and } \mat{P}_{\mathsf{fus}}^{-1} \in \mathbb{R}^{d\times d}\,,
+\end{equation}
+are produced. A trusted querying party can then request \eqref{eq:cloud_fusion:fus_info_vec_and_mat} from the cloud when desired.
+
+The cryptographic aims of this problem are captured by the actions of the involved parties and the accepted leakage of confidential information. 
+\begin{description}
+    \item[Honest-but-curious parties] We assume that all sensors and the fusion cloud follow fusion protocols correctly and that no injection or modification to transmitted data is performed by network eavesdroppers, but all parties may use any learned information for external malicious gain. Collusion between any malicious parties is considered possible.
+    \item[Encrypted estimates meeting IND-CPA] Permitted leakage is such that all estimate information available to a colluding subset of malicious parties, excluding any locally produced estimates (in the case of malicious sensors), is encrypted with a scheme meeting the IND-CPA cryptographic notion, introduced in section \ref{subsec:prelims:crypto_notions}.
+\end{description}
+
+The relatively strict estimation and security aims above can be difficult to achieve in general and relaxations of some requirements may be necessary to achieve others. This will be seen in the two methods presented later in this chapter. Participants, communications between them and whether they are trusted, concerning the ideal aims above, are summarised graphically in figure \ref{fig:cloud_fusion:problem_layout}.
 \begin{figure}[htbp]
     \centering
     \begin{tikzpicture}
-        % Bounding box
-        %\draw [gray] (1,-1.5) rectangle (8.5,7);
         % Estimators
-        \node at (2.5,6.25) {Estimator $1$};
-        \node at (7,6.25) {Estimator $n$};
-        \fill [pyplotorange!70] (7,5.5) ellipse (0.5 and 0.5);
-        \fill [pyplotorange!70] (2.5,5.5) ellipse (0.5 and 0.5);
+        \fill [pyplotorange!70] (1.4,5.75) rectangle (3.6,5.25);
+        \fill [pyplotorange!70] (5.9,5.75) rectangle (8.1,5.25);
+        \node at (2.5,5.5) {Estimator $1$};
+        \node at (7,5.5) {Estimator $n$};
+        % Dots
         \fill [black] (5,5.5) circle (0.05);
         \fill [black] (4.5,5.5) circle (0.05);
         \fill [black] (4.75,5.5) circle (0.05);
         % Estimates
-        \node [right] at (6.25,4.5) {$\hat{\vec{x}}_{k,m},\mat{P}_{k,n}$};
-        \node [left] at (3.25,4.5) {$\hat{\vec{x}}_{k,1},\mat{P}_{k,1}$};
-        % Fusion
-        \node [right] at (5.25,0.5) {$\hat{\vec{x}}_{k,\mathsf{fus}},\mat{P}_{k,\mathsf{fus}}$};
-        % Cloud
-        \node at (4.75,3.65) {Cloud};
-        \fill [pyplotorange!70] (4.75,3) ellipse (0.4 and 0.4);
-        \fill [pyplotorange!70] (5.25,2.75) ellipse (0.4 and 0.25);
-        \fill [pyplotorange!70] (4.25,2.75) ellipse (0.25 and 0.25);
-        \fill [pyplotorange!70] (5.25,3) ellipse (0.25 and 0.25);
-        \fill [pyplotorange!70] (4.25,2.5) rectangle (5.25,2.75);
-        % Third party
-        \node at (4.75,1.25) {Trusted Third party};
-        \fill [pyplotblue!70] (5.5,-0.25) -- (4,-0.25) -- (4.75,1);
+        \node [left] at (3.25,4.25) {$\mat{P}_1^{-1}\hat{\vec{x}}_1,\mat{P}_1^{-1}$};
+        \node [right] at (6.25,4.25) {$\mat{P}_n^{-1}\hat{\vec{x}}_n,\mat{P}_n^{-1}$};
         % Estimator arrows
-        \draw [-latex]  plot coordinates {(3,5)  (4.25,4)};
-        \draw [-latex]  plot coordinates {(6.5,5)  (5.25,4)};
-        % Third-party arrows
-        \draw [latex-latex]  plot coordinates {(4.75,2.3)  (4.75,1.65)};
+        \draw [-latex]  plot coordinates {(3,5)  (4.25,2.75)};
+        \draw [-latex]  plot coordinates {(6.5,5)  (5.25,2.75)};
+        % Network
+        \fill [pyplotorange!70] (2.65,3.75) rectangle (6.85,3.25);
+        \node at (4.75,3.5) {Network Eavesdroppers};
+        % Cloud
+        \fill [pyplotorange!70] (4.6,2.35) ellipse (0.5 and 0.4);
+        \fill [pyplotorange!70] (5.25,2.1) ellipse (0.25 and 0.25);
+        \fill [pyplotorange!70] (4.25,2.1) ellipse (0.25 and 0.25);
+        \fill [pyplotorange!70] (5.1,2.35) ellipse (0.25 and 0.25);
+        \fill [pyplotorange!70] (4.25,1.85) rectangle (5.25,2.1);
+        \node at (4.75,2.15) {Cloud};
+         % Fusion
+        \node [right] at (4.75,1.25) {$\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}},\mat{P}_{\mathsf{fus}}^{-1}$};
+        % Querying party
+        \fill [pyplotblue!70] (3.3,0.5) rectangle (6.2,0);
+        \node at (4.75,0.25) {Querying Party};
+        % Querying party arrows
+        \draw [-latex]  plot coordinates {(4.75,1.75)  (4.75,0.75)};
     \end{tikzpicture}
-    \caption{Participants and communications in the considered cloud fusion problem.}
+    \caption{Trusted (blue) and untrusted (orange) participants and the communications between them in the cloud fusion problem.}
     \label{fig:cloud_fusion:problem_layout}
 \end{figure}
-
-In addition to the fusion of estimates, we specify the security goals of data fusion on an untrusted cloud. Both the cloud and sensors are considered \textit{honest-but-curious}, meaning they follow protocols correctly but may use any learned information for external malicious gain. The desire is for transmitted data accessible to the cloud and eavesdroppers to leak no additional information that is already known by the participants beyond formally specified leakage. Similarly, sensors should learn no additional information about transmitted data beyond their local estimates \eqref{eq:cloud_fusion:sen_ests_and_covs}. To achieve these goals, two methods are proposed in this chapter. The first allows complete homomorphic computation of the fusion results by the cloud but requires mutually trusted sensors and the leakage of relative error covariance sizes. The second method leaks no information in transmitted data and allows malicious collaborations, but requires additional computations by the trusted party when querying the cloud.
 
 % 
 % 8888888888 888     888  .d8888b. 8888888 .d88888b.  888b    888      888      
@@ -92,7 +94,7 @@ In addition to the fusion of estimates, we specify the security goals of data fu
 % 
 
 \section{Confidential Cloud Fusion Leaking Fusion Weights}\label{sec:cloud_fusion:secfci}
-In this section, we present the method for computing the fusion result \eqref{eq:cloud_fusion:fus_ests_and_covs} at the fusion cloud while leaking the order of sensor error covariances to the cloud and eavesdroppers. In addition to the layout in figure \ref{fig:cloud_fusion:problem_layout}, we assume that sensors are computationally capable of running both the Paillier and Lewi encryption schemes locally, from sections \ref{subsec:prelims:paillier} and \ref{subsec:prelims:lewi_ore}, respectively, and require a key distribution step before the beginning of the algorithm. Here, the trusted third party generates a Paillier scheme public key $\mathsf{pk}=N$ and secret key $\mathsf{sk}=(p,q)$ as well as a shared symmetric key $\mathsf{sk}_{\mathsf{o}}$ for the Lewi ORE scheme. The public key $\mathsf{pk}$ is made available to all participants in the fusion process, namely the cloud and sensors, while the shared ORE key $\mathsf{sk}_{\mathsf{o}}$ is made available only to the sensors and thus implies a trust between the sensors in this scenario. The sharing of these keys can be performed by any public-key encryption scheme such as RSA [rivestMethodObtainingDigital1978].
+In this section, we present the method for computing the fusion result \eqref{eq:cloud_fusion:fus_info_vec_and_mat} at the fusion cloud while leaking the order of sensor error covariances to the cloud and eavesdroppers. In addition to the layout in figure \ref{fig:cloud_fusion:problem_layout}, we assume that sensors are computationally capable of running both the Paillier and Lewi encryption schemes locally, from sections \ref{subsec:prelims:paillier} and \ref{subsec:prelims:lewi_ore}, respectively, and require a key distribution step before the beginning of the algorithm. Here, the trusted third party generates a Paillier scheme public key $\mathsf{pk}=N$ and secret key $\mathsf{sk}=(p,q)$ as well as a shared symmetric key $\mathsf{sk}_{\mathsf{o}}$ for the Lewi ORE scheme. The public key $\mathsf{pk}$ is made available to all participants in the fusion process, namely the cloud and sensors, while the shared ORE key $\mathsf{sk}_{\mathsf{o}}$ is made available only to the sensors and thus implies a trust between the sensors in this scenario. The sharing of these keys can be performed by any public-key encryption scheme such as RSA [rivestMethodObtainingDigital1978].
 % TODO add discussion on the added assumption that sensors trust each other and that only the cloud is considered malicious
 
 %As we assume the querying party is the owner of all individual sensors, the threat model to be considered is that of network eavesdroppers and a malicious fusion centre, with no possible collusion between sensors and the fusion centre.

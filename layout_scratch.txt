@@ -26,9 +26,8 @@ Preliminaries
 Estimate Fusion on an Untrusted Cloud
 	Problem Formulation
 	Confidential Cloud Fusion Leaking Fusion Weights
-		Secure Fast Covariance Intersection
-			Two-sensor case
-			Multi-sensor case
+		Two-sensor case
+		Multi-sensor case
 		Computational Complexity
 		Security Analysis
 		Simulation

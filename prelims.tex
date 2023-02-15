@@ -30,11 +30,11 @@ Sensor and estimate data that we consider is primarily Bayesian in nature and ty
 % 
 
 \subsection{Kalman Filter}\label{subsec:prelims:kf}
-The Kalman filter (KF) [orig kf] is a popular and well studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^n$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{n \times n}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ [kf uses]. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^n$ at each timestep $k$, following the linear process model
+The Kalman filter (KF) [orig kf] is a popular and well-studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^d$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{d \times d}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ [kf uses]. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^d$ at each timestep $k$, following the linear process model
 \begin{equation}\label{eq:prelims:lin_gauss_process_model}
     \vec{x}_k = \mat{F}_k \vec{x}_{k-1} + \vec{w}_k\,,
 \end{equation}
-where $\vec{w}_k \sim \mathcal{N}(\vec{0}, \mat{Q}_k)$ with known covariance $\mat{Q}_k \in \mathbb{R}^{n \times n}$. Similarly, measurements $\vec{z}_k \in \mathbb{R}^m$ are assumed to follow the linear measurement model
+where $\vec{w}_k \sim \mathcal{N}(\vec{0}, \mat{Q}_k)$ with known covariance $\mat{Q}_k \in \mathbb{R}^{d \times d}$. Similarly, measurements $\vec{z}_k \in \mathbb{R}^m$ are assumed to follow the linear measurement model
 \begin{equation}\label{eq:prelims:lin_gauss_measurement_model}
     \vec{z}_k = \mat{H}_k \vec{x}_k + \vec{v}_k\,,
 \end{equation}
@@ -48,7 +48,7 @@ and
 \end{equation}
 Next, this prediction is updated with current measurement information, known as the \textit{update} step, and given by
 \begin{equation}\label{eq:prelims:kf_est_update}
-    \hat{\vec{x}}_{k|k} = \hat{\vec{x}}_{k|k-1}+\mat{P}_{k|k-1}\mat{H}_k^\top\left(\mat{H}_k\mat{P}_{k|k-1}\mat{H}_k^\top + \mat{R}_k\right)^{-1}\left(z_k-\mat{H}_k\hat{\vec{x}}_{k|k-1}\right)
+    \hat{\vec{x}}_{k|k} = \hat{\vec{x}}_{k|k-1}+\mat{P}_{k|k-1}\mat{H}_k^\top\left(\mat{H}_k\mat{P}_{k|k-1}\mat{H}_k^\top + \mat{R}_k\right)^{-1}\left(\vec{z}_k-\mat{H}_k\hat{\vec{x}}_{k|k-1}\right)
 \end{equation}
 and
 \begin{equation}\label{eq:prelims:kf_cov_update}
@@ -86,15 +86,15 @@ and computed by \eqref{eq:prelims:kf_cov_predict} and \eqref{eq:prelims:kf_cov_u
 \subsection{Extended Kalman Filter}\label{subsec:prelims:ekf}
 The extended Kalman filter (EKF) is a recursive state estimation filter applicable to non-linear models and closely related to the linear KF [ekf paper,huag+chap]. The filter produces estimates and their covariances at each timestep by linearising models at the current estimate and evaluating the filter similarly to the KF. As in the KF, a true state $\vec{x}_k$ is assumed to follow known models. The process model is now non-linear and given by
 \begin{equation}\label{eq:prelims:nonlin_gauss_process_model}
-    \vec{x}_k = f_k(\vec{x}_{k-1}) + \vec{w}_k\,,
+    \vec{x}_k = \vec{f}_k(\vec{x}_{k-1}) + \vec{w}_k\,,
 \end{equation}
 where again $\vec{w}_k \sim \mathcal{N}(\vec{0}, \mat{Q}_k)$ with known covariance $\mat{Q}_k$. Similarly, measurements are assumed to follow the non-linear measurement model
 \begin{equation}\label{eq:prelims:nonlin_gauss_measurement_model}
-    \vec{z}_k = h_k(\vec{x}_k) + \vec{v}_k\,,
+    \vec{z}_k = \vec{h}_k(\vec{x}_k) + \vec{v}_k\,,
 \end{equation}
 with $\vec{v}_k \sim \mathcal{N}(\vec{0}, \mat{R}_k)$ and known covariance $\mat{R}_k$. The EKF \textit{prediction} step is given by
 \begin{equation}\label{eq:prelims:ekf_est_predict}
-    \hat{\vec{x}}_{k|k-1} = f_k\left(\hat{\vec{x}}_{k-1|k-1}\right)
+    \hat{\vec{x}}_{k|k-1} = \vec{f}_k\left(\hat{\vec{x}}_{k-1|k-1}\right)
 \end{equation}
 and
 \begin{equation}\label{eq:prelims:ekf_cov_predict}
@@ -102,11 +102,11 @@ and
 \end{equation}
 with Jacobian
 \begin{equation}\label{eq:prelims:ekf_predict_jacobian}
-    \hat{\mat{F}}_k = \left.\frac{\partial f_k}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k-1|k-1}}
+    \hat{\mat{F}}_k = \left.\frac{\partial \vec{f}_k}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k-1|k-1}}
 \end{equation}
 linearising the process model at the latest estimate for estimate error covariance prediction. The EKF \textit{update} step is given by
 \begin{equation}\label{eq:prelims:ekf_est_update}
-    \hat{\vec{x}}_{k|k} = \hat{\vec{x}}_{k|k-1}+\mat{P}_{k|k-1}\hat{\mat{H}}_k^\top\left(\hat{\mat{H}}_k\mat{P}_{k|k-1}\hat{\mat{H}}_k^\top + \mat{R}_k\right)^{-1}\left(z_k-h_k(\hat{\vec{x}}_{k|k-1})\right)
+    \hat{\vec{x}}_{k|k} = \hat{\vec{x}}_{k|k-1}+\mat{P}_{k|k-1}\hat{\mat{H}}_k^\top\left(\hat{\mat{H}}_k\mat{P}_{k|k-1}\hat{\mat{H}}_k^\top + \mat{R}_k\right)^{-1}\left(\vec{z}_k-\vec{h}_k(\hat{\vec{x}}_{k|k-1})\right)
 \end{equation}
 and
 \begin{equation}\label{eq:prelims:ekf_cov_update}
@@ -114,7 +114,7 @@ and
 \end{equation}
 with Jacobian
 \begin{equation}\label{eq:prelims:ekf_update_jacobian}
-    \hat{\mat{H}}_k = \left.\frac{\partial h_k}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k|k-1}}
+    \hat{\mat{H}}_k = \left.\frac{\partial \vec{h}_k}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k|k-1}}
 \end{equation}
 linearising the measurement model. Unlike the linear KF, by linearising the models the EKF propagates Gaussian model noises in its estimates that may not be Gaussian in reality, even when process and measurement models \eqref{eq:prelims:nonlin_gauss_process_model} and \eqref{eq:prelims:nonlin_gauss_measurement_model}, respectively, are exactly correct. For this reason, the EKF does not hold the same guarantees on optimality as the KF does. To a similar effect, highly non-linear models or inaccurate models can lead to greater inaccuracies and divergence of estimates from true states in EKF estimates. Despite these downsides, its scalability and efficiency have made the EKF an industry-standard estimation filter for non-linear systems [smth on uses of ekf]. More details on the EKF and its derivation can be found in [huag+chap].
 
@@ -129,7 +129,7 @@ linearising the measurement model. Unlike the linear KF, by linearising the mode
 % 
 
 \subsection{Information Filter}\label{subsec:prelims:if}
-The information filter (IF) is an algebraic reformulation of the KF from section \ref{subsec:prelims:kf} [niehsenInformationFusionBased2002, Mutambara, another]. The information form of the filter simplifies the update step of the filter making it more suitable when multiple independent measurements are present at the same timestep. The key difference of the IF is the storing and propagation of the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ rather than the estimate and its error covariance, $\hat{\vec{x}}_{k|k'}$ and $\mat{P}_{k|k'}$, respectively, stored by the KF. When assuming the same linear and Gaussian models \eqref{eq:prelims:lin_gauss_process_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, the information vector and matrix are related to the estimate and its covariance by
+The information filter (IF) is an algebraic reformulation of the KF from section \ref{subsec:prelims:kf} [niehsenInformationFusionBased2002, Mutambara, another]. The information form of the filter simplifies the update step of the filter making it more suitable when multiple independent measurements are present at the same timestep. The key difference of the IF is the storing and propagation of the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ rather than the estimate and its error covariance, $\hat{\vec{x}}_{k|k'}$ and $\mat{P}_{k|k'}$, stored by the KF. When assuming the same linear and Gaussian models \eqref{eq:prelims:lin_gauss_process_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, the information vector and matrix are related to the estimate and its covariance by
 \begin{equation}\label{eq:prelims:info_vec_defn}
     \hat{\vec{y}}_{k|k'} = \mat{P}_{k|k'}^{-1}\hat{\vec{x}}_{k|k'}
 \end{equation}
@@ -155,18 +155,18 @@ and
 \end{equation}
 where added terms $\vec{i}_k$ and $\mat{I}_k$ are known as the measurement vector and measurement matrix, respectively, and are defined as
 \begin{equation}
-    \vec{i}_k = \mat{H}_k^\top\mat{R}_k^{-1}z_k
+    \vec{i}_k = \mat{H}_k^\top\mat{R}_k^{-1}\vec{z}_k
 \end{equation}
 and
 \begin{equation}
     \mat{I}_k = \mat{H}_k^\top\mat{R}_k^{-1}\mat{H}_k\,.
 \end{equation}
 
-Since all information related to a measurement and its sensor are captured in $\vec{i}_k$ and $\mat{I}_k$, namely the measured value $z_k$, measurement model $\mat{H}_k$ and measurement error $\mat{R}_k$, sequential IF update steps required in the presence of multiple sensors are easily computed as a summation of this information from each sensor. That is, if we consider the same process model \eqref{eq:prelims:lin_gauss_process_model} and multiple sensors $i$, $1\leq i\leq n$, making independent measurements that follow models
+Since all information related to measurements and their sensors are captured in $\vec{i}_k$ and $\mat{I}_k$, namely the measured value $\vec{z}_k$, measurement model $\mat{H}_k$ and measurement error $\mat{R}_k$, sequential IF update steps required in the presence of multiple sensors are easily computed as a summation of this information from each sensor. That is, if we consider the same process model \eqref{eq:prelims:lin_gauss_process_model} and multiple sensors $i$, $1\leq i\leq n$, making independent measurements that follow models
 \begin{equation}
     \vec{z}_{k,i} = \mat{H}_{k,i} \vec{x}_k + \vec{v}_{k,i}\,,
 \end{equation}
-with $\vec{v}_{k,i}\sim\mathcal{N}(\vec{0},\mat{R}_{k,i})$ and known covariances $\mat{R}_{k,i}$, the update step of the filter using all measurements at timestep $k$ can be written as
+with $\vec{v}_{k, i}\sim\mathcal{N}(\vec{0},\mat{R}_{k, i})$ and known covariances $\mat{R}_{k, i}$, the update step of the filter using all measurements at timestep $k$ can be written as
 \begin{equation}\label{eq:prelims:if_info_vec_update}
     \hat{\vec{y}}_{k|k} = \hat{\vec{y}}_{k|k-1} + \sum_{i=1}^n\vec{i}_{k,i}
 \end{equation}
@@ -176,7 +176,7 @@ and
 \end{equation}
 where information vectors $\vec{i}_{k,i}$ and information matrices $\mat{I}_{k,i}$ are now dependent on sensor $i$ and given by
 \begin{equation}\label{eq:prelims:if_measurement_vec_defn}
-    \vec{i}_{k,i} = \mat{H}_{k,i}^\top\mat{R}_{k,i}^{-1}z_{k,i}
+    \vec{i}_{k,i} = \mat{H}_{k,i}^\top\mat{R}_{k,i}^{-1}\vec{z}_{k,i}
 \end{equation}
 and
 \begin{equation}\label{eq:prelims:if_measurement_mat_defn}
@@ -197,11 +197,11 @@ The easily computed summation has led to the IF being particularly suited to dis
 \subsection{Extended Information Filter}\label{subsec:prelims:eif}
 The extended information filter (EIF) is an algebraic reformulation of the EKF and represents a non-linear model extension to the linear IF [thrun, another]. As with the IF, its simplification of the update step to a trivial sum has led to its adoption in suitable distributed environments with multiple sensors and a desire to reduce communicational costs [tobias garritsen thesis]. Similarly, the EIF estimates and propagates the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ that relate to the state estimate and its covariance by \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, respectively. Assuming the non-linear process model \eqref{eq:prelims:nonlin_gauss_process_model} and multiple sensors $i$, $1\leq i \leq n$, making independent non-linear measurements that follow models
 \begin{equation}
-    \vec{z}_{k,i} = h_{k,i}\left(\vec{x}_k\right) + \vec{v}_{k,i}\,,
+    \vec{z}_{k,i} = \vec{h}_{k,i}\left(\vec{x}_k\right) + \vec{v}_{k,i}\,,
 \end{equation}
 with $\vec{v}_{k,i}\sim\mathcal{N}(\vec{0},\mat{R}_{k,i})$ and known covariances $\mat{R}_{k,i}$, the EIF predict step is given by
 \begin{equation}\label{eq:prelims:eif_info_vec_predict}
-    \hat{\vec{y}}_{k|k-1} = \mat{Y}_{k|k-1}f_k\left(\mat{Y}_{k-1|k-1}^{-1}\hat{\vec{y}}_{k-1|k-1}\right)
+    \hat{\vec{y}}_{k|k-1} = \mat{Y}_{k|k-1}\vec{f}_k\left(\mat{Y}_{k-1|k-1}^{-1}\hat{\vec{y}}_{k-1|k-1}\right)
 \end{equation}
 and
 \begin{equation}\label{eq:prelims:eif_info_mat_predict}
@@ -209,7 +209,7 @@ and
 \end{equation}
 with Jacobian linearising the process model
 \begin{equation}
-    \hat{\mat{F}}_k = \left.\frac{\partial f_k}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k-1|k-1}}\,.
+    \hat{\mat{F}}_k = \left.\frac{\partial \vec{f}_k}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k-1|k-1}}\,.
 \end{equation}
 The update step of the filter using all $n$ measurements is given by
 \begin{equation}\label{eq:prelims:eif_info_vec_update}
@@ -221,7 +221,7 @@ and
 \end{equation}
 where information vectors $\vec{i}_{k,i}$ and information matrices $\mat{I}_{k,i}$ now linearise the measurement model and are given by
 \begin{equation}\label{eq:prelims:eif_measurement_vec_defn}
-    \vec{i}_{k,i} = \hat{\mat{H}}_{k,i}^\top\mat{R}_{k,i}^{-1}\left(z_{k,i} - h_{k,i}\left(\mat{Y}_{k|k-1}^{-1}\hat{\vec{y}}_{k|k-1}\right) + \hat{\mat{H}}_{k,i}\mat{Y}_{k|k-1}^{-1}\hat{\vec{y}}_{k|k-1}\right)
+    \vec{i}_{k,i} = \hat{\mat{H}}_{k,i}^\top\mat{R}_{k,i}^{-1}\left(\vec{z}_{k,i} - \vec{h}_{k,i}\left(\mat{Y}_{k|k-1}^{-1}\hat{\vec{y}}_{k|k-1}\right) + \hat{\mat{H}}_{k,i}\mat{Y}_{k|k-1}^{-1}\hat{\vec{y}}_{k|k-1}\right)
 \end{equation}
 and
 \begin{equation}\label{eq:prelims:eif_measurement_mat_defn}
@@ -229,7 +229,7 @@ and
 \end{equation}
 with Jacobian
 \begin{equation}
-    \hat{\mat{H}}_{k,i} = \left.\frac{\partial h_{k,i}}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k|k-1}}\,.
+    \hat{\mat{H}}_{k,i} = \left.\frac{\partial \vec{h}_{k,i}}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k|k-1}}\,.
 \end{equation}
 Similarly to the EKF, the linearisation of models leads to estimation errors making optimality guarantees of the KF and IF not hold for the EIF. For further reading and applications of the EIF, see [refs].
 
@@ -244,7 +244,7 @@ Similarly to the EKF, the linearisation of models leads to estimation errors mak
 % 
 
 \subsection{Covariance Intersection and Fast Covariance Intersection}\label{subsec:prelims:fci}
-In the filters presented in the previous sections, measurements from the same timestep must be independent for sequential update steps to fuse them correctly. That is, non-zero cross-correlations between measurements can lead to overly confident estimate error covariances and estimation track divergence [crosscor paper]. In some cases, this independence of measurements cannot be guaranteed and a conservative fusion method is required to obtain a final estimate and its error covariance using all available measurements. A typical scenario is the fusion of local estimator estimates themselves, such as those produced by separate KF, IF, EKF or EIF instances, that may contain cross-correlations due to shared process model assumptions during estimation [ci and dependence ref]. Covariance intersection (CI), is a fusion algorithm that fuses estimates or measurements and their error covariances when cross-correlations are unknown [julierNondivergentEstimation] and produces estimates that are guaranteed to be conservative, that is, not overly confident in the error of resulting fused estimates. CI is particularly well suited to fusing estimates $\hat{\vec{x}}_i$ and covariances $\mat{P}_i$ of sensor $i$ in the information form, as given in \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, such that the fusion of $n$ information vectors $\mat{P}_i^{-1}\hat{\vec{x}}_i$, $1\leq i\leq n$, and information matrices $\mat{P}_i^{-1}$, $1\leq i\leq n$, produces a fused information vector $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$ and matrix $\mat{P}_{\mathsf{fus}}^{-1}$, by
+In the filters presented in the previous sections, measurements from the same timestep must be independent for sequential update steps to fuse them correctly. That is, non-zero cross-correlations between measurements can lead to overly confident estimate error covariances and estimation track divergence [crosscor paper]. In some cases, this independence of measurements cannot be guaranteed and a conservative fusion method is required to obtain a final estimate and its error covariance using all available measurements. A typical scenario is the fusion of local estimator estimates themselves, such as those produced by separate KF, IF, EKF or EIF instances, that may contain cross-correlations due to shared process model assumptions during estimation [ci and dependence ref]. Covariance intersection (CI), is a time-independent fusion algorithm that fuses estimates or measurements and their error covariances when cross-correlations are unknown [julierNondivergentEstimation] and produces estimates that are guaranteed to be conservative, that is, not overly confident in the error of resulting fused estimates. CI is particularly well suited to fusing estimates $\hat{\vec{x}}_i$ and covariances $\mat{P}_i$ of sensor $i$ in the information form, as given in \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, such that the fusion of $n$ information vectors $\mat{P}_i^{-1}\hat{\vec{x}}_i$, $1\leq i\leq n$, and information matrices $\mat{P}_i^{-1}$, $1\leq i\leq n$, produces a fused information vector $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$ and matrix $\mat{P}_{\mathsf{fus}}^{-1}$. It is given by
 \begin{equation}\label{eq:prelims:ci_est}
     \mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} = \sum_{i=1}^n \omega_i \mat{P}_i^{-1} \hat{\vec{x}}_i
 \end{equation}
@@ -426,7 +426,7 @@ removing all noise terms.
 \subsection{Lewi Order-Revealing Encryption Scheme}\label{subsec:prelims:lewi_ore}
 The Lewi order-revealing encryption (ORE) scheme is a symmetric encryption scheme that allows for message values to be compared numerically after encryption. The scheme does not meet the ideal notion of security for order-revealing encryption, IND-OCPA, due to the inherent difficulty of this problem [chenettePracticalOrderRevealingEncryption2016] but rather meets a weaker simulation-based security given in [chenettePracticalOrderRevealingEncryption2016] that allows for some leakage.
 
-To allow additional control over which encrypted values can be compared, the scheme provides two encryption functions, namely a \textit{left} encryption and \textit{right} encryption, such that comparisons can only take place between left and right encryptions. As complete equations for the scheme are lengthy and unnecessary for following this thesis, only notation will be introduced here. The two encryption equations provided can encrypt plaintexts $a_1,a_2\in\mathbb{Z}$ with a secret key $\mathsf{sk}_{\mathsf{o}}$ and functions
+To allow additional control over which encrypted values can be compared, the scheme provides two encryption functions, namely a \textit{left} encryption and \textit{right} encryption, such that comparisons can only take place between left and right encryptions. As complete equations for the scheme are lengthy and unnecessary for following this thesis, only its notation will be introduced here. The two encryption equations provided can encrypt plaintexts $a_1,a_2\in\mathbb{Z}$ with a secret key $\mathsf{sk}_{\mathsf{o}}$ and functions
 \begin{equation}\label{eq:prelims:lewi_enc}
     \mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}\left(a_1\right)\text{ and }\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}\left(a_2\right)
 \end{equation}
@@ -456,42 +456,42 @@ For details on implementation, see [lewi order revealing].
 % 
 
 \subsection{Encoding Numbers for Encryption}\label{subsec:prelims:encoding}
-The Paillier encryption scheme and the Joye-Libert aggregation scheme in sections \ref{subsec:prelims:paillier} and \ref{subsec:prelims:joye_libert_agg}, respectively, both provide encryption on integer inputs in the modulo group $\mathbb{Z}_N$ given a large $N$. In addition, they provide homomorphic operations on these inputs after encryption, namely, the Paillier scheme provides addition and scalar multiplication with \eqref{eq:prelims:paillier_hom_add}, \eqref{eq:prelims:paillier_hom_add_plain} and \eqref{eq:prelims:paillier_hom_mult} while the Joye-Libert scheme provides addition with \eqref{eq:prelims:joye_libert_agg_sum}. For this reason, real-valued estimation variables that may require encryption with these schemes, such as those introduced in section \ref{sec:prelims:est_prelims}, require quantisation and integer mapping such that the operations are preserved after encryption. Throughout this thesis, we will rely on a generalised Q number encoding [oberstarFixedPointRepresentationFractional2007], applying scalar encoding and encryption operations elementwise on multidimensional data, due to applicability and implementation simplicity.
+The Paillier encryption scheme and the Joye-Libert aggregation scheme in sections \ref{subsec:prelims:paillier} and \ref{subsec:prelims:joye_libert_agg} both provide encryption on integer inputs in the modulo group $\mathbb{Z}_N$ given a large $N$. In addition, they provide homomorphic operations on these inputs after encryption, namely, the Paillier scheme provides addition and scalar multiplication with \eqref{eq:prelims:paillier_hom_add}, \eqref{eq:prelims:paillier_hom_add_plain} and \eqref{eq:prelims:paillier_hom_mult} while the Joye-Libert scheme provides addition with \eqref{eq:prelims:joye_libert_agg_sum}. For this reason, real-valued estimation variables that may require encryption with these schemes, such as those introduced in section \ref{sec:prelims:est_prelims}, require quantisation and integer mapping such that the operations are preserved after encryption. Throughout this thesis, we will rely on a generalised Q number encoding [oberstarFixedPointRepresentationFractional2007] and apply scalar encoding and encryption operations elementwise on multidimensional data, due to applicability and implementation simplicity.
 
 Quantisation to a subset of rational numbers is performed in terms of an output range $M \in \mathbb{N}$ and fractional precision $\phi \in \mathbb{N}$. This contrasts with the common definition in terms of total bits and fractional bits [oberstarFixedPointRepresentationFractional2007, schulzedarupEncryptedCooperativeControl2019, farokhiSecurePrivateControl2017] but allows for a direct mapping to integer ranges which are not a power of two, such as the group $\mathbb{Z}_N$. This rational subset, $\mathbb{Q}_{M,\phi}$, is defined by
 \begin{equation}
-    \mathbb{Q}_{M,\phi} = \left\{o \,\middle|\, \phi o \in \mathbb{N} \wedge -\left\lfloor\frac{M}{2}\right\rfloor \leq \phi o < \left\lfloor\frac{M}{2}\right\rfloor \right\}\,,
+    \mathbb{Q}_{M,\phi} = \left\{\chi \,\middle|\, \phi \chi \in \mathbb{N} \wedge -\left\lfloor\frac{M}{2}\right\rfloor \leq \phi \chi < \left\lfloor\frac{M}{2}\right\rfloor \right\}\,,
 \end{equation}
-and can be used to quantise any real number $a \in \mathbb{R}$ by taking the nearest rational $o \in \mathbb{Q}_{M,\phi}$, that is, $\argmin_{o\in\mathbb{Q}_{M,\phi}} |a-o|$. Mapping the rationals $\mathbb{Q}_{M,\phi}$, both positive and negative, to a group $\mathbb{Z}_M$ can then be achieved by modulo arithmetic. Additionally, we note that the Q number format requires a precision factor $\phi$ to be removed after each encoded multiplication. This is captured by a third parameter $d$; the number of additional precision factors present in encodings.
+and can be used to quantise any real number $a \in \mathbb{R}$ by taking the nearest rational $\chi \in \mathbb{Q}_{M,\phi}$, that is, $\argmin_{\chi\in\mathbb{Q}_{M,\phi}} |a-\chi|$. Mapping the rationals $\mathbb{Q}_{M,\phi}$, both positive and negative, to a group $\mathbb{Z}_M$ can then be achieved by modulo arithmetic. Additionally, we note that the Q number format requires a precision factor $\phi$ to be removed after each encoded multiplication. This is captured by a third parameter $\delta$; the number of additional precision factors present in encodings.
 
-The function for \textit{combined} quantisation and encoding, $\mathsf{E}_{M,\phi,d}(a)$, of a given number $a \in \mathbb{R}$ and with output integer range $\mathbb{Z}_M$, precision $\phi$ and scaling for $d$ prior encoded multiplications, is given by
+The function for \textit{combined} quantisation and encoding, $\mathsf{E}_{M,\phi,\delta}(a)$, of a given number $a \in \mathbb{R}$ and with output integer range $\mathbb{Z}_M$, precision $\phi$ and scaling for $\delta$ prior encoded multiplications, is given by
 \begin{equation}\label{eq:prelims:encoding_encode}
-    \mathsf{E}_{M,\phi,d}(a) = \left\lfloor \phi^{d+1} a \right\rceil \pmod{M}\,.
+    \mathsf{E}_{M,\phi,\delta}(a) = \left\lfloor \phi^{\delta+1} a \right\rceil \pmod{M}\,.
 \end{equation}
 Decoding of an integer $u \in \mathbb{Z}_M$ is given by
 \begin{equation}\label{eq:prelims:encoding_decode}
-    \mathsf{E}^{-1}_{M,\phi,d}(u)=
+    \mathsf{E}^{-1}_{M,\phi,\delta}(u)=
     \begin{dcases}
-        \frac{u \pmod{M}}{\phi^{d+1}}, & u \pmod{M} \leq \left\lfloor\frac{M}{2}\right\rfloor \\
-        -\frac{M - u \pmod{M}}{\phi^{d+1}}, & \text{otherwise}
+        \frac{u \pmod{M}}{\phi^{\delta+1}}, & u \pmod{M} \leq \left\lfloor\frac{M}{2}\right\rfloor \\
+        -\frac{M - u \pmod{M}}{\phi^{\delta+1}}, & \text{otherwise}
     \end{dcases}.
 \end{equation}
 
 Encoding with \eqref{eq:prelims:encoding_encode} additionally provides two useful properties when used with homomorphic operations,
 \begin{equation}\label{eq:prelims:encoding_add}
-    \mathsf{E}_{M,\phi,d}(a_1) + \mathsf{E}_{M,\phi,d}(a_2) \pmod{M} \approx \mathsf{E}_{M,\phi,d}(a_1+a_2)
+    \mathsf{E}_{M,\phi,\delta}(a_1) + \mathsf{E}_{M,\phi,\delta}(a_2) \pmod{M} \approx \mathsf{E}_{M,\phi,\delta}(a_1+a_2)
 \end{equation}
 and
 \begin{equation}\label{eq:prelims:encoding_mult}
-        \mathsf{E}_{M,\phi,d}(a_1)\mathsf{E}_{M,\phi,d}(a_2) \pmod{M} \approx \mathsf{E}_{M,\phi,d+1}(a_1a_2)\,,
+        \mathsf{E}_{M,\phi,\delta}(a_1)\mathsf{E}_{M,\phi,\delta}(a_2) \pmod{M} \approx \mathsf{E}_{M,\phi,\delta+1}(a_1a_2)\,,
 \end{equation}
 where deviation from equality stems from quantisation and its associated error
 \begin{equation}
-    \left|\mathsf{E}^{-1}_{M,\phi,d}\left(\mathsf{E}_{M,\phi,d}(a)\right) - a\right| \leq \frac{1}{\phi}\,.
+    \left|\mathsf{E}^{-1}_{M,\phi,\delta}\left(\mathsf{E}_{M,\phi,\delta}(a)\right) - a\right| \leq \frac{1}{\phi}\,.
 \end{equation}
 
-In general, choosing a large precision parameter $\phi$ reduces quantisation errors but risks overflow after too many multiplications. When the total number of encoded multiplications, $d_{\mathsf{max}}$, and the largest value to be encoded, $a_{\mathsf{max}}$, are known, $\phi$ can be chosen to avoid overflow by satisfying
+In general, choosing a large precision parameter $\phi$ reduces quantisation errors but risks overflow after too many multiplications. When the total number of encoded multiplications, $\delta_{\mathsf{max}}$, and the largest value to be encoded, $a_{\mathsf{max}}$, are known, $\phi$ can be chosen to avoid overflow by satisfying
 \begin{equation}\label{eq:prelims:encoding_overflow_limit}
-    \left|\phi^{d_{\mathsf{max}}+1}a_{\mathsf{max}}\right| < \left\lfloor \frac{M}{2} \right\rfloor\,.
+    \left|\phi^{\delta_{\mathsf{max}}+1}a_{\mathsf{max}}\right| < \left\lfloor \frac{M}{2} \right\rfloor\,.
 \end{equation}
 In practice, we set $M=N$ to use the Paillier or Joye-Libert schemes, such that the properties \eqref{eq:prelims:encoding_add} and \eqref{eq:prelims:encoding_mult} can be used with the homomorphic operations of the schemes. Equation \eqref{eq:prelims:encoding_overflow_limit} can then be ignored as $N$ is typically very large ($N>2^{1024}$) and $\phi$ can be made sufficiently large to make quantisation errors negligible.
