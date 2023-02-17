@@ -197,11 +197,11 @@ Each condition \eqref{eq:prelims:fci_added_constraints} is considered as a parti
 \begin{equation}\label{eq:cloud_fusion:secfci_nsen_partial_sol_subspace}
     \omega_i\tr(\mat{P}_i) = \omega_{i+1}\tr(\mat{P}_{i+1})\,,
 \end{equation}
-with $1\leq i< n$ and $\sum_{i=1}^n\omega_i=1$, and their solution spaces, linear subspaces $\mathcal{S}_i$ over possible values of $\vec{\omega}=\begin{bsmallmatrix}\omega_1 & \cdots & \omega_n\end{bsmallmatrix}^\top$, desired. The intersection of these subspaces naturally results in the final solution to $\vec{\omega}$ in \eqref{eq:prelims:fci_matrix_equation}. Each solution space $\mathcal{S}_i$ can be defined by $n-1$ linearly independent solution points $\vec{\omega}_i^{(s)}$, $1\leq s\leq n-1$. $n-2$ of these solutions can be trivially obtained as the points where a single $\omega_j=1$, $j\neq i\neq i+1$ while the final point, $\vec{\omega}_i^{(n-1)}$, can be obtained as the solution to
+with $1\leq i< n$ and $\sum_{i=1}^n\omega_i=1$, and their solution spaces, linear subspaces $\mathcal{S}_i$ over possible values of $\vec{\omega}=\begin{bsmallmatrix}\omega_1 & \cdots & \omega_n\end{bsmallmatrix}^\top$, desired. The intersection of these subspaces naturally results in the final solution to $\vec{\omega}$ in \eqref{eq:prelims:fci_matrix_equation}. Each solution space $\mathcal{S}_i$ can be defined by $n-1$ linearly independent solution points $\vec{\omega}_i^{(\zeta)}$, $1\leq \zeta\leq n-1$. $n-2$ of these solutions can be trivially obtained as the points where a single $\omega_j=1$, $j\neq i\neq i+1$ while the final point, $\vec{\omega}_i^{(n-1)}$, can be obtained as the solution to
 \begin{equation}\label{eq:cloud_fusion:secfci_nsen_partial_sol_point}
     \omega_i\tr(\mat{P}_i) = (1-\omega_i)\tr(\mat{P}_{i+1})\,,
 \end{equation}
-$\omega_j=0$, $j\neq i\neq i+1$, noting equivalence to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_subspace} and $\omega_{i+1}=1-\omega_i$. The solutions $\vec{\omega}_i^{(s)}$ and the $n-2$ dimensional subspace they define can be rewritten in parametric form as
+$\omega_j=0$, $j\neq i\neq i+1$, noting equivalence to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_subspace} and $\omega_{i+1}=1-\omega_i$. The solutions $\vec{\omega}_i^{(\zeta)}$ and the $n-2$ dimensional subspace they define can be rewritten in parametric form as
 \begin{equation}\label{eq:cloud_fusion:secfci_nsen_partial_subspace}
     \mathcal{S}_i(\vec{\gamma}_i)=\vec{\omega}_i^{(1)} + 
     \begin{bmatrix}
@@ -209,7 +209,7 @@ $\omega_j=0$, $j\neq i\neq i+1$, noting equivalence to \eqref{eq:cloud_fusion:se
     \end{bmatrix}
     \vec{\gamma}_i\,,
 \end{equation}
-where $\bar{\vec{\omega}}_i^{(x)}=\vec{\omega}_i^{(x)}-\vec{\omega}_i^{(1)}$ denotes direction vectors. The intersection of these $n-1$ subspaces gives the solution to $\vec{\omega}$ in \eqref{eq:prelims:fci_matrix_equation}. This solution, as well as the parameters $\vec{\gamma}_i$, can be obtained as a solution to the linear system
+where $\bar{\vec{\omega}}_i^{(\zeta)}=\vec{\omega}_i^{(\zeta)}-\vec{\omega}_i^{(1)}$ denotes direction vectors. The intersection of these $n-1$ subspaces gives the solution to $\vec{\omega}$ in \eqref{eq:prelims:fci_matrix_equation}. This solution, as well as the parameters $\vec{\gamma}_i$, can be obtained as a solution to the linear system
 \begin{equation}\label{eq:cloud_fusion:secfci_nsen_omega_solution}
     \begin{bmatrix}
         -\mat{I} & \bar{\vec{\omega}}_1^{(2)} & \cdots & \bar{\vec{\omega}}_1^{(n-1)} & 0 & \cdots & 0\\
@@ -274,7 +274,7 @@ resulting in sequences of the same form as \eqref{eq:cloud_fusion:secfci_2sen_en
     % TODO Label which points are approximated. Turn axis labels the right way around. Label solution space correctly; it is the plane of the sum equalling one.
 \end{figure}
 
-The resulting estimate $\hat{\vec{\omega}} \approx \vec{\omega}$ can then be used with \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_ests} and \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_covs} to compute the fusion of $n$ estimates in information form at the cloud.
+The resulting estimate $\hat{\vec{\omega}} \approx \vec{\omega}$ can then be used with \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_ests} and \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_covs} to compute the fusion of $n$ information vectors and matrices at the cloud.
 
 % 
 %  ######   #######  ##     ## ########  
