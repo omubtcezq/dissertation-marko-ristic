@@ -245,11 +245,11 @@ Similarly to the EKF, the linearisation of models leads to estimation errors mak
 
 \subsection{Covariance Intersection and Fast Covariance Intersection}\label{subsec:prelims:fci}
 In the filters presented in the previous sections, measurements from the same timestep must be independent for sequential update steps to fuse them correctly. That is, non-zero cross-correlations between measurements can lead to overly confident estimate error covariances and estimation track divergence [crosscor paper]. In some cases, this independence of measurements cannot be guaranteed and a conservative fusion method is required to obtain a final estimate and its error covariance using all available measurements. A typical scenario is the fusion of local estimator estimates themselves, such as those produced by separate KF, IF, EKF or EIF instances, that may contain cross-correlations due to shared process model assumptions during estimation [ci and dependence ref]. Covariance intersection (CI), is a time-independent fusion algorithm that fuses estimates or measurements and their error covariances when cross-correlations are unknown [julierNondivergentEstimation] and produces estimates that are guaranteed to be conservative, that is, not overly confident in the error of resulting fused estimates. CI is particularly well suited to fusing estimates $\hat{\vec{x}}_i$ and covariances $\mat{P}_i$ of sensor $i$ in the information form, as given in \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, such that the fusion of $n$ information vectors $\mat{P}_i^{-1}\hat{\vec{x}}_i$, $1\leq i\leq n$, and information matrices $\mat{P}_i^{-1}$, $1\leq i\leq n$, produces a fused information vector $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$ and matrix $\mat{P}_{\mathsf{fus}}^{-1}$. It is given by
-\begin{equation}\label{eq:prelims:ci_est}
+\begin{equation}\label{eq:prelims:ci_info_vec}
     \mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} = \sum_{i=1}^n \omega_i \mat{P}_i^{-1} \hat{\vec{x}}_i
 \end{equation}
 and
-\begin{equation}\label{eq:prelims:ci_cov}
+\begin{equation}\label{eq:prelims:ci_info_mat}
 \mat{P}_{\mathsf{fus}}^{-1}=\sum_{i=1}^{n}\omega_i \mat{P}_i^{-1}\,,
 \end{equation}
 for some weights $0\leq \omega_i \leq 1$, $1\leq i \leq n$, such that

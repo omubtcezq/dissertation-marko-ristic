@@ -75,7 +75,7 @@ The relatively strict estimation and security aims above can be difficult to ach
         % Querying party arrows
         \draw [-latex]  plot coordinates {(4.75,1.75)  (4.75,0.75)};
     \end{tikzpicture}
-    \caption{Trusted (blue) and untrusted (orange) participants and the communications between them in the cloud fusion problem.}
+    \caption{Trusted (blue) and untrusted (orange) participants, and the communications between them in the cloud fusion problem.}
     \label{fig:cloud_fusion:problem_layout}
 \end{figure}
 
@@ -114,7 +114,7 @@ Lastly, we assume that the trusted sensors are computationally capable of locall
 % 
 
 \subsection{Two-sensor Case}\label{subsec:cloud_fusion:secfci_2sen}
-The confidential fusion algorithm will first be introduced in the special case of two sensors, before an extension to the $n$-sensor case. Recalling FCI fusion \eqref{eq:prelims:ci_est}, \eqref{eq:prelims:ci_cov} and \eqref{eq:prelims:ci_weight_sum}, we can write the fusion of two information vectors and matrices as
+The confidential fusion algorithm will first be introduced in the special case of two sensors, before an extension to the $n$-sensor case. Recalling FCI fusion \eqref{eq:prelims:ci_info_vec}, \eqref{eq:prelims:ci_info_mat} and \eqref{eq:prelims:ci_weight_sum}, we can write the fusion of two information vectors and matrices as
 \begin{equation}
     \mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} = \omega_1\mat{P}_1^{-1}\hat{\vec{x}}_1 + (1 - \omega_1)\mat{P}_2^{-1}\hat{\vec{x}}_2
 \end{equation}
@@ -244,7 +244,65 @@ allowing for comparison between sequences from consecutive sensors $i$ and $i+1$
         \left\langle\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(\tr(\mat{P}_i)), \mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}((1-g)\tr(\mat{P}_i)), \mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}((1-2g)\tr(\mat{P}_i)),\dots,\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(0)\right\rangle\,,\ & \text{if } i \text{ is even,}
     \end{split}
 \end{equation}
-resulting in sequences of the same form as \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_1} and \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_2}. The value $\hat{\omega}_i = \iota g + g/2 \approx \omega_i$, or in the case of an equality $\hat{\omega}_i = \iota g = \omega_i$, for some index $\iota$, is used to approximate the solution $\hat{\vec{\omega}}_i^{(n-1)} \approx \vec{\omega}_i^{(n-1)}$. A visualisation of solving \eqref{eq:cloud_fusion:secfci_nsen_omega_solution} with approximations to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_point} in the three-sensor case is graphically displayed in figure \ref{fig:cloud_fusion:secfci_nsen_partial_sols_and_intersect}.
+resulting in sequences of the same form as \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_1} and \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_2}. The value $\hat{\omega}_i = \iota g + g/2 \approx \omega_i$, or in the case of an equality $\hat{\omega}_i = \iota g = \omega_i$, for some index $\iota$, is used to approximate the solution $\hat{\vec{\omega}}_i^{(n-1)} \approx \vec{\omega}_i^{(n-1)}$. 
+To demonstrate the fusion process, pseudocode for encryption, fusion and decryption is given in algorithms \ref{alg:cloud_fusion:secfci_sensor_steps}, \ref{alg:cloud_fusion:secfci_cloud_steps} and \ref{alg:cloud_fusion:secfci_query_steps}, respectively, and visualisation of solving \eqref{eq:cloud_fusion:secfci_nsen_omega_solution} with approximations to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_point} in the three-sensor case is graphically shown in figure \ref{fig:cloud_fusion:secfci_nsen_partial_sols_and_intersect}.
+\begin{algorithm}[htbp]
+    \caption{Encryption at the Sensors}\label{alg:cloud_fusion:secfci_sensor_steps}
+    \begin{algorithmic}[1]
+        \setstretch{1.35}
+        \Procedure{Estimate}{$i$, $g$, $\mathsf{pk}$, $\mathsf{sk}_{\mathsf{o}}$}
+        \State Estimate $\mat{P}_i^{-1}\hat{\vec{x}}_i$ locally
+        \State Estimate $\mat{P}_i^{-1}$ locally
+        \State $\mathcal{L}_i \gets \texttt{List}()$
+        \State $\epsilon \gets 0$
+        \LineComment{Discretise possible values of fusion weight}
+        \While{$\epsilon \leq 1$}
+            \LineComment{Choose appropriate encryption function}
+            \If{$i$ is even}
+                \State $\mathcal{L}_i\texttt{.append}\left(\mathcal{E}_{\mathsf{sk}_{\mathsf{o}}}^{\mathsf{L}}\left(\epsilon\cdot\tr(\mat{P}_i)\right)\right)$
+            \Else
+                \State $\mathcal{L}_i\texttt{.append}\left(\mathcal{E}_{\mathsf{sk}_{\mathsf{o}}}^{\mathsf{R}}\left(\epsilon\cdot\tr(\mat{P}_i)\right)\right)$
+            \EndIf
+            \State $\epsilon \gets \epsilon+g$
+        \EndWhile
+        \State Send $\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\mat{P}_i^{-1}\right)\right)$, $\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\mat{P}_i^{-1}\hat{\vec{x}}_i\right)\right)$ and $\mathcal{L}_i$ to fusion cloud
+        \EndProcedure
+    \end{algorithmic}
+    \end{algorithm}
+    \begin{algorithm}[htbp]
+    \caption{Fusion at the Cloud}\label{alg:cloud_fusion:secfci_cloud_steps}
+    \begin{algorithmic}[1]
+        \setstretch{1.35}
+        \Procedure{Fuse}{$\mathsf{pk}$}
+        \State Receive $\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\mat{P}_i^{-1}\right)\right)$, $\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\mat{P}_i^{-1}\hat{\vec{x}}_i\right)\right)$ and $\mathcal{L}_i$ for all $1\leq i \leq n$
+        \LineComment{Perform homomorphic summations}
+        
+        \LineComment{Perform homomorphic summations}
+        \State $s \gets \oplus_{i=1}^{n} s_i$
+        \State $\mat{C} \gets \oplus_{i=1}^{n} \mat{C}_i$
+        \State $\vec{e} \gets \oplus_{i=1}^{n} \vec{e}_i$
+        \State Store $s$, $\mat{C}$ and $\vec{e}$ in case of query
+        \EndProcedure
+    \end{algorithmic}
+    \end{algorithm}
+    \begin{algorithm}[htbp]
+    \caption{Decryption at the Querying Party}\label{alg:cloud_fusion:secfci_query_steps}
+    \begin{algorithmic}[1]
+        \setstretch{1.35}
+        \Procedure{QueryFuse}{$\mathsf{pk}$, $\mathsf{sk}$}
+        \State Query and receive $s$, $\mat{C}$ and $\vec{e}$ from fusion cloud
+        \LineComment Decrypt and decode
+        \State $\bar{s} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(s\right)\right)$
+        \State $\bar{\mat{C}} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\mat{C}\right)\right)$
+        \State $\bar{\vec{e}} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\vec{e}\right)\right)$
+        \LineComment Compute remaining fusion operations
+        \State $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} \gets \bar{s}^{-1} \cdot \bar{\vec{e}}$
+        \State $\mat{P}_{\mathsf{fus}}^{-1} \gets \bar{s}^{-1} \cdot \bar{\mat{C}}$
+        \State \Return $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$, $\mat{P}_{\mathsf{fus}}^{-1}$
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
 \begin{figure}[htbp]
     \begin{subfigure}[htbp]{\textwidth}
         \begin{center}
@@ -311,14 +369,14 @@ Individual encryption operation complexities with the assumptions made above hav
 Applying operation complexities to the fusion algorithm we get the computational complexity for the sensors, cloud and querying party. These can be seen in table \ref{tab:cloud_fusion:secfci_complexity}, where unencrypted FCI algorithm complexities are also shown for reference. 
 \begin{table}[htbp]
    \centering
-   \caption{Computation complexity at each timestep $k$ for each party.}
+   \caption{Computation complexity for each party.}
    \label{tab:cloud_fusion:secfci_complexity}
    \begin{tabular}{|c|c|c|}
       \hline
        & \textbf{FCI} & \textbf{Confidential Fusion Leaking Weights} \\ 
       \hline
       Sensor & $O(1)$ & $O\left(d^2\log^3{N} + \frac{1}{g}\log^2{N}\right)$ \\ 
-      Cloud & $O(nd^2+n^3)$ & $O\left(nd^2\log^3{N} + n\log{\frac{1}{g}} + n^3\right)$ \\ 
+      Cloud & $O\left(nd^2+n^3\right)$ & $O\left(nd^2\log^3{N} + n\log{\frac{1}{g}} + n^3\right)$ \\ 
       Querying Party & $O(1)$ & $O\left(d^2\log^3{N}\right)$ \\ 
       \hline
    \end{tabular}
@@ -370,7 +428,7 @@ Along with the discussions above, we have implemented a simulation of the method
     \end{bmatrix}
     \right)\,,
 \end{equation}
-is simulated and measured by four independent position sensors $1\leq i\leq 4$, producing measurements 
+was simulated and measured by four independent position sensors $1\leq i\leq 4$, that produced measurements 
 \begin{equation}\label{eq:cloud_fusion:secfci_measurement_model}
     \vec{z}_{k,i} = 
     \begin{bmatrix}
@@ -403,7 +461,7 @@ with covariances sampled independently, resulting in
         \end{bmatrix}\,.
     \end{split}
 \end{equation}
-Each sensor runs a local linear Information Filter (IF) from section \ref{subsec:prelims:if} before processing and sending its estimate information, $\mat{P}_{k, i}^{-1}\hat{\vec{x}}_{k, i}$ and $\mat{P}_{k, i}^{-1}$, to the cloud for fusion. At each timestep, the time-independent fusion of information vectors and matrices is computed homomorphically at the cloud and decrypted by the querying party. The simulation was written in the Python and C programming languages, using the $\mathsf{phe}$ Paillier encryption scheme library [PythonPaillier2013], and using a key size of $512$ bits for encryption schemes. Figure \ref{fig:cloud_fusion:secfci_sim_error} shows the average estimation error of $1000$ simulations when using our algorithm with varying stepsizes $g$ alongside the standard FCI algorithm. 
+Each sensor ran a local linear Information Filter (IF) from section \ref{subsec:prelims:if} before processing and sending its estimate information, $\mat{P}_{k, i}^{-1}\hat{\vec{x}}_{k, i}$ and $\mat{P}_{k, i}^{-1}$, to the cloud for fusion. At each timestep, time-independent fusion of information vectors and matrices was computed homomorphically at the cloud and decrypted by the querying party. The simulation was written in the Python and C programming languages, using the $\mathsf{phe}$ Paillier encryption scheme library [PythonPaillier2013], and using a key size of $512$ bits for encryption schemes. Figure \ref{fig:cloud_fusion:secfci_sim_error} shows the average estimation error of $1000$ simulations when using our algorithm with varying stepsizes $g$ alongside the standard FCI algorithm. 
 \begin{figure}[htbp]
     \centering
     \includegraphics{figures/fci_secfci_cmp.pdf}
@@ -412,7 +470,7 @@ Each sensor runs a local linear Information Filter (IF) from section \ref{subsec
     % TODO figure to display MSE of 1000 simulations for FCI and our method with g=0.1, 0.2, 0.33, 0.5
     % latex y-axis label for MSE
  \end{figure}
- In all cases, resulting plaintext information vectors and matrices are converted to estimates and estimate error covariances before comparison with the true simulated state. From the figure, it can be seen that the estimation error of our method is similar to the normal FCI method when stepsize $g$ is small, $g\leq 2$, but grows as expected when $g$, and thus the possible error in weights $\omega_i$, is increased.
+ In all cases, resulting plaintext information vectors and matrices were converted to estimates and estimate error covariances before comparison with the true simulated state. From the figure, it can be seen that the estimation error of our method is similar to the normal FCI method when stepsize $g$ is small, $g\leq 2$, but grows as expected when $g$, and thus the possible error in weights $\omega_i$, is increased.
 
 Since the system described by \eqref{eq:cloud_fusion:secfci_system_model}, \eqref{eq:cloud_fusion:secfci_measurement_model} and estimated by the KF reaches an estimation steady-state, fusion weights $\omega_i$ do as well. Figure \ref{fig:cloud_fusion:secfci_omega_error} shows the steady state error of estimated weights when compared to the true FCI weights. 
 \begin{figure}[htbp]
@@ -443,34 +501,37 @@ Here, the maximum errors in fusion weights naturally depend on the stepsize $g$ 
 % 
 
 \section{Confidential Cloud Fusion Without Leaking Fusion Weights}\label{sec:cloud_fusion:secfci2}
-In section \ref{sec:cloud_fusion:secfci} we introduced a solution to the cloud fusion problem that solves confidential estimate fusion on an untrusted cloud under some additional assumptions on the system. Namely, we assumed that the sensors were mutually trusted and allowed the leakage of fusion weights $\omega_i$, $1\leq i\leq n$, at the cloud, in turn allowing the cloud to prioritise estimates at the cost of leaking confidential information. Here, we propose an alternative method that relaxes these assumptions, providing estimate fusion without assuming trust between the sensors or allowing leakage of fusion weights. 
+Previously, we presented a method for solving the estimate fusion problem by weakening the desired cryptographic aims in section \ref{sec:cloud_fusion:problem}. In this section, we present a method that meets these aims exactly by making a relaxation on the produced fusion output of the fusion cloud.
+\begin{description}
+    \item[Broader fusion output] In this method, the fusion cloud is not strictly required to produce the fused information vector $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$ and matrix $\mat{P}_{\mathsf{fus}}^{-1}$. Instead, any statistics over data from individual sensors $i$ can be computed homomorphically at the fusion cloud and provided to the querying party. For example, the sum statistic over inverted estimate covariance traces, $\sum_{i=1}^n \tr(\mat{P}_i)^{-1}$, may be returned.
+\end{description}
 
-The idea of the method is to postpone the evaluation of operations that cannot be performed homomorphically until partial results are decrypted by the querying party. The remaining operations can then be evaluated on unencrypted inputs to produce the final results. First, we note that FCI fusion \eqref{eq:prelims:ci_est}, \eqref{eq:prelims:ci_cov} and \eqref{eq:prelims:fci_solution} can be rearranged and weights substituted to obtain
-\begin{equation}\label{eq:cloud_fusion:secfci2_est_rearrange}
-    \hat{\vec{x}}_{k,\mathsf{fus}} = \mat{P}_{k,\mathsf{fus}}\left(\sum_{i=1}^n \frac{1}{\tr(\mat{P}_{k,i})}\right)^{-1}\sum_{i=1}^n\frac{1}{\tr(\mat{P}_{k,i})}\mat{P}_{k,i}^{-1}\hat{\vec{x}}_{k,i}
+The idea behind the method is to postpone the evaluation of operations that cannot be performed homomorphically until partial fusion results are decrypted by the querying party. The remaining operations are then evaluated on unencrypted inputs to produce the final fusion results. First, we note that FCI fusion \eqref{eq:prelims:ci_info_vec}, \eqref{eq:prelims:ci_info_mat} and \eqref{eq:prelims:fci_solution} can be rearranged and weights substituted to obtain
+\begin{equation}\label{eq:cloud_fusion:secfci2_info_vec_rearrange}
+    \mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} = \left(\sum_{i=1}^n \frac{1}{\tr(\mat{P}_i)}\right)^{-1}\sum_{i=1}^n\frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\hat{\vec{x}}_i
 \end{equation}
 and
-\begin{equation}\label{eq:cloud_fusion:secfci2_cov_rearrange}
-    \mat{P}_{k,\mathsf{fus}} = \left(\left(\sum_{i=1}^n \frac{1}{\tr(\mat{P}_{k,i})}\right)^{-1}\sum_{i=1}^n \frac{1}{\tr(\mat{P}_{k,i})}\mat{P}_{k,i}^{-1}\right)^{-1}\,.
+\begin{equation}\label{eq:cloud_fusion:secfci2_info_mat_rearrange}
+    \mat{P}_{k,\mathsf{fus}}^{-1} = \left(\sum_{i=1}^n \frac{1}{\tr(\mat{P}_i)}\right)^{-1}\sum_{i=1}^n \frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\,.
 \end{equation}
 
 In this form, innermost summations  
 \begin{equation}
-    \sum_{i=1}^n \frac{1}{\tr(\mat{P}_{k,i})}\,,\ \sum_{i=1}^n \frac{1}{\tr(\mat{P}_{k,i})}\mat{P}_{k,i}^{-1}\text{ and }\sum_{i=1}^n\frac{1}{\tr(\mat{P}_{k,i})}\mat{P}_{k,i}^{-1}\hat{\vec{x}}_{k,i}
+    \sum_{i=1}^n \frac{1}{\tr(\mat{P}_i)}\,,\ \sum_{i=1}^n \frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\text{ and }\sum_{i=1}^n\frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\hat{\vec{x}}_i
 \end{equation}
-combine information from individual sensors $i$ and are computable homomorphically given suitable encryptions. Encryptions of these sums can then be decrypted by the querying party, before remaining inversions and multiplications in \eqref{eq:cloud_fusion:secfci2_est_rearrange} and \eqref{eq:cloud_fusion:secfci2_cov_rearrange} can be computed to obtain the final results. To depict this process, pseudocode for the encryption at the sensors, fusion at the cloud and decryption at the querying party are shown in algorithms \ref{alg:cloud_fusion:secfci2_sensor_steps}, \ref{alg:cloud_fusion:secfci2_cloud_steps} and \ref{alg:cloud_fusion:secfci2_query_steps}, respectively. As in the previous section, encoding from section \ref{subsec:prelims:encoding} is used with $M=N$, where $N$ is the Paillier scheme public key, and an appropriate precision $\phi$ is chosen.
+combine information from individual sensors $i$, are computable homomorphically given suitable encryption and suit the fusion relaxation defined above. Encryptions of these sums can then be decrypted by the querying party, before remaining inversions and multiplications in \eqref{eq:cloud_fusion:secfci2_info_vec_rearrange} and \eqref{eq:cloud_fusion:secfci2_info_mat_rearrange} can be computed to obtain the final results. To depict this process, pseudocode for the encryption at the sensors, fusion at the cloud and decryption at the querying party are shown in algorithms \ref{alg:cloud_fusion:secfci2_sensor_steps}, \ref{alg:cloud_fusion:secfci2_cloud_steps} and \ref{alg:cloud_fusion:secfci2_query_steps}, respectively. As in the previous section, the Paillier encryption scheme, producing keys $\mathsf{pk}$ and $\mathsf{sk}$, is used, encoding from section \ref{subsec:prelims:encoding} is used with $M=N$, where $N$ is the Paillier scheme modulus, and an appropriate precision $\phi$ is chosen.
 \begin{algorithm}[htbp]
-\caption{Encryption at Sensors}\label{alg:cloud_fusion:secfci2_sensor_steps}
+\caption{Encryption at the Sensors}\label{alg:cloud_fusion:secfci2_sensor_steps}
 \begin{algorithmic}[1]
     \setstretch{1.35}
-    \Procedure{Estimate}{$i$, $k$, $\mathsf{pk}$}
-    \State Estimate $\mat{P}_{k,i}^{-1}\hat{\vec{x}}_{k,i}$ locally
-    \State Estimate $\mat{P}_{k,i}^{-1}$ locally
+    \Procedure{Estimate}{$i$, $\mathsf{pk}$}
+    \State Estimate $\mat{P}_i^{-1}\hat{\vec{x}}_i$ locally
+    \State Estimate $\mat{P}_i^{-1}$ locally
     \LineComment{Encode and encrypt scaling, covariance and estimate components}
-    \State $s_{k,i} \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_{k,i})}\right)\right)$
-    \State $\mat{C}_{k,i} \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_{k,i})}\mat{P}_{k,i}^{-1}\right)\right)$
-    \State $\vec{e}_{k,i} \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_{k,i})}\mat{P}_{k,i}^{-1}\hat{\vec{x}}_{k,i}\right)\right)$
-    \State Send $s_{k,i}$, $\mat{C}_{k,i}$ and $\vec{e}_{k,i}$ to fusing cloud
+    \State $s_i \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_i)}\right)\right)$
+    \State $\mat{C}_i \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\right)\right)$
+    \State $\vec{e}_i \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\hat{\vec{x}}_i\right)\right)$
+    \State Send $s_i$, $\mat{C}_i$ and $\vec{e}_i$ to fusion cloud
     \EndProcedure
 \end{algorithmic}
 \end{algorithm}
@@ -478,15 +539,13 @@ combine information from individual sensors $i$ and are computable homomorphical
 \caption{Partial Fusion at the Cloud}\label{alg:cloud_fusion:secfci2_cloud_steps}
 \begin{algorithmic}[1]
     \setstretch{1.35}
-    \Procedure{PartialFuse}{$k$, $\mathsf{pk}$}
-    \State Receive $s_{k,i}$, $\mat{C}_{k,i}$ and $\vec{e}_{k,i}$ for all $1\leq i \leq m$
-    \LineComment{Public key is encryption modulus}
-    \State $N \gets \mathsf{pk}$
+    \Procedure{PartialFuse}{$\mathsf{pk}$}
+    \State Receive $s_i$, $\mat{C}_i$ and $\vec{e}_i$ for all $1\leq i \leq n$
     \LineComment{Perform homomorphic summations}
-    \State $s_k \gets \prod_{i=1}^{m} s_{k,i} \pmod{N^2}$
-    \State $\mat{C}_k \gets \otimes_{i=1}^{m} \mat{C}_{k,i} \pmod{N^2}$
-    \State $\vec{e}_k \gets \otimes_{i=1}^{m} \vec{e}_{k,i} \pmod{N^2}$
-    \State Store $s_k$, $\mat{C}_k$ and $\vec{e}_k$ in case of query
+    \State $s \gets \oplus_{i=1}^{n} s_i$
+    \State $\mat{C} \gets \oplus_{i=1}^{n} \mat{C}_i$
+    \State $\vec{e} \gets \oplus_{i=1}^{n} \vec{e}_i$
+    \State Store $s$, $\mat{C}$ and $\vec{e}$ in case of query
     \EndProcedure
 \end{algorithmic}
 \end{algorithm}
@@ -494,22 +553,21 @@ combine information from individual sensors $i$ and are computable homomorphical
 \caption{Completing Fusion at the Querying Party}\label{alg:cloud_fusion:secfci2_query_steps}
 \begin{algorithmic}[1]
     \setstretch{1.35}
-    \Procedure{QueryFuse}{$k$, $\mathsf{pk}$, $\mathsf{sk}$}
-    \State Query and receive $s_k$, $\mat{C}_k$ and $\vec{e}_k$ from fusing cloud
-    \State $N \gets \mathsf{pk}$
+    \Procedure{QueryFuse}{$\mathsf{pk}$, $\mathsf{sk}$}
+    \State Query and receive $s$, $\mat{C}$ and $\vec{e}$ from fusion cloud
     \LineComment Decrypt and decode
-    \State $\bar{s}_k \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{sk}}\left(s_k\right)\right)$
-    \State $\bar{\mat{C}}_k \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{sk}}\left(\mat{C}_k\right)\right)$
-    \State $\bar{\vec{e}}_k \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{sk}}\left(\vec{e}_k\right)\right)$
+    \State $\bar{s} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(s\right)\right)$
+    \State $\bar{\mat{C}} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\mat{C}\right)\right)$
+    \State $\bar{\vec{e}} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\vec{e}\right)\right)$
     \LineComment Compute remaining fusion operations
-    \State $\mat{P}_{k,\mathsf{fus}}^{-1} \gets \bar{s}_k^{-1} \cdot \bar{\mat{C}}_k$
-    \State $\mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}} \gets \bar{s}_k^{-1} \cdot \bar{\vec{e}}_k$
-    \State \Return $\mat{P}_{k,\mathsf{fus}}^{-1}\hat{\vec{x}}_{k,\mathsf{fus}}$, $\mat{P}_{k,\mathsf{fus}}^{-1}$
+    \State $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} \gets \bar{s}^{-1} \cdot \bar{\vec{e}}$
+    \State $\mat{P}_{\mathsf{fus}}^{-1} \gets \bar{s}^{-1} \cdot \bar{\mat{C}}$
+    \State \Return $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$, $\mat{P}_{\mathsf{fus}}^{-1}$
     \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 
-Along with allowing the summations to be performed homomorphically on the cloud, we note that this form of the FCI also allows the cloud's partial fusion operations to be evaluated sequentially. This can be seen in algorithm \ref{alg:cloud_fusion:secfci2_cloud_steps}, where individual components $s_{k, i}$, $\mat{C}_{k, i}$ and $\vec{e}_{k, i}$ from each sensor can continue to be sequentially aggregated as sensors send their estimate information. This, in turn, supports the dynamic joining and leaving of sensors in the network without affecting the cloud or the operations of the querying party.
+Along with allowing the summations to be performed homomorphically on the cloud, we note that this form of the FCI also allows the cloud's partial fusion operations to be evaluated sequentially. This can be seen in algorithm \ref{alg:cloud_fusion:secfci2_cloud_steps}, where individual components $s_i$, $\mat{C}_i$ and $\vec{e}_i$ from each sensor can continue to be sequentially aggregated as sensors send their estimate information. This, in turn, supports the dynamic joining and leaving of sensors in the network without affecting the cloud or the operations of the querying party.
 
 % 
 %  ######   #######  ##     ## ########  
@@ -522,7 +580,7 @@ Along with allowing the summations to be performed homomorphically on the cloud,
 % 
 
 \subsection{Computational Complexity}\label{subsec:cloud_fusion:secfci2_comp_complexity}
-As with the method in section \ref{sec:cloud_fusion:secfci}, this method allows the homomorphic computation of FCI fusion given $n$ sensor estimates at the computational cost of encryption and homomorphic operations. Here, we look at this additional cost when performing the confidential fusion method without leaking fusion weights. We again assume floating-point and small integer operations to have complexity $O(1)$, the Paillier scheme to have key size $\log{N}$ bits and repeat the Paillier operation complexities in table \ref{tab:cloud_fusion:secfci2_op_complexity} for convenience. 
+As with the previous method, we allow the homomorphic computation of FCI fusion at the computational cost of encryption and homomorphic operations. Here, we look at this additional cost for each involved party using the newly presented scheme. We again assume floating-point and small integer operations to have complexity $O(1)$, the Paillier scheme to have key size $\log{N}$ bits and repeat the Paillier operation complexities in table \ref{tab:cloud_fusion:secfci2_op_complexity} for convenience. 
 \begin{table}[htbp]
     \centering
     \caption{Computation complexity of Paillier encryption operations.}
@@ -538,22 +596,22 @@ As with the method in section \ref{sec:cloud_fusion:secfci}, this method allows 
         \hline
     \end{tabular}
 \end{table}
-In table \ref{tab:cloud_fusion:secfci2_complexity}, we apply the Paillier operation complexities to the presented method where the unencrypted FCI algorithm is again shown for reference.
+In table \ref{tab:cloud_fusion:secfci2_complexity}, we apply the Paillier operation complexities to the presented method and the unencrypted FCI algorithm is again shown for reference.
 \begin{table}[tb]
     \centering
-    \caption{Computation complexity at each timestep $k$ for each party.}
+    \caption{Computation complexity for each party.}
     \label{tab:cloud_fusion:secfci2_complexity}
     \begin{tabular}{|c|c|c|}
        \hline
         & \textbf{FCI} & \textbf{Confidential Fusion} \\ 
        \hline
        Sensor & $O(1)$ & $O\left(d^2\log^3{N}\right)$ \\ 
-       Cloud & $O(nd^2 + n^3)$ & $O\left(nd^2\log^2{N}\right)$ \\ 
+       Cloud & $O\left(nd^2 + n^3\right)$ & $O\left(nd^2\log^2{N}\right)$ \\ 
        Querying Party & $O(1)$ & $O\left(d^2\log^3{N}\right)$ \\ 
        \hline
     \end{tabular}
  \end{table}
-Here we see that the burden of computation in the confidential fusion without leaking weights is reduced when compared to the method leaking weights in section \ref{sec:cloud_fusion:secfci}. This can be attributed to no longer requiring the Lewi ORE scheme and the computational simplicity of the final steps of fusion required at the querying party in comparison to the expensive decryption operations. Again, the presented computational requirements are a property that must be considered if this method were to be implemented on hardware and the security benefits desired.
+Here we see that the burden of computation is reduced when compared to the method leaking weights in section \ref{sec:cloud_fusion:secfci}. This can be attributed to no longer requiring the Lewi ORE scheme and the computational simplicity of the final fusion steps at the querying party compared to the required decryption operations. These computational requirements are a necessity for providing the specified security and fusion aims and must be considered when choosing hardware for a physical system where the aims are desired.
 
 % 
 %  ######  ########  ######  
@@ -566,9 +624,9 @@ Here we see that the burden of computation in the confidential fusion without le
 % 
 
 \subsection{Security Analysis}\label{subsec:cloud_fusion:secfci2_security}
-The provable security of the presented method is relatively straightforward. Our aim for IND-CPA security of all information received by the cloud, sent by the sensors or observable by eavesdroppers is achieved by the Paillier homomorphic encryption scheme. Since all transmitted information is encrypted, and the cloud, estimators and eavesdroppers do not hold the secret key $\mathsf{sk}$, the IND-CPA notion of sensor estimates and fusion weights is met. As with the method that leaks weights, we acknowledge the implicit leakage of the state dimension $d$ when using elementwise encryption, present in this method as well, but again note that only implicit information about the fusion's use case can be leaked rather than state estimates themselves.
+Showing that the cryptographic aims of the fusion problem are met is relatively straightforward. Our aim is for all estimate information, excluding locally produced estimates, that is available to the cloud, eavesdroppers and sensors to be encrypted with a scheme meeting the IND-CPA notion. Since the Paillier scheme meets this notion and all transmitted information is encrypted, and noting that the cloud, estimators and eavesdroppers do not hold the secret key $\mathsf{sk}$, the cryptographic aim is met. We do, however, note that the implicit leakage of state dimension $d$ is again present in this method due to the reliance on elementwise encryption.
 
-Regarding the ability of the presented method to compute FCI sequentially, and thus supporting dynamic joining and leaving of sensors during fusion, we note further implicit leakage that must be considered if the scheme was to be implemented. Periodic estimation from a sensor may reveal when the sensor is within an estimation range or context, potentially leaking sensor privacy. To combat this, appropriate methods to mitigate implicit leakage need to be considered for real hardware, for example, sending dummy estimate information $s_{k, i}=\mathcal{E}_{\mathsf{pk}}(\mathsf{E}_0(0))$ when sensor $i$ is out of estimation context.
+Lastly, when discussing security, we recall that the partial computation of FCI in this method supports the dynamic joining and leaving of sensors during fusion, but note that the implementation of this in practice introduces additional implicit leakages that need to be considered. Periodic estimation from a sensor may reveal when the sensor is within an estimation range or context, potentially leaking sensor privacy. To combat this, appropriate methods to mitigate implicit leakage need to be considered for real hardware, for example, sending dummy estimate information, $\mathcal{E}_{\mathsf{pk}}(\mathsf{E}_0(0))$, $\mathcal{E}_{\mathsf{pk}}(\mathsf{E}_0(\mat{0}))$ and $\mathcal{E}_{\mathsf{pk}}(\mathsf{E}_0(\vec{0}))$, when sensor $i$ is out of estimation context.
 
 % 
 %  ######  #### ##     ## 
@@ -581,7 +639,7 @@ Regarding the ability of the presented method to compute FCI sequentially, and t
 % 
 
 \subsection{Simulation}\label{subsec:cloud_fusion:secfci2_simulation}
-To demonstrate the accuracy of the method and compare it to the method in section \ref{sec:cloud_fusion:secfci} as well as the FCI algorithm it approximates, we implemented a simulation of the fusion scenario. Since errors in fusion are now only introduced during real number quantisation we expect the estimation error to be smaller than that in section \ref{sec:cloud_fusion:secfci}. We again use the $\mathsf{phe}$ Paillier encryption scheme library [PythonPaillier2013], choose the Paillier and Lewi key sizes $N$, and therefore encoding modulus $M$, to be $512$ bits long, and implement the constant-speed linear model \eqref{eq:cloud_fusion:secfci_system_model}. At each timestep $k$, the system state $\vec{x}_k$ is measured by $m=4$ sensors, $1\leq i \leq 4$, with measurements $\vec{z}_{k,i}$ following the measurement models \eqref{eq:cloud_fusion:secfci_measurement_model} and covariances \eqref{eq:cloud_fusion:secfci_measurement_model_covariances}. Using a linear IF, each sensor produces estimate information $\mat{P}_{k, i}^{-1}\hat{\vec{x}}_{k, i}$ and $\mat{P}_{k, i}^{-1}$, respectively, that are processed, encrypted and fused at the cloud and querying party. The fusion error results of $1000$ simulation runs are shown in figure \ref{fig:cloud_fusion:secfci2_sim_error}. 
+To demonstrate the accuracy of the method and compare it to the method in section \ref{sec:cloud_fusion:secfci} as well as the FCI algorithm it approximates, we have implemented a simulation of the fusion scenario. Since errors in fusion are now only introduced during real number quantisation we expect the estimation error to be smaller than that in section \ref{sec:cloud_fusion:secfci}. Code was written in the Python programming language, again using the $\mathsf{phe}$ Paillier encryption scheme library [PythonPaillier2013]. A key size of $512$ bits was used, and the constant-speed linear model in \eqref{eq:cloud_fusion:secfci_system_model} was implemented. At each timestep $k$, the system state $\vec{x}_k$ was measured by $m=4$ sensors, $1\leq i \leq 4$, with measurements $\vec{z}_{k,i}$ following the measurement models \eqref{eq:cloud_fusion:secfci_measurement_model} and covariances \eqref{eq:cloud_fusion:secfci_measurement_model_covariances}. Using a linear IF, each sensor produced estimate information $\mat{P}_{k, i}^{-1}\hat{\vec{x}}_{k, i}$ and $\mat{P}_{k, i}^{-1}$, respectively, that were processed, encrypted and fused at the cloud and querying party. The fusion error results of $1000$ simulation runs are shown in figure \ref{fig:cloud_fusion:secfci2_sim_error}. 
 \begin{figure}[htbp]
     \centering
     \includegraphics{figures/sim_error_plot.pdf}
@@ -605,8 +663,8 @@ From the figure, we can see the expected similarity in performance between all t
 % 
 
 \section{Conclusions on Confidential Estimate Fusion}\label{sec:cloud_fusion:conclusion}
-In this chapter, we have presented two methods for approximating the FCI fusion algorithm on an untrusted cloud where estimates and final fusion results remain confidential to trusted parties. The methods primarily differ in whether the FCI fusion weights are leaked to eavesdroppers and the cloud as well as the assumptions on collusions between parties in the network.
+In this chapter, we have presented two methods for approximating the FCI fusion algorithm on an untrusted cloud where estimates and final fusion meet specified cryptographic aims. The methods primarily differ in whether the FCI fusion weights are leaked to eavesdroppers and the cloud as well as the assumptions on collusions between parties in the network.
 
-The first method, providing confidential fusion with the leakage of weights, introduced in section \ref{sec:cloud_fusion:secfci}, has the benefit of allowing the untrusted cloud to prioritise sensors when performing fusion. This is done by preferring sensors that reduce fused estimate error, as indicated by their fusion weight, but requires the assumption that sensors are trusted and cannot collude maliciously. That is, only the untrusted cloud and eavesdroppers are considered possible adversaries. The method also requires the use of two encryption schemes, resulting in higher computational complexity at sensors and the cloud, as can be seen in section \ref{subsec:cloud_fusion:secfci_comp_complexity}. The second method, presented in section \ref{sec:cloud_fusion:secfci2}, provides confidential fusion without the leakage of weights. The method considers all parties in the network except the trusted query party as potential adversaries and leaks no information beyond the implicit leakage of state dimension, present in both methods. The stronger security guarantees come with the disadvantage that the cloud cannot prioritise estimates based on their fusion error and additional, albeit constant, complexity at the querying party. Both methods have their computational complexity and security implications analysed and are simulated to demonstrate estimation performance.
+The first method, providing confidential fusion with the leakage of weights, introduced in section \ref{sec:cloud_fusion:secfci}, has the benefit of allowing the untrusted cloud to prioritise sensors when performing fusion. This is done by preferring sensors that reduce fused estimate error, as indicated by their fusion weight, but requires the assumption that sensors are trusted and cannot collude maliciously. The method also requires the use of two encryption schemes, resulting in higher computational complexity at sensors and the cloud, as can be seen in section \ref{subsec:cloud_fusion:secfci_comp_complexity}. The second method, presented in section \ref{sec:cloud_fusion:secfci2}, provides confidential fusion without the leakage of weights. This method doesn't consider sensors as trusted parties and leaks no information beyond the implicit leakage of state dimension, present in both methods. The stronger security guarantees come with disadvantages, namely that the cloud cannot prioritise estimates based on their fusion error and that an additional, albeit constant, complexity is present at the querying party. Both methods have their computational complexity and security implications analysed and are simulated to demonstrate estimation performance.
 
 Future directions for the topic of confidential data fusion include multi-variable encryption, removing the implicit leakage of state dimension, and the extension of the method to decentralised environments where confidential fusion without a centralised cloud is desirable.
