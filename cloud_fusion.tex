@@ -244,65 +244,7 @@ allowing for comparison between sequences from consecutive sensors $i$ and $i+1$
         \left\langle\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(\tr(\mat{P}_i)), \mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}((1-g)\tr(\mat{P}_i)), \mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}((1-2g)\tr(\mat{P}_i)),\dots,\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(0)\right\rangle\,,\ & \text{if } i \text{ is even,}
     \end{split}
 \end{equation}
-resulting in sequences of the same form as \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_1} and \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_2}. The value $\hat{\omega}_i = \iota g + g/2 \approx \omega_i$, or in the case of an equality $\hat{\omega}_i = \iota g = \omega_i$, for some index $\iota$, is used to approximate the solution $\hat{\vec{\omega}}_i^{(n-1)} \approx \vec{\omega}_i^{(n-1)}$. 
-To demonstrate the fusion process, pseudocode for encryption, fusion and decryption is given in algorithms \ref{alg:cloud_fusion:secfci_sensor_steps}, \ref{alg:cloud_fusion:secfci_cloud_steps} and \ref{alg:cloud_fusion:secfci_query_steps}, respectively, and visualisation of solving \eqref{eq:cloud_fusion:secfci_nsen_omega_solution} with approximations to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_point} in the three-sensor case is graphically shown in figure \ref{fig:cloud_fusion:secfci_nsen_partial_sols_and_intersect}.
-\begin{algorithm}[htbp]
-    \caption{Encryption at the Sensors}\label{alg:cloud_fusion:secfci_sensor_steps}
-    \begin{algorithmic}[1]
-        \setstretch{1.35}
-        \Procedure{Estimate}{$i$, $g$, $\mathsf{pk}$, $\mathsf{sk}_{\mathsf{o}}$}
-        \State Estimate $\mat{P}_i^{-1}\hat{\vec{x}}_i$ locally
-        \State Estimate $\mat{P}_i^{-1}$ locally
-        \State $\mathcal{L}_i \gets \texttt{List}()$
-        \State $\epsilon \gets 0$
-        \LineComment{Discretise possible values of fusion weight}
-        \While{$\epsilon \leq 1$}
-            \LineComment{Choose appropriate encryption function}
-            \If{$i$ is even}
-                \State $\mathcal{L}_i\texttt{.append}\left(\mathcal{E}_{\mathsf{sk}_{\mathsf{o}}}^{\mathsf{L}}\left(\epsilon\cdot\tr(\mat{P}_i)\right)\right)$
-            \Else
-                \State $\mathcal{L}_i\texttt{.append}\left(\mathcal{E}_{\mathsf{sk}_{\mathsf{o}}}^{\mathsf{R}}\left(\epsilon\cdot\tr(\mat{P}_i)\right)\right)$
-            \EndIf
-            \State $\epsilon \gets \epsilon+g$
-        \EndWhile
-        \State Send $\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\mat{P}_i^{-1}\right)\right)$, $\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\mat{P}_i^{-1}\hat{\vec{x}}_i\right)\right)$ and $\mathcal{L}_i$ to fusion cloud
-        \EndProcedure
-    \end{algorithmic}
-    \end{algorithm}
-    \begin{algorithm}[htbp]
-    \caption{Fusion at the Cloud}\label{alg:cloud_fusion:secfci_cloud_steps}
-    \begin{algorithmic}[1]
-        \setstretch{1.35}
-        \Procedure{Fuse}{$\mathsf{pk}$}
-        \State Receive $\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\mat{P}_i^{-1}\right)\right)$, $\mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\mat{P}_i^{-1}\hat{\vec{x}}_i\right)\right)$ and $\mathcal{L}_i$ for all $1\leq i \leq n$
-        \LineComment{Perform homomorphic summations}
-        
-        \LineComment{Perform homomorphic summations}
-        \State $s \gets \oplus_{i=1}^{n} s_i$
-        \State $\mat{C} \gets \oplus_{i=1}^{n} \mat{C}_i$
-        \State $\vec{e} \gets \oplus_{i=1}^{n} \vec{e}_i$
-        \State Store $s$, $\mat{C}$ and $\vec{e}$ in case of query
-        \EndProcedure
-    \end{algorithmic}
-    \end{algorithm}
-    \begin{algorithm}[htbp]
-    \caption{Decryption at the Querying Party}\label{alg:cloud_fusion:secfci_query_steps}
-    \begin{algorithmic}[1]
-        \setstretch{1.35}
-        \Procedure{QueryFuse}{$\mathsf{pk}$, $\mathsf{sk}$}
-        \State Query and receive $s$, $\mat{C}$ and $\vec{e}$ from fusion cloud
-        \LineComment Decrypt and decode
-        \State $\bar{s} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(s\right)\right)$
-        \State $\bar{\mat{C}} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\mat{C}\right)\right)$
-        \State $\bar{\vec{e}} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\vec{e}\right)\right)$
-        \LineComment Compute remaining fusion operations
-        \State $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} \gets \bar{s}^{-1} \cdot \bar{\vec{e}}$
-        \State $\mat{P}_{\mathsf{fus}}^{-1} \gets \bar{s}^{-1} \cdot \bar{\mat{C}}$
-        \State \Return $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$, $\mat{P}_{\mathsf{fus}}^{-1}$
-        \EndProcedure
-    \end{algorithmic}
-\end{algorithm}
-
+resulting in sequences of the same form as \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_1} and \eqref{eq:cloud_fusion:secfci_2sen_enc_seq_2}. The value $\hat{\omega}_i = \iota g + g/2 \approx \omega_i$, or in the case of an equality $\hat{\omega}_i = \iota g = \omega_i$, for some index $\iota$, is used to approximate the solution $\hat{\vec{\omega}}_i^{(n-1)} \approx \vec{\omega}_i^{(n-1)}$. A visualisation of solving \eqref{eq:cloud_fusion:secfci_nsen_omega_solution} with approximations to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_point} in the three-sensor case is graphically shown in figure \ref{fig:cloud_fusion:secfci_nsen_partial_sols_and_intersect}.
 \begin{figure}[htbp]
     \begin{subfigure}[htbp]{\textwidth}
         \begin{center}
@@ -519,7 +461,7 @@ In this form, innermost summations
 \begin{equation}
     \sum_{i=1}^n \frac{1}{\tr(\mat{P}_i)}\,,\ \sum_{i=1}^n \frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\text{ and }\sum_{i=1}^n\frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\hat{\vec{x}}_i
 \end{equation}
-combine information from individual sensors $i$, are computable homomorphically given suitable encryption and suit the fusion relaxation defined above. Encryptions of these sums can then be decrypted by the querying party, before remaining inversions and multiplications in \eqref{eq:cloud_fusion:secfci2_info_vec_rearrange} and \eqref{eq:cloud_fusion:secfci2_info_mat_rearrange} can be computed to obtain the final results. To depict this process, pseudocode for the encryption at the sensors, fusion at the cloud and decryption at the querying party are shown in algorithms \ref{alg:cloud_fusion:secfci2_sensor_steps}, \ref{alg:cloud_fusion:secfci2_cloud_steps} and \ref{alg:cloud_fusion:secfci2_query_steps}, respectively. As in the previous section, the Paillier encryption scheme, producing keys $\mathsf{pk}$ and $\mathsf{sk}$, is used, encoding from section \ref{subsec:prelims:encoding} is used with $M=N$, where $N$ is the Paillier scheme modulus, and an appropriate precision $\phi$ is chosen.
+combine information from individual sensors $i$, are computable homomorphically given suitable encryption and suit the fusion relaxation defined above. Encryptions of these sums can then be decrypted by the querying party, before remaining inversions and multiplications in \eqref{eq:cloud_fusion:secfci2_info_vec_rearrange} and \eqref{eq:cloud_fusion:secfci2_info_mat_rearrange} can be computed to obtain the final results. To depict this straightforward process, pseudocode for the encryption at the sensors, fusion at the cloud and decryption at the querying party are shown in algorithms \ref{alg:cloud_fusion:secfci2_sensor_steps}, \ref{alg:cloud_fusion:secfci2_cloud_steps} and \ref{alg:cloud_fusion:secfci2_query_steps}, respectively. As in the previous section, the Paillier encryption scheme, producing keys $\mathsf{pk}$ and $\mathsf{sk}$, is used, encoding from section \ref{subsec:prelims:encoding} is used with $M=N$, where $N$ is the Paillier scheme modulus, and an appropriate precision $\phi$ is chosen.
 \begin{algorithm}[htbp]
 \caption{Encryption at the Sensors}\label{alg:cloud_fusion:secfci2_sensor_steps}
 \begin{algorithmic}[1]
