@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.tri as mtri
 
-import plotting_helpers as pltng
+import plotting as pltng
 
 SAVE_FIGS = True
 pltng.init_matplotlib_params(SAVE_FIGS, True)
