@@ -307,23 +307,19 @@ def secfci_error_plot():
     fci_errs = [np.mean([sum((sim['gt'][k] - sim['fci'][k][0])**2) for sim in sims]) for k in ks]
     g01_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][0])**2) for sim in sims]) for k in ks]
     g02_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][1])**2) for sim in sims]) for k in ks]
-    g033_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][2])**2) for sim in sims]) for k in ks]
+    #g033_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][2])**2) for sim in sims]) for k in ks]
     g05_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][3])**2) for sim in sims]) for k in ks]
 
     ax.plot(ks, fci_errs, marker='', label=r'FCI Benchmark')
     ax.plot(ks, g05_errs, marker='', label=r'$g=0.5$')
-    ax.plot(ks, g033_errs, marker='', label=r'$g=0.33$')
+    #ax.plot(ks, g033_errs, marker='', label=r'$g=0.33$')
     ax.plot(ks, g02_errs, marker='', label=r'$g=0.2$')
-    ax.plot(ks, g01_errs, marker='', label=r'$g=0.1$')
+    ax.plot(ks, g01_errs, marker='', linestyle='--', label=r'$g=0.1$')
     
     ax.set_xlabel(r'Simulation Timestep')
     ax.set_ylabel(r'Mean Square Error (MSE)')
 
     plt.legend()
-    #ax.set_yticks([trA, trB])
-    #ax.set_yticklabels([r'$\tr(\mat{P}_1)$', r'$\tr(\mat{P}_2)$'])
-    #ax.set_xticks(list(np.arange(0,1.1,0.1))+[0.5*(l+r)])
-    #ax.set_xticklabels([str(x/10) if x in [0,5,10] else '' for x in range(11)]+[r'$\hat{\omega}_1$'])
 
     if SAVE_FIGS:
         plt.savefig('figures/cloud_fusion_secfci_sim_error.pdf')
@@ -352,18 +348,15 @@ def secfci_omega_plot():
 
     sims = pickle.load(open("code/cloud_fusion_sims.p", "rb"))
 
-    w_errs = [sum((np.array(sims[0]['fci'][-1][1]) - np.array(sims[0]['secfci'][-1][1][g]))**2) for g in range(4)]
+    w_errs = [sum((np.array(sims[0]['fci'][-1][1]) - np.array(sims[0]['secfci'][-1][1][g]))**2) for g in [0,1,3]]
 
-    ax.plot([0.1,0.2,0.33,0.5], w_errs, marker='', label=r'$\hat{\vec{\omega}}$ Estimate Error')
+    ax.plot([0.1,0.2,0.5], w_errs, marker='', label=r'$\hat{\vec{\omega}}$ Estimate Error')
 
     ax.set_xlabel(r'$g$')
     ax.set_ylabel(r'Mean Square Error (MSE)')
 
     plt.legend()
-    #ax.set_yticks([trA, trB])
-    #ax.set_yticklabels([r'$\tr(\mat{P}_1)$', r'$\tr(\mat{P}_2)$'])
-    ax.set_xticks([0.1,0.2,0.33,0.5])
-    #ax.set_xticklabels([str(x/10) if x in [0,5,10] else '' for x in range(11)]+[r'$\hat{\omega}_1$'])
+    ax.set_xticks([0.1,0.2,0.5])
 
     if SAVE_FIGS:
         plt.savefig('figures/cloud_fusion_secfci_omega_error.pdf')
@@ -418,7 +411,7 @@ def secfci2_error_plot():
     return
 
 
-store_sims(runs=10)
-#secfci_error_plot()
-#secfci_omega_plot()
-#secfci2_error_plot()
+#store_sims(runs=10)
+secfci_error_plot()
+secfci_omega_plot()
+secfci2_error_plot()
