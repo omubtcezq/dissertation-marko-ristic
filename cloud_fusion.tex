@@ -402,25 +402,21 @@ with covariances sampled independently, resulting in
         \end{bmatrix}\,.
     \end{split}
 \end{equation}
-Each sensor ran a local linear Information Filter (IF) from section \ref{subsec:prelims:if} before processing and sending its estimate information, $\mat{P}_{k, i}^{-1}\hat{\vec{x}}_{k, i}$ and $\mat{P}_{k, i}^{-1}$, to the cloud for fusion. At each timestep, time-independent fusion of information vectors and matrices was computed homomorphically at the cloud and decrypted by the querying party. The simulation was written in the Python and C programming languages, using the $\mathsf{phe}$ Paillier encryption scheme library [PythonPaillier2013], and using a key size of $512$ bits for encryption schemes. Figure \ref{fig:cloud_fusion:secfci_sim_error} shows the average estimation error of $1000$ simulations when using our algorithm with varying stepsizes $g$ alongside the standard FCI algorithm. 
+Each sensor ran a local linear Information Filter (IF) from section \ref{subsec:prelims:if}, initialised with the true state of the system, before processing and sending its estimate information, $\mat{P}_{k, i}^{-1}\hat{\vec{x}}_{k, i}$ and $\mat{P}_{k, i}^{-1}$, to the cloud for fusion. At each timestep, the time-independent fusion of information vectors and matrices was computed homomorphically at the cloud and decrypted by the querying party. The simulation was written in the Python and C programming languages, using the $\mathsf{phe}$ Paillier encryption scheme library [PythonPaillier2013], and using a key size of $512$ bits for encryption schemes. Figure \ref{fig:cloud_fusion:secfci_sim_error} shows the average estimation error of $1000$ simulations when using our algorithm with varying stepsizes $g$ alongside the standard FCI algorithm. 
 \begin{figure}[htbp]
     \centering
-    \includegraphics{figures/fci_secfci_cmp.pdf}
+    \includegraphics{figures/cloud_fusion_secfci_sim_error.pdf}
     \caption{Average MSE with varying stepsize $g$ over $1000$ simulation runs.}
     \label{fig:cloud_fusion:secfci_sim_error}
-    % TODO figure to display MSE of 1000 simulations for FCI and our method with g=0.1, 0.2, 0.33, 0.5
-    % latex y-axis label for MSE
  \end{figure}
- In all cases, resulting plaintext information vectors and matrices were converted to estimates and estimate error covariances before comparison with the true simulated state. From the figure, it can be seen that the estimation error of our method is similar to the normal FCI method when stepsize $g$ is small, $g\leq 2$, but grows as expected when $g$, and thus the possible error in weights $\omega_i$, is increased.
+ In all cases, resulting plaintext information vectors and matrices were converted to estimates and estimate error covariances before comparison with the true simulated state. From the figure, it can be seen that the estimation error of our method is similar to the normal FCI method when stepsize $g$ is small, $g=0.1$, but grows as expected when $g$, and thus the possible error in weights $\omega_i$ is increased.
 
 Since the system described by \eqref{eq:cloud_fusion:secfci_system_model}, \eqref{eq:cloud_fusion:secfci_measurement_model} and estimated by the KF reaches an estimation steady-state, fusion weights $\omega_i$ do as well. Figure \ref{fig:cloud_fusion:secfci_omega_error} shows the steady state error of estimated weights when compared to the true FCI weights. 
 \begin{figure}[htbp]
     \centering
-    \includegraphics{figures/omegas_cmp.pdf}
+    \includegraphics{figures/cloud_fusion_secfci_omega_error.pdf}
     \caption{Steady-state MSE of estimated weights $\hat{\vec{\omega}}$ with varying stepsize $g$.}
     \label{fig:cloud_fusion:secfci_omega_error}
-    % TODO plot steady-state error of weights g=0.1,0,2,0.33,0.5
-    % Y-axis is weight error (not simulation error) and X-axis is g
 \end{figure}
 Here, the maximum errors in fusion weights naturally depend on the stepsize $g$ and support the results seen in figure \ref{fig:cloud_fusion:secfci_sim_error}. Further, an upper bound on this error can be derived by considering the maximum error of each approximation \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_point} and is given by
 \begin{equation}
@@ -580,10 +576,10 @@ Lastly, when discussing security, we recall that the partial computation of FCI 
 % 
 
 \subsection{Simulation}\label{subsec:cloud_fusion:secfci2_simulation}
-To demonstrate the accuracy of the method and compare it to the method in section \ref{sec:cloud_fusion:secfci} as well as the FCI algorithm it approximates, we have implemented a simulation of the fusion scenario. Since errors in fusion are now only introduced during real number quantisation we expect the estimation error to be smaller than that in section \ref{sec:cloud_fusion:secfci}. Code was written in the Python programming language, again using the $\mathsf{phe}$ Paillier encryption scheme library [PythonPaillier2013]. A key size of $512$ bits was used, and the constant-speed linear model in \eqref{eq:cloud_fusion:secfci_system_model} was implemented. At each timestep $k$, the system state $\vec{x}_k$ was measured by $m=4$ sensors, $1\leq i \leq 4$, with measurements $\vec{z}_{k,i}$ following the measurement models \eqref{eq:cloud_fusion:secfci_measurement_model} and covariances \eqref{eq:cloud_fusion:secfci_measurement_model_covariances}. Using a linear IF, each sensor produced estimate information $\mat{P}_{k, i}^{-1}\hat{\vec{x}}_{k, i}$ and $\mat{P}_{k, i}^{-1}$, respectively, that were processed, encrypted and fused at the cloud and querying party. The fusion error results of $1000$ simulation runs are shown in figure \ref{fig:cloud_fusion:secfci2_sim_error}. 
+To demonstrate the accuracy of the method and compare it to the method in section \ref{sec:cloud_fusion:secfci} as well as the FCI algorithm it approximates, we have implemented a simulation of the fusion scenario. Since errors in fusion are now only introduced during real number quantisation we expect the estimation error to be smaller than that in section \ref{sec:cloud_fusion:secfci}. Code was written in the Python programming language, again using the $\mathsf{phe}$ Paillier encryption scheme library [PythonPaillier2013]. A key size of $512$ bits was used, and the constant-speed linear model in \eqref{eq:cloud_fusion:secfci_system_model} was implemented. At each timestep $k$, the system state $\vec{x}_k$ was measured by $m=4$ sensors, $1\leq i \leq 4$, with measurements $\vec{z}_{k,i}$ following the measurement models \eqref{eq:cloud_fusion:secfci_measurement_model} and covariances \eqref{eq:cloud_fusion:secfci_measurement_model_covariances}. Using a linear IF, initialised with the true state of the system, each sensor produced estimate information $\mat{P}_{k, i}^{-1}\hat{\vec{x}}_{k, i}$ and $\mat{P}_{k, i}^{-1}$, respectively, that were processed, encrypted and fused at the cloud and querying party. The fusion error results of $1000$ simulation runs are shown in figure \ref{fig:cloud_fusion:secfci2_sim_error}. 
 \begin{figure}[htbp]
     \centering
-    \includegraphics{figures/sim_error_plot.pdf}
+    \includegraphics{figures/cloud_fusion_secfci2_sim_error.pdf}
     \caption{Average MSE of presented fusion methods over $1000$ simulations.}
     \label{fig:cloud_fusion:secfci2_sim_error}
 \end{figure}

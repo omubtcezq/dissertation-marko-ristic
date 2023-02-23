@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import encryption as enc
 import plotting as pltng
 
-SAVE_FIGS = False
+SAVE_FIGS = True
 pltng.init_matplotlib_params(SAVE_FIGS, True)
 
 """
@@ -109,6 +109,7 @@ def omegas_from_ore_lists(sensor_lists, stepsize):
     for i in range(n-1):
         omega = intersect_approx_bsearch(sensor_lists[i], sorted(sensor_lists[i+1], reverse=True), stepsize)
         assert(0<=omega<=1)
+        assert((list(np.array(sensor_lists[i]) < np.array(sorted(sensor_lists[i+1], reverse=True))).index(False)-0.5)*stepsize == omega)
         point = np.array([0]*i + [omega, 1-omega] + [0]*(n-2-i))
         known_points = []
         for j in range(n):
@@ -131,7 +132,7 @@ def omegas_from_ore_lists(sensor_lists, stepsize):
     #print(mat,'')
 
     # Solve system
-    sol_vec, err, rnk, sing = np.linalg.lstsq(mat, res)
+    sol_vec, err, rnk, sing = np.linalg.lstsq(mat, res, rcond=None)
     #print(err,')
     return sol_vec[:n]
 
@@ -208,10 +209,10 @@ def store_sims(runs=1000, simlen=50):
                 enc_Pinvx = np.array([enc.EncryptedEncoding(pk, x) for x in Pinvx])
                 # TODO Seem to have lost Python wrapper for ORE! Doesn't really matter since code is not timed and ORE adds no error
                 # Pretend it's encrypted
-                list_g01 = [tr*w for w in [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]]
-                list_g02 = [tr*w for w in [0,0.2,0.4,0.6,0.8,1]]
-                list_g033 = [tr*w for w in [0,0.333,0.666,1]]
-                list_g05 = [tr*w for w in [0,0.5,1]]
+                list_g01 = [tr*w for w in [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]]
+                list_g02 = [tr*w for w in [0, 0.2, 0.4, 0.6, 0.8, 1]]
+                list_g033 = [tr*w for w in [0, 0.33, 0.66, 1]]
+                list_g05 = [tr*w for w in [0, 0.5, 1]]
                 secfci_data.append((enc_Pinvx, enc_Pinv, list_g01, list_g02, list_g033, list_g05))
 
                 # Sensor SecFCI2
@@ -248,7 +249,7 @@ def store_sims(runs=1000, simlen=50):
             secfci_Pinv_g02 = np.array([[x.decrypt(sk) for x in row] for row in enc_secfci_Pinv_g02])
             secfci_x_g02 = np.linalg.inv(secfci_Pinv_g02)@secfci_Pinvx_g02
 
-            g033_ws = omegas_from_ore_lists([x[4] for x in secfci_data], 0.333)
+            g033_ws = omegas_from_ore_lists([x[4] for x in secfci_data], 0.33)
             enc_secfci_Pinvx_g033 = sum([w*Pinvx for w,Pinvx in zip(g033_ws, [d[0] for d in secfci_data])])
             enc_secfci_Pinv_g033 = sum([w*Pinv for w,Pinv in zip(g033_ws, [d[1] for d in secfci_data])])
             secfci_Pinvx_g033 = np.array([x.decrypt(sk) for x in enc_secfci_Pinvx_g033])
@@ -303,18 +304,18 @@ def secfci_error_plot():
     sims = pickle.load(open("code/cloud_fusion_sims.p", "rb"))
     ks = [k for k in range(len(sims[0]['gt']))]
 
-    fci_errs = [np.mean([(sim['gt'][k] - sim['fci'][k][0])**2 for sim in sims]) for k in ks]
-    g01_errs = [np.mean([(sim['gt'][k] - sim['secfci'][k][0][0])**2 for sim in sims]) for k in ks]
-    g02_errs = [np.mean([(sim['gt'][k] - sim['secfci'][k][0][1])**2 for sim in sims]) for k in ks]
-    g033_errs = [np.mean([(sim['gt'][k] - sim['secfci'][k][0][2])**2 for sim in sims]) for k in ks]
-    g05_errs = [np.mean([(sim['gt'][k] - sim['secfci'][k][0][3])**2 for sim in sims]) for k in ks]
+    fci_errs = [np.mean([sum((sim['gt'][k] - sim['fci'][k][0])**2) for sim in sims]) for k in ks]
+    g01_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][0])**2) for sim in sims]) for k in ks]
+    g02_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][1])**2) for sim in sims]) for k in ks]
+    g033_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][2])**2) for sim in sims]) for k in ks]
+    g05_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][3])**2) for sim in sims]) for k in ks]
 
-    ax.plot(ks, fci_errs, marker='', label=r'FCI')
-    ax.plot(ks, g01_errs, marker='', label=r'$g=0.1$')
-    ax.plot(ks, g02_errs, marker='', label=r'$g=0.2$')
-    ax.plot(ks, g033_errs, marker='', label=r'$g=0.33$')
+    ax.plot(ks, fci_errs, marker='', label=r'FCI Benchmark')
     ax.plot(ks, g05_errs, marker='', label=r'$g=0.5$')
-
+    ax.plot(ks, g033_errs, marker='', label=r'$g=0.33$')
+    ax.plot(ks, g02_errs, marker='', label=r'$g=0.2$')
+    ax.plot(ks, g01_errs, marker='', label=r'$g=0.1$')
+    
     ax.set_xlabel(r'Simulation Timestep')
     ax.set_ylabel(r'Mean Square Error (MSE)')
 
@@ -331,7 +332,58 @@ def secfci_error_plot():
     plt.close()
     return
 
+"""
+ 
+  ######      ########  ##        #######  ######## 
+ ##    ##     ##     ## ##       ##     ##    ##    
+ ##           ##     ## ##       ##     ##    ##    
+ ##   ####    ########  ##       ##     ##    ##    
+ ##    ##     ##        ##       ##     ##    ##    
+ ##    ##     ##        ##       ##     ##    ##    
+  ######      ##        ########  #######     ##    
+ 
+"""
 def secfci_omega_plot():
+    fig = plt.figure()
+    # 70% text width and default matplotlib aspect ratio
+    fig.set_size_inches(w=0.7*5.78853, h=0.75*0.7*5.78853)
+    ax = fig.add_subplot(111)
+    ax.grid(True, c='lightgray')
+
+    sims = pickle.load(open("code/cloud_fusion_sims.p", "rb"))
+
+    w_errs = [sum((np.array(sims[0]['fci'][-1][1]) - np.array(sims[0]['secfci'][-1][1][g]))**2) for g in range(4)]
+
+    ax.plot([0.1,0.2,0.33,0.5], w_errs, marker='', label=r'$\hat{\vec{\omega}}$ Estimate Error')
+
+    ax.set_xlabel(r'$g$')
+    ax.set_ylabel(r'Mean Square Error (MSE)')
+
+    plt.legend()
+    #ax.set_yticks([trA, trB])
+    #ax.set_yticklabels([r'$\tr(\mat{P}_1)$', r'$\tr(\mat{P}_2)$'])
+    ax.set_xticks([0.1,0.2,0.33,0.5])
+    #ax.set_xticklabels([str(x/10) if x in [0,5,10] else '' for x in range(11)]+[r'$\hat{\omega}_1$'])
+
+    if SAVE_FIGS:
+        plt.savefig('figures/cloud_fusion_secfci_omega_error.pdf')
+    else:
+        plt.show()
+    plt.close()
+    return
+
+"""
+ 
+  #######     ######## ########  ########     ########  ##        #######  ######## 
+ ##     ##    ##       ##     ## ##     ##    ##     ## ##       ##     ##    ##    
+        ##    ##       ##     ## ##     ##    ##     ## ##       ##     ##    ##    
+  #######     ######   ########  ########     ########  ##       ##     ##    ##    
+ ##           ##       ##   ##   ##   ##      ##        ##       ##     ##    ##    
+ ##           ##       ##    ##  ##    ##     ##        ##       ##     ##    ##    
+ #########    ######## ##     ## ##     ##    ##        ########  #######     ##    
+ 
+"""
+def secfci2_error_plot():
     fig = plt.figure()
     # 70% text width and default matplotlib aspect ratio
     fig.set_size_inches(w=0.7*5.78853, h=0.75*0.7*5.78853)
@@ -341,15 +393,13 @@ def secfci_omega_plot():
     sims = pickle.load(open("code/cloud_fusion_sims.p", "rb"))
     ks = [k for k in range(len(sims[0]['gt']))]
 
-    g01_errs = [np.mean([(sim['gt'][k] - sim['secfci'][k][0][0])**2 for sim in sims]) for k in ks]
-    g02_errs = [np.mean([(sim['gt'][k] - sim['secfci'][k][0][1])**2 for sim in sims]) for k in ks]
-    g033_errs = [np.mean([(sim['gt'][k] - sim['secfci'][k][0][2])**2 for sim in sims]) for k in ks]
-    g05_errs = [np.mean([(sim['gt'][k] - sim['secfci'][k][0][3])**2 for sim in sims]) for k in ks]
+    fci_errs = [np.mean([sum((sim['gt'][k] - sim['fci'][k][0])**2) for sim in sims]) for k in ks]
+    secfci_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][1])**2) for sim in sims]) for k in ks]
+    secfci2_errs = [np.mean([sum((sim['gt'][k] - sim['secfci2'][k])**2) for sim in sims]) for k in ks]
 
-    ax.plot(ks, g01_errs, marker='', label=r'$g=0.1$')
-    ax.plot(ks, g02_errs, marker='', label=r'$g=0.2$')
-    ax.plot(ks, g033_errs, marker='', label=r'$g=0.33$')
-    ax.plot(ks, g05_errs, marker='', label=r'$g=0.5$')
+    ax.plot(ks, fci_errs, marker='', label=r'FCI Benchmark')
+    ax.plot(ks, secfci_errs, marker='', label=r'Leaking Weights ($g=0.2$)')
+    ax.plot(ks, secfci2_errs, marker='', linestyle='--', label=r'Without Leaking Weights')
 
     ax.set_xlabel(r'Simulation Timestep')
     ax.set_ylabel(r'Mean Square Error (MSE)')
@@ -361,13 +411,14 @@ def secfci_omega_plot():
     #ax.set_xticklabels([str(x/10) if x in [0,5,10] else '' for x in range(11)]+[r'$\hat{\omega}_1$'])
 
     if SAVE_FIGS:
-        plt.savefig('figures/cloud_fusion_secfci_sim_error.pdf')
+        plt.savefig('figures/cloud_fusion_secfci2_sim_error.pdf')
     else:
         plt.show()
     plt.close()
     return
 
 
-#store_sims(runs=10)
+store_sims(runs=10)
 #secfci_error_plot()
-secfci_omega_plot()
+#secfci_omega_plot()
+#secfci2_error_plot()
