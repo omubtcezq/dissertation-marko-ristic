@@ -1,5 +1,5 @@
 
-\chapter{Distributed Non-Linear Measurement Fusion with Untrusted Participants}
+\chapter{Distributed Non-Linear Measurement Fusion with Untrusted Participants}\label{ch:nonlin_fusion}
 
 % 
 % 8888888b.  8888888b.   .d88888b.  888888b.   
@@ -15,10 +15,10 @@
 %                                              
 % 
 
-\section{Problem Formulation}
-In this work, we consider the context of privacy-preserving range sensor navigation, where we want no sensor to learn any information about the navigator or other sensors beyond their local measurements, and the navigator not to learn any information about individual sensors beyond its location estimate. The problem is two-fold, in that we require explicit cryptographic requirements with a suitable encryption scheme meeting them as well as an estimation scheme that can use the encryption in the context of range-only navigation.
+\section{Problem Formulation}\label{sec:nonlin_fusion:problem}
+This problem aims to lay down a foundation for solving general non-linear measurement fusion where sensor and navigator privacy is preserved and involved data remains confidential. Since solving the general problem is difficult due to broad measurement definitions and the need for concrete communications to be known when proving cryptographic aims, we study a specific non-linear problem instead. The presented solution to this problem then lends itself to solving a class of related, but not exhaustive, non-linear measurement fusion problems with the same communication and cryptographic requirements, discussed later in this chapter. We consider the specific context of confidential range sensor navigation, where we want no sensor to learn any information about the navigator or other sensors beyond their local measurements, and the navigator not to learn any information about individual sensors beyond its location estimate. The problem is two-fold, in that we require explicit cryptographic requirements with a suitable encryption scheme meeting them as well as an estimation scheme that can use the encryption in the context of range-only navigation.
 
-To give a formal cryptographic requirement in a distributed setting, we must first consider the communication requirements of our context and define attacker capabilities and the desired security of a suitable encryption scheme. In this section, we will define a communication protocol and the relevant formal definition of security we aim to achieve, followed by the estimation problem to which we will apply it.
+To give a formal cryptographic requirement in a distributed setting, we first consider the communication requirements of our context and define attacker capabilities and the desired security of a suitable encryption scheme. In this section, we define a communication protocol and the relevant formal definition of security we aim to achieve, followed by the estimation problem to which we will apply it.
 
 % 
 %  ######  ########  ##    ## ########  ########  #######     ########  ########   #######  ########  
@@ -30,7 +30,7 @@ To give a formal cryptographic requirement in a distributed setting, we must fir
 %  ######  ##     ##    ##    ##           ##     #######     ##        ##     ##  #######  ########  
 % 
 
-\subsection{Formal Cryptographic Problem} \label{subsec:crypto_problem}
+\subsection{Formal Cryptographic Problem}\label{subsec:nonlin_fusion:crypto_problem}
 The communication between the navigator and sensors in our estimation problem will be decomposed into a simple two-step bi-directional protocol that will simplify defining formal security. In section \ref{sec:priv_localisation}, we will show how this protocol is sufficient to compute the location estimate at a navigator while meeting our desired privacy goals. The communication protocol is as follows.
 
 At every \textit{instance} $t$ (used to distinguish from an estimation \textit{timestep}), the navigator first broadcasts $m$ weights $\omega_j^{(t)}, j\in\{1,\dots,m\}$ to all sensors $i\in\{1,\dots,n\}$, who individually compute linear combinations $l^{(t)}_i=\sum^m_{j=1}a_{j,i}^{(t)}\omega_i^{(t)}$ based on their measurement data $a_{j,i}$. Linear combinations are then sent back to the navigator, who computes their sum $\sum^n_{i=1}l^{(t)}_{i}$. This two-step linear combination aggregation protocol has been visually displayed in figure \ref{fig:agg_steps}.

@@ -411,7 +411,7 @@ Each sensor ran a local linear Information Filter (IF) from section \ref{subsec:
  \end{figure}
  In all cases, resulting plaintext information vectors and matrices were converted to estimates and estimate error covariances before comparison with the true simulated state. From the figure, it can be seen that the estimation error of our method is similar to the normal FCI method when stepsize $g$ is small, $g=0.1$, but grows as expected when $g$, and thus the possible error in weights $\omega_i$ is increased.
 
-Since the system described by \eqref{eq:cloud_fusion:secfci_system_model}, \eqref{eq:cloud_fusion:secfci_measurement_model} and estimated by the KF reaches an estimation steady-state, fusion weights $\omega_i$ do as well. Figure \ref{fig:cloud_fusion:secfci_omega_error} shows the steady state error of estimated weights when compared to the true FCI weights. 
+Since the system described by \eqref{eq:cloud_fusion:secfci_system_model}, \eqref{eq:cloud_fusion:secfci_measurement_model} and estimated by the IF reaches an estimation steady-state, fusion weights $\omega_i$ do as well. Figure \ref{fig:cloud_fusion:secfci_omega_error} shows the steady state error of estimated weights when compared to the true FCI weights. 
 \begin{figure}[htbp]
     \centering
     \includegraphics{figures/cloud_fusion_secfci_omega_error.pdf}
