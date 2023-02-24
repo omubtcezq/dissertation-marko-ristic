@@ -411,7 +411,7 @@ def secfci2_error_plot():
     return
 
 
-#store_sims(runs=10)
+#store_sims(runs=1000)
 secfci_error_plot()
 secfci_omega_plot()
 secfci2_error_plot()
