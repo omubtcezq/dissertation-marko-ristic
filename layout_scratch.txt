@@ -43,11 +43,11 @@ Distributed Non-Linear Measurement Fusion with Untrusted Participants
 		Formal Cryptographic Problem
 		Estimation Problem
 	Confidential Range-Only Localisation
-		Private Linear Combination Aggregation Scheme
-		Privacy-Preserving Loclisation
+		A Linear Combination Aggregation Scheme
+		Localisation
 			..
 			Range Measurement Modification
-			Localisation
+			Applying the Linear Combination Aggregation Scheme
 			Pseudocode
 		Solvable Sub-Class of Non-Linear Measurement Models
 		Security Analysis
