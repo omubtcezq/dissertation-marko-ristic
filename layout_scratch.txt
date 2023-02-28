@@ -42,13 +42,12 @@ Distributed Non-Linear Measurement Fusion with Untrusted Participants
 	Problem Formulation
 		Formal Cryptographic Problem
 		Estimation Problem
+	A Linear Combination Aggregation Scheme
 	Confidential Range-Only Localisation
-		A Linear Combination Aggregation Scheme
-		Localisation
-			..
-			Range Measurement Modification
-			Applying the Linear Combination Aggregation Scheme
-			Pseudocode
+		..
+		Range Measurement Modification
+		Applying the Linear Combination Aggregation Scheme
+		Pseudocode
 		Solvable Sub-Class of Non-Linear Measurement Models
 		Security Analysis
 		Simulation
@@ -83,8 +82,8 @@ Provable Estimation Performances
 Conclusion
 
 Appendix
-
-
+	Linear-Combination Aggregator Obliviousness (LCAO)
+	Cryptographic Proof of LCAO Scheme Security
 
 
 #==========================================================================================#

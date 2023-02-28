@@ -1,48 +1,132 @@
+% 
+% 888      .d8888b.        d8888  .d88888b.  
+% 888     d88P  Y88b      d88888 d88P" "Y88b 
+% 888     888    888     d88P888 888     888 
+% 888     888           d88P 888 888     888 
+% 888     888          d88P  888 888     888 
+% 888     888    888  d88P   888 888     888 
+% 888     Y88b  d88P d8888888888 Y88b. .d88P 
+% 88888888 "Y8888P" d88P     888  "Y88888P"  
+%                                            
+%                                            
+%                                            
+% 
 
-\chapter{Linear-Combination Aggregator Obliviousness}\label{app:lcao_definition}
+\chapter{Linear-Combination Aggregator Obliviousness (LCAO)}\label{app:lcao_definition}
 The following game between attacker and challenger defines the security notion of LCAO.
 \begin{description}
-    \item[Setup] The challenger chooses security parameter $\kappa$, runs the $\mathsf{Setup}(\kappa)$ algorithm and gives $\mathsf{pub}$, $m$ and $pk_0$ to the attacker
+    \item[Setup] The challenger chooses security parameter $\kappa$, runs the $\mathsf{Setup}(\kappa)$ algorithm and gives $\mathsf{pub}$, $l$ and $\mathsf{pk}_{\mathsf{a}}$ to the attacker
     \item[Queries] The attacker can now perform encryptions or submit queries that are answered by the challenger. The types of actions are:
     \begin{enumerate}
-        \item \textit{Encryption:} The attacker chooses a value $x$ and computes an encryption of $x$ under the aggregator's public key $pk_0$, obtaining $\mathcal{E}_{pk_0}(x)$.
-        \item \textit{Weight Queries:} The attacker chooses an instance $t$ and receives the weights for that instance encrypted with the aggregator's public key, $\mathcal{E}_{pk_0}(\omega^{(t)}_{j}),\,j\in\{1,\dots,m\}$.
-        \item \textit{Combine Queries:} The attacker chooses a tuple $(i,t,a^{(t)}_{i,1},\dots,a^{(t)}_{i,m})$ such that for any two chosen combine query tuples $(i,t,a^{(t)}_{i,1},\dots,a^{(t)}_{i,m})$ and $(i',t',a^{\prime(t')}_{i',1},\dots,a^{\prime(t')}_{i',m})$, the following condition holds:
+        \item \textit{Encryption:} The attacker chooses a value $x$ and computes an encryption of $x$ under the aggregator's public key $\mathsf{pk}_{\mathsf{a}}$, obtaining $\mathcal{E}_{\mathsf{pk}_{\mathsf{a}}}(x)$.
+        \item \textit{Weight Queries:} The attacker chooses an instance $t$ and receives the weights for that instance encrypted with the aggregator's public key, $\mathcal{E}_{\mathsf{pk}_{\mathsf{a}}}(\theta^{(t)}_{j})$, $1\leq j\leq l$.
+        \item \textit{Combine Queries:} The attacker chooses a tuple $(i,t,a^{(t)}_{i,1},\dots,a^{(t)}_{i,l})$ such that for any two chosen combine query tuples $(i,t,a^{(t)}_{i,1},\dots,a^{(t)}_{i,l})$ and $(i^\prime,t^\prime,a^{\prime(t^\prime)}_{i^\prime,1},\dots,a^{\prime(t^\prime)}_{i^\prime,l})$, the following condition holds:
         \begin{equation*}
-            i = i' \wedge t = t' \implies a^{(t)}_{i,j} = a^{\prime(t')}_{i',j},\,j\in\{1,\dots,m\}\,.
+            i = i^\prime \wedge t = t^\prime \implies a^{(t)}_{i,j} = a^{\prime(t^\prime)}_{i',j},\ 1\leq j\leq l\,.
         \end{equation*}
-        The attacker is then given back the encryption of the linear combination $\mathcal{E}_{pk_0,sk_i}(\sum^m_{j=1}a^{(t)}_{i,j}\omega^{(t)}_j)$ encrypted under both the aggregator public key $pk_0$ and the secret key $sk_i$.
-        \item \textit{Compromise queries:} The attacker chooses $i$ and receives the secret key $sk_i$. The aggregator's secret key may also be compromised (when choosing $i=0$).
+        The attacker is then given back the encryption of the linear combination $\mathcal{E}_{\mathsf{pk}_{\mathsf{a}},\mathsf{sk}_{\mathsf{a}, i}}(\sum^l_{j=1}a^{(t)}_{i,j}\theta^{(t)}_j)$ encrypted under both the aggregator public key $\mathsf{pk}_{\mathsf{a}}$ and the secret key $\mathsf{sk}_{\mathsf{a}, i}$.
+        \item \textit{Compromise queries:} The attacker chooses $i$ and receives the secret key $\mathsf{sk}_{\mathsf{a}, i}$. The aggregator's secret key may also be compromised (when choosing $i=0$).
     \end{enumerate} 
     \item[Challenge] Next, the attacker chooses an instance $t^*$, and a subset of users $S \subseteq U$ where $U$ is the complete set of users for which no combine queries, for the instance $t^*$, and no compromise queries, are made for the duration of the game. The attacker then chooses two series of tuples
     \begin{equation*}
-        \left\langle\left(i,t^*,a^{(t^*)(0)}_{i,1},\dots,a^{(t^*)(0)}_{i,m}\right)\,\middle|\,i \in S\right\rangle
+        \left\langle\left(i,t^*,a^{(t^*)(0)}_{i,1},\dots,a^{(t^*)(0)}_{i,l}\right)\ \middle|\ i \in S\right\rangle
     \end{equation*}
     and
     \begin{equation*}
-        \left\langle\left(i,t^*,a^{(t^*)(1)}_{i,1},\dots,a^{(t^*)(1)}_{i,m}\right)\,\middle|\, i \in S\right\rangle\,,
+        \left\langle\left(i,t^*,a^{(t^*)(1)}_{i,1},\dots,a^{(t^*)(1)}_{i,l}\right)\ \middle|\ i \in S\right\rangle\,,
     \end{equation*}
     and gives them to the challenger. In the case that $0 \in S$ (\textit{i.e.}, the aggregator is compromised) and $S = U$, it is additionally required that
     \begin{equation*}
-        \sum_{i\in S}\sum^{m}_{j=1} a^{(t^*)(0)}_{i,j}\omega^{(t^*)}_j = \sum_{i \in S}\sum^{m}_{j=1} a^{(t^*)(1)}_{i,j}\omega^{(t^*)}_j\,,
+        \sum_{i\in S}\sum^{l}_{j=1} a^{(t^*)(0)}_{i,j}\theta^{(t^*)}_j = \sum_{i \in S}\sum^{l}_{j=1} a^{(t^*)(1)}_{i,j}\theta^{(t^*)}_j\,,
     \end{equation*}
-    for weights $\omega^{(t^*)}_j,\,j\in\{1,\dots,m\}$ returned by a \textit{Weight Query} with chosen instance $t^*$. The challenger then chooses a random bit $b \in \{1,0\}$ and returns encryptions 
+    for weights $\theta^{(t^*)}_j$, $1\leq j\leq l$, returned by a \textit{Weight Query} with chosen instance $t^*$. The challenger then chooses a random bit $b \in \{1,0\}$ and returns encryptions 
     \begin{equation*}
-        \left\langle\mathcal{E}_{pk_0,sk_i}\left(\sum^m_{j=1}a^{(t^*)(b)}_{i,j}\omega^{(t^*)}_j\right)\,\middle|\,i\in S\right\rangle\,.
+        \left\langle\mathcal{E}_{\mathsf{pk}_{\mathsf{a}},\mathsf{sk}_{\mathsf{a}, i}}\left(\sum^l_{j=1}a^{(t^*)(b)}_{i,j}\theta^{(t^*)}_j\right)\ \middle|\ i\in S\right\rangle\,.
     \end{equation*}
     \item[More Queries] The attacker can now perform more encryptions and submit queries, so long as the queries do not break the requirements in the Challenge stage. That is, $S \subseteq U$.
-    \item[Guess] At the end, the attacker outputs a bit $b'$ and wins the game if and only if $b' = b$. The advantage of an attacker $\mathcal{A}$ is defined as
+    \item[Guess] At the end, the attacker outputs a bit $b^\prime$ and wins the game if and only if $b^\prime = b$. The advantage of an attacker $\mathcal{A}$ is defined as
     \begin{equation*}
-        \mathsf{Adv}^{LCAO}(\mathcal{A}) \coloneqq \left\lvert \Pr [b'=b] - \frac{1}{2}\right\rvert\,.
+        \mathsf{Adv}^{LCAO}(\mathcal{A}) \coloneqq \left\lvert \Pr [b^\prime=b] - \frac{1}{2}\right\rvert\,.
     \end{equation*} 
 \end{description}
 
 \begin{definition}
-    An encryption scheme meets LCAO security if no probabilistic adversary, running in polynomial-time with respect to security parameter $\kappa$, has more than a negligible advantage in winning the above security game. That is, for all adversaries $\mathcal{A}$, there exists a negligible function $\eta$, such that
+    An encryption scheme meets LCAO security if no probabilistic adversary, running in polynomial-time with respect to the security parameter $\kappa$, has more than a negligible advantage in winning the above security game. That is, for all adversaries $\mathcal{A}$, there exists a negligible function $\eta$, such that
     \begin{equation*}
         \mathsf{Adv}^{LCAO}(\mathcal{A}) \leq \eta(\kappa)\,,
     \end{equation*}
     with probabilities taken over randomness introduced by $\mathcal{A}$, and in $\mathsf{Setup}$, $\mathsf{Enc}$ and $\mathsf{CombEnc}$.
 \end{definition}
 
-\chapter{Cryptographic Proof of LCAO Scheme Security}
+% 
+% 888      .d8888b.        d8888      8888888b.  8888888b.   .d88888b.   .d88888b.  8888888888 
+% 888     d88P  Y88b      d88888      888   Y88b 888   Y88b d88P" "Y88b d88P" "Y88b 888        
+% 888     888    888     d88P888      888    888 888    888 888     888 888     888 888        
+% 888     888           d88P 888      888   d88P 888   d88P 888     888 888     888 8888888    
+% 888     888          d88P  888      8888888P"  8888888P"  888     888 888     888 888        
+% 888     888    888  d88P   888      888        888 T88b   888     888 888     888 888        
+% 888     Y88b  d88P d8888888888      888        888  T88b  Y88b. .d88P Y88b. .d88P 888        
+% 88888888 "Y8888P" d88P     888      888        888   T88b  "Y88888P"   "Y88888P"  888        
+%                                                                                              
+%                                                                                              
+%                                                                                              
+% 
+
+\chapter{Cryptographic Proof for Meeting the LCAO Notion}\label{app:lca_scheme_proof}
+The scheme in section \ref{sec:nonlin_fusion:lcao_scheme} will be shown to meet LCAO by contrapositive. We show that for any adversary $\mathcal{A}$ playing against a challenger using the scheme, we can always create an adversary $\mathcal{A}'$ playing against a challenger $\mathcal{C}$ using the Joye-Libert scheme, such that
+\begin{equation*}
+    \mathsf{Adv}^{LCAO}(\mathcal{A}) > \eta_1(\kappa) \implies \mathsf{Adv}^{AO}(\mathcal{A}') > \eta_2(\kappa)\,,
+\end{equation*}
+for \textit{any} negligible functions $\eta_1$, $\eta_2$ and security parameter $\kappa$. That is, if we assume our scheme does not meet LCAO, then the Joye-Libert scheme in section \ref{subsec:prelims:joye_libert_agg} does not meet AO (which is not the case, [joyeScalableSchemePrivacyPreserving2013]).
+\begin{proof}
+    Consider adversary $\mathcal{A}$ playing the LCAO game. The following is a construction of an adversary $\mathcal{A}'$ playing the AO game [shiPrivacyPreservingAggregationTimeSeries2011] against a challenger $\mathcal{C}$ using the Joye-Libert aggregation scheme.
+    \begin{description}
+        \item[Setup] When receiving $N$ and $H$ as public parameters from $\mathcal{C}$, choose an $l>1$ and give public parameter $H$, number of weights $l$, and $\mathsf{pk}_{\mathsf{a}}=N$ to $\mathcal{A}$.
+        \item[Queries] Handle queries from $\mathcal{A}$:
+        \begin{description}
+            \item[\textit{Weight Query}] When $\mathcal{A}$ submits a weight query $t$, choose weights $\theta^{(t)}_j$, $1\leq j\leq l$, and random values $\rho_j \in \mathbb{Z}_N$, $1\leq j\leq l$, and return encryptions 
+            \begin{equation*}
+                (N+1)^{\theta^{(t)}_{j}}\rho_j^N\pmod{N^2},\ 1\leq j\leq l\,,
+            \end{equation*}
+            to $\mathcal{A}$.
+            \item[\textit{Combine Query}] When $\mathcal{A}$ submits combine query $(i, t, a^{(t)}_{i,1},\dots,a^{(t)}_{i,l})$, choose weights $\theta^{(t)}_j$, $1\leq j\leq l$, if not already chosen for the instance $t$, and make an AO encryption query $(i, t, \sum^l_{j=1}a^{(t)}_{i,j}\theta^{(t)}_j)$ to $\mathcal{C}$. The received response will be of the form $(N+1)^{\sum^l_{j=1}a^{(t)}_{i,j}\theta^{(t)}_j}H(t)^{\mathsf{sk}_{\mathsf{a},i}}$; multiply it by $\tilde{\rho}^N$ for a random $\tilde{\rho} \in \mathbb{Z}_N$ and return 
+            \begin{equation*}
+                (N+1)^{\sum^l_{j=1}a^{(t)}_{i,j}\theta^{(t)}_j}\tilde{\rho}^N H(t)^{\mathsf{sk}_{\mathsf{a},i}} \pmod{N^2}
+            \end{equation*}
+            to $\mathcal{A}$.
+            \item[\textit{Compromise Query}] When $\mathcal{A}$ submits compromise query $i$, make the same compromise query $i$ to $\mathcal{C}$, and return the recieved secret key $\mathsf{sk}_{\mathsf{a},i}$ to $\mathcal{A}$.
+        \end{description}
+        \item[Challenge] When $\mathcal{A}$ submits challenge series
+        \begin{equation*}
+            \left\langle\left(i,t^*,a^{(t^*)(0)}_{i,1},\dots,a^{(t^*)(0)}_{i,l}\right)\ \middle|\ i \in S\right\rangle
+        \end{equation*}
+        and
+        \begin{equation*}
+            \left\langle\left(i,t^*,a^{(t^*)(1)}_{i,1},\dots,a^{(t^*)(1)}_{i,l}\right)\ \middle|\ i \in S\right\rangle\,,
+        \end{equation*}
+        choose weights $\theta^{(t^*)}_j$, $1\leq j\leq l$, for instance $t^*$ and submit AO challenge series
+        \begin{equation*}
+            \left\langle\left(i,t^*,\sum^l_{j=1}a^{(t^*)(0)}_{i,j}\theta^{(t^*)}_j\right)\ \middle|\ i \in S\right\rangle
+        \end{equation*}
+        and
+        \begin{equation*}
+            \left\langle\left(i,t^*,\sum^l_{j=1}a^{(t^*)(1)}_{i,j}\theta^{(t^*)}_j\right)\ \middle|\ i \in S\right\rangle\,,
+        \end{equation*}
+        to $\mathcal{C}$. The received response will be of the form 
+        \begin{equation*}
+            \left\langle(N+1)^{\sum^l_{j=1}a^{(t^*)(b)}_{i,j}\theta^{(t^*)}_j}H(t^*)^{\mathsf{sk}_{\mathsf{a},i}}\ \middle|\ i\in U\right\rangle\,,
+        \end{equation*}
+        for an unknown $b \in \{0,1\}$. Multiply series elements by $\tilde{\rho}_i^N$, $1\leq i\leq n$, for randomly chosen $\tilde{\rho}_i \in \mathbb{Z}_N$ and return
+        \begin{equation*}
+            \left\langle(N+1)^{\sum^l_{j=1}a^{(t^*)(b)}_{i,j}\theta^{(t^*)}_j}\tilde{\rho}_i^N H(t^*)^{\mathsf{sk}_{\mathsf{a},i}}\ \middle|\ i\in U\right\rangle
+        \end{equation*}
+        to $\mathcal{A}$.
+        \item[Guess] When $\mathcal{A}$ makes guess $b'$, make the same guess $b'$ to $\mathcal{C}$.
+    \end{description}
+
+    In the above construction, $\mathcal{C}$ follows the Joye-Libert scheme exactly, and to $\mathcal{A}$, $\mathcal{A}'$ follows our presented scheme exactly. Since $\mathcal{A}'$ runs in polynomial-time to security parameter when $\mathcal{A}$ does, and no non-negligible advantage adversary to $\mathcal{C}$ exists, we conclude that no non-negligible advantage adversary $\mathcal{A}$ exists. That is, there exists a negligible function $\eta$, such that
+    \begin{equation*}
+        \mathsf{Adv}^{LCAO}(\mathcal{A}) \leq \eta(\kappa)
+    \end{equation*}
+    for security parameter $\kappa$. Lastly, the function $H$ used by our scheme is treated as a random oracle in the Joye-Libert AO proof and will, therefore, prove our scheme secure in the random oracle model as well.
+\end{proof}
