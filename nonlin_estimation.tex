@@ -248,36 +248,33 @@ The security proof of this scheme must both show that encrypted weights meet IND
 % 
 
 \section{Confidential Range-Only Localisation}\label{sec:nonlin_fusion:conf_range_only_localisation}
-With a concrete scheme meeting the LCAO notion, we now put forward a localisation filter with communication that can be reformulated to the required protocol. To produce an estimate of the state $\vec{x}_k$, we make use of an algebraic reformulation of the Extended Kalman Filter (EKF), the Extended Information Filter (EIF) [maybeckStochasticModelsEstimation1982], which reduces the filter update step to a single summation. The EIF update step requires the predicted state estimate $\hat{\vec{x}}_{k|k-1}$ and estimate covariance $\mat{P}_{k|k-1}$ in the information vector and matrix forms
+With a concrete scheme meeting the LCAO notion, we now put forward a localisation filter with communication that can be reformulated to the required protocol. To produce an estimate of the state $\vec{x}_k$, we make use of the EKF, introduced in section \ref{subsec:prelims:ekf}. The EKF is performed on the information form of the state estimate and its error covariance, repeated here for convenience. That is, the information vector and information matrix,
 \begin{equation}
-    \hat{\vec{y}}_{k|k-1} = \mat{P}_{k|k-1}^{-1}\hat{\vec{x}}_{k|k-1} \quad\textrm{and}\quad \mat{Y}_{k|k-1} = \mat{P}_{k|k-1}^{-1}\,,
+    \hat{\vec{y}}_{k|k-1} = \mat{P}_{k|k-1}^{-1}\hat{\vec{x}}_{k|k-1} \text{ and } \mat{Y}_{k|k-1} = \mat{P}_{k|k-1}^{-1}\,,
 \end{equation}
-respectively. In this form, the update equations for $n$ sensor measurements at time $k$, with measurement models \eqref{eqn:measurement_model}, are given by
-\begin{equation}
-    \begin{split}
-        &\hat{\vec{y}}_{k|k} = \hat{\vec{y}}_{k|k-1} + \\
-        &\quad \sum^n_{i=1}\mat{H}^\top_{k,i} r^{-1}_i \left(z_{k,i} - h_i(\hat{\vec{x}}_{k|k-1}) + \mat{H}_{k,i}\hat{\vec{x}}_{k|k-1}\right)
-    \end{split} \label{eqn:eif_info_vec_update}
+respectively. In this form, the update equations for $n$ sensor measurements at time $k$, with measurement models \eqref{eq:nonlin_fusion:measurement_model}, are given by
+\begin{equation}\label{eq:nonlin_fusion:eif_info_vec_update}
+        \hat{\vec{y}}_{k|k} = \hat{\vec{y}}_{k|k-1} +  \sum^n_{i=1}\mat{H}^\top_{k,i} r^{-1}_i \left(z_{k,i} - h_i(\hat{\vec{x}}_{k|k-1}) + \mat{H}_{k,i}\hat{\vec{x}}_{k|k-1}\right)
 \end{equation}
 and
-\begin{equation}
-    \mat{Y}_{k|k} = \mat{Y}_{k|k-1} + \sum^n_{i=1}\mat{H}^\top_{k,i} r^{-1}_i \mat{H}_{k,i}\,, \label{eqn:eif_info_mat_update}
+\begin{equation}\label{eq:nonlin_fusion:eif_info_mat_update}
+    \mat{Y}_{k|k} = \mat{Y}_{k|k-1} + \sum^n_{i=1}\mat{H}^\top_{k,i} r^{-1}_i \mat{H}_{k,i}\,,
 \end{equation}
 with Jacobians
-\begin{equation}
-    \mat{H}_{k,i} = \left.\frac{\partial h_i}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k|k-1}} \label{eqn:measurement_jacobian}
+\begin{equation}\label{eq:nonlin_fusion:measurement_jacobian}
+    \mat{H}_{k,i} = \left.\frac{\partial h_i}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k|k-1}}
 \end{equation}
-for sensors $i\in\{1,\dots,n\}$. After converting the updated information vector and matrix back to state estimate $\hat{\vec{x}}_{k|k}$ and estimate covariance $\mat{P}_{k|k}$, the filter's prediction step can be computed by the navigator locally using any suitable filter for the known system model \eqref{eqn:system_model}.
+for sensors $1\leq i\leq n$. The updated information vector and matrix can then be used in a local filter prediction step at the navigator, using any suitable filter for the known system model \eqref{eq:nonlin_fusion:system_model}.
 
 In the form above, at every timestep $k$, all sensitive sensor information required for state estimation is captured in the measurement vector
-\begin{equation}
-    \vec{i}_{k,i} = \mat{H}^\top_{k,i} r^{-1}_i \left(z_{k,i} - h_i(\hat{\vec{x}}_{k|k-1}) + \mat{H}_{k,i}\hat{\vec{x}}_{k|k-1}\right) \label{eqn:measurement_vec}
+\begin{equation}\label{eq:nonlin_fusion:measurement_vec}
+    \vec{i}_{k,i} = \mat{H}^\top_{k,i} r^{-1}_i \left(z_{k,i} - h_i(\hat{\vec{x}}_{k|k-1}) + \mat{H}_{k,i}\hat{\vec{x}}_{k|k-1}\right)
 \end{equation}
 and the measurement matrix
-\begin{equation}
-    \mat{I}_{k,i} = \mat{H}^\top_{k,i} r^{-1}_i \mat{H}_{k,i}\,, \label{eqn:measurement_mat}
+\begin{equation}\label{eq:nonlin_fusion:measurement_mat}
+    \mat{I}_{k,i} = \mat{H}^\top_{k,i} r^{-1}_i \mat{H}_{k,i}\,,
 \end{equation}
-namely, their measurements $z_{k,i}$, measurement variances $r_{k,i}$ and locations $\vec{s}_i$; captured in measurement functions $h_i$ and Jacobians $\mat{H}_{k,i}$. To compute $\vec{i}_{k,i}$ and $\mat{I}_{k,i}$, however, the current predicted state estimate $\hat{\vec{x}}_{k|k-1}$ is also required (in $h_i$ and $\mat{H}_{k,i}$). Therefore, our goal is to rearrange \eqref{eqn:measurement_vec} and \eqref{eqn:measurement_mat} as a linear combination of functions of $\hat{\vec{x}}_{k|k-1}$ (the navigator weights) computable at each sensor $i$, to be subsequently aggregated at the navigator. Application of the linear combination aggregation scheme proposed in turn guarantees that sensors do not learn the navigator state, and the navigator learns only the aggregation required for updating its state estimate in \eqref{eqn:eif_info_vec_update} and \eqref{eqn:eif_info_mat_update}.
+namely, their measurements $z_{k,i}$, measurement variances $r_{k,i}$ and locations $\vec{s}_i$; captured in measurement functions $h_i$ and Jacobians $\mat{H}_{k,i}$. However, computing $\vec{i}_{k,i}$ and $\mat{I}_{k,i}$ also requires the current predicted state estimate $\hat{\vec{x}}_{k|k-1}$, when evaluating $h_i$ and $\mat{H}_{k,i}$. To achieve the communication protocol desired, we aim to rearrange \eqref{eq:nonlin_fusion:measurement_vec} and \eqref{eq:nonlin_fusion:measurement_mat} as a linear combination of functions of $\hat{\vec{x}}_{k|k-1}$ (considered the navigator weights), computable at each sensor $i$, to be subsequently aggregated at the navigator. Application of the linear combination aggregation scheme proposed can then guarantee that sensors do not learn the navigator state, and the navigator learns only the aggregation required for updating its estimate \eqref{eq:nonlin_fusion:eif_info_vec_update} and \eqref{eq:nonlin_fusion:eif_info_mat_update}.
 
 % 
 % ########     ###    ##    ##  ######   ########    ##     ##  #######  ########  
@@ -290,7 +287,7 @@ namely, their measurements $z_{k,i}$, measurement variances $r_{k,i}$ and locati
 % 
 
 \subsection{Range Measurement Modification}\label{subsec:nonlin_fusion:measurement_modification}
-The first thing we notice when wanting to rearrange $\vec{i}_{k,i}$ and $\mat{I}_{k,i}$ to a linear combination of functions of $\hat{\vec{x}}_{k|k-1}$, is that $h_i$ cannot be rearranged in this way due to the present square-root. Similarly, the Jacobian of $h_i$ at $\hat{\vec{x}}_{k|k-1}$,
+Rearranging $\vec{i}_{k, i}$ and $\mat{I}_{k, i}$ to a linear combination of functions of $\hat{\vec{x}}_{k|k-1}$, we note that $h_i$ does not inherently support this due to the present square-root. Similarly, the Jacobian of $h_i$ at $\hat{\vec{x}}_{k|k-1}$,
 \begin{equation}
     \mat{H}_{k,i} = 
     \begin{bmatrix}
@@ -300,11 +297,11 @@ The first thing we notice when wanting to rearrange $\vec{i}_{k,i}$ and $\mat{I}
         \vdots
     \end{bmatrix}^\top\,,
 \end{equation}
-cannot be either. We, therefore, consider the modified measurement functions
-\begin{equation}
-    h'_i(\vec{x}) = h_i(\vec{x})^2\,. \label{eqn:modified_measurement_func}
+does not either. Instead, the modified measurement functions
+\begin{equation}\label{eq:nonlin_fusion:modified_measurement_func}
+    h'_i(\vec{x}) = h_i(\vec{x})^2\,,
 \end{equation}
-A measurement function in this form allows rearrangement of $h'_i$ and the corresponding Jacobian $\mat{H}'_{k,i}$ to a linear combination of powers of location elements in $\hat{\vec{x}}_{k|k-1}$, as
+are considered. In this form, the functions allow rearrangement of $h'_i$ and the corresponding Jacobian $\mat{H}'_{k,i}$ to a linear combination of powers of location elements in $\hat{\vec{x}}_{k|k-1}$, as
 \begin{equation}
     \begin{split}
         h'_i(\vec{x}) &= \left\lVert
@@ -312,54 +309,54 @@ A measurement function in this form allows rearrangement of $h'_i$ and the corre
             x & y
         \end{bmatrix}^\top - \vec{s}_i\right\rVert^2 \\
         &= (x - s_{x,i})^2 + (y - s_{y,i})^2 \\
-        &= x^2 + y^2 -2s_{x,i}x -2s_{y,i}y +s_{x,i}^2 +s_{y,i}^2
-    \end{split}\,,
+        &= x^2 + y^2 -2s_{x,i}x -2s_{y,i}y +s_{x,i}^2 +s_{y,i}^2\,,
+    \end{split}
 \end{equation}
 and
-\begin{equation}
+\begin{equation}\label{eq:nonlin_fusion:modified_jacobian}
     \mat{H}'_{k,i} = 
     \begin{bmatrix}
         2\hat{x}_{k|k-1} - 2s_{x,i} \\
         2\hat{y}_{k|k-1} - 2s_{y,i} \\
         0 \\
         \vdots
-    \end{bmatrix}^\top\,. \label{eqn:modified_jacobian}
+    \end{bmatrix}^\top\,.
 \end{equation}
-Here, $h'_i$ and $\mat{H}'_{k,i}$ are linear combinations of $\hat{x}_{k|k-1}^2$, $\hat{y}_{k|k-1}^2$, $\hat{x}_{k|k-1}$ and $\hat{y}_{k|k-1}$. To show how the corresponding modified measurement vectors $\vec{i}'_{k,i}$ and matrices $\mat{I}'_{k,i}$ can be similarly rearranged and used for localisation, we also require the existence of measurements following a modified measurement model of the form
-\begin{equation}
-    z'_{k,i} = h'_i(\vec{x}_k)+v'_{k,i}\,, \label{eqn:modified_measurement_model}
+Here, $h'_i$ and $\mat{H}'_{k,i}$ are linear combinations of $\hat{x}_{k|k-1}^2$, $\hat{y}_{k|k-1}^2$, $\hat{x}_{k|k-1}$ and $\hat{y}_{k|k-1}$. For the rearrangement of corresponding modified measurement vectors $\vec{i}'_{k, i}$ and matrices $\mat{I}'_{k, i}$, usable for the desired localisation update, we also require the existence of measurements following the considered modified measurement models,
+\begin{equation}\label{eq:nonlin_fusion:modified_measurement_model}
+    z'_{k,i} = h'_i(\vec{x}_k)+v'_{k,i}\,,
 \end{equation}
 where $z'_{k,i}$ is the modified measurement, and noise term $v'_{k,i}$ is zero-mean and has a known variance $r'_{k,i}$.
 
-Computing $z'_{k,i}$ and its variance $r'_{k,i}$ from the original measurements $z_{k,i}$ are complicated by the noise term $v_{k,i} \sim \mathcal{N}(0, r_{k,i})$, and simply squaring the original range measurements produces
+Computing $z'_{k,i}$ and its variance $r'_{k,i}$ from the original measurements $z_{k,i}$ is complicated by the original noise term $v_{k,i} \sim \mathcal{N}(0, r_{k,i})$. Squaring the original range measurements produces
 \begin{equation}
     \begin{split}
         z_{k,i}^2 &= (h_i(\vec{x}_k) + v_{k,i})^2 \\
         &= h'_i(\vec{x}_k) + 2h_i(\vec{x}_k)v_{k,i} + v_{k,i}^2\,,
     \end{split}
 \end{equation}
-with a new noise term $2h_i(\vec{x}_k)v_{k,i} + v_{k,i}^2$, now dependent on the measurement function $h_i$, and no longer zero-mean. We can compute the mean of this new noise term (a function of the Gaussian term $v_{k,i}$) as $\mathsf{E}[2h_i(\vec{x}_k)v_{k,i} + v_{k,i}^2] = r_{k,i}$ and mean-adjust modified measurements as
-\begin{equation}
+with a new noise term $2h_i(\vec{x}_k)v_{k,i} + v_{k,i}^2$, now dependent on the measurement function $h_i$, and no longer zero-mean. The mean of this new noise term (a function of the Gaussian term $v_{k, i}$) is given by $\mathsf{E}[2h_i(\vec{x}_k)v_{k, i} + v_{k, i}^2] = r_{k, i}$ and can be used to mean-adjust the squared measurement above, producing the modified measurements
+\begin{equation}\label{eq:nonlin_fusion:modified_measurement}
     \begin{split}
         z'_{k,i} &= z_{k,i}^2 - r_{k,i} \\
         &= h_i(\vec{x}_k)^2 + 2h_i(\vec{x}_k)v_{k,i} + v_{k,i}^2 - r_{k,i} \\
         &= h'_i(\vec{x}_k) + v'_{k,i}\,,
-    \end{split} \label{eqn:modified_measurement}
+    \end{split}
 \end{equation}
-with now zero-mean noise $v'_{k,i} = 2h_i(\vec{x}_k)v_{k,i} + v_{k,i}^2 - r_{k,i}$. The noise in this case (again a function of $v_{k,i}$) has variance 
-\begin{equation}
-    \mathsf{Var}[v'_{k,i}] = 4h_i(\vec{x}_k)^2r_{k,i} + 2r_{k,i}^2 \label{eqn:modified_measurement_variance}
+with now zero-mean noise term $v'_{k,i} = 2h_i(\vec{x}_k)v_{k,i} + v_{k,i}^2 - r_{k,i}$. This noise, again a function of $v_{k,i}$, has variance 
+\begin{equation}\label{eq:nonlin_fusion:modified_measurement_variance}
+    \mathsf{Var}[v'_{k,i}] = 4h_i(\vec{x}_k)^2r_{k,i} + 2r_{k,i}^2\,,
 \end{equation}
-and is also dependent on $h_i$. To use the modified measurement \eqref{eqn:modified_measurement} with the EIF, we require an estimate for $\mathsf{Var}[v'_{k,i}]$ at the sensor as well. Additionally, a conservative estimate (\textit{i.e.}, a larger variance resulting in less confidence in measurements) is desirable to reduce filter divergence. While the naive approach, replacing $h_i(\vec{x}_k)$ with $z_{k,i}$ in \eqref{eqn:modified_measurement_variance}, may not provide a conservative estimate when $z_{k,i}^2 < h_i(\vec{x}_k)^2$, the Gaussianity of $v_{k,i}$ can be exploited to provide a conservative estimate with $95\%$ confidence by shifting the replacement term $z_{k,i}$ by two of its standard deviations $\sqrt{r_{k,i}}$. The modified measurement's variance at timestep $k$ can therefore be conservatively approximated by
-\begin{equation}
+still dependent on $h_i$. To use the modified measurements \eqref{eq:nonlin_fusion:modified_measurement} with the EIF, we require an estimate for $\mathsf{Var}[v'_{k, i}]$ at the sensor as well. Additionally, a conservative estimate, that is, a larger variance resulting in less confidence in measurements, is desirable to reduce filter divergence. Intuitively replacing $h_i(\vec{x}_k)$ with $z_{k, i}$ in \eqref{eq:nonlin_fusion:modified_measurement_variance} may not provide a conservative estimate when $z_{k, i}^2 < h_i(\vec{x}_k)^2$, but Gaussianity of $v_{k, i}$ and the squaring of $z_{k, i}$ can be exploited to provide a conservative estimate, with $95\%$ confidence, by adding two of its standard deviations, $\sqrt{r_{k, i}}$, to the replacement term $z_{k, i}$. The modified measurement's variance at timestep $k$ is then conservatively approximated by
+\begin{equation}\label{eq:nonlin_fusion:modified_measurement_variance_estimate}
     \begin{split}
         r'_{k, i} &= 4(z_{k,i} + 2\sqrt{r_{k,i}})^2r_{k,i} + 2r_{k,i}^2 \\
         &\gtrapprox \mathsf{Var}[v'_{k,i}]\,,
-    \end{split} \label{eqn:modified_measurement_variance_estimate}
+    \end{split}
 \end{equation}
 at each sensor $i$.
 
-The modified measurement model \eqref{eqn:modified_measurement_model} can now be used for localisation, when measurements are modified by \eqref{eqn:modified_measurement} and their new variance estimated with \eqref{eqn:modified_measurement_variance_estimate}.
+The modified measurement model \eqref{eq:nonlin_fusion:modified_measurement_model} can now be used for localisation, when measurements are modified by \eqref{eq:nonlin_fusion:modified_measurement} and their new variances estimated with \eqref{eq:nonlin_fusion:modified_measurement_variance_estimate}.
 
 % 
 % ##     ##  ######  #### ##    ##  ######      ##        ######     ###    
@@ -372,30 +369,26 @@ The modified measurement model \eqref{eqn:modified_measurement_model} can now be
 % 
 
 \subsection{Applying the Linear Combination Aggregation Scheme}\label{subsec:nonlin_fusion:applying_lca_scheme}
-To complete the EIF update as a linear combination aggregation, modified vectors $\vec{i}'_{k,i}$ and matrices $\mat{I}'_{k,i}$, using the modified measurement model \eqref{eqn:modified_measurement_model}, can be rearranged as follows.
-\begin{equation}
+To complete the EIF update as a linear combination aggregation, modified vectors $\vec{i}'_{k, i}$ and matrices $\mat{I}'_{k, i}$, using the modified measurement model \eqref{eq:nonlin_fusion:modified_measurement_model}, can be rearranged as
+\begin{equation}\label{eq:nonlin_fusion:hrz_linear_comb}
     \begin{split}
         \vec{i}'_{k,i} &= \mat{H}_{k,i}^{\prime\top} r_{k,i}^{\prime-1}(z'_{k,i} - h'_i(\hat{\vec{x}}_{k|k-1}) + \mat{H}'_{k,i}\hat{\vec{x}}_{k|k-1}) \\
         &= 
         \begin{bmatrix}
             \alpha_i^{(k,1)} & \alpha_i^{(k,2)} & 0 & \cdots
         \end{bmatrix}^\top\,,
-    \end{split} \label{eqn:hrz_linear_comb}
+    \end{split}
 \end{equation}
 with
 \begin{align*}
     \begin{split}
-        \alpha_i^{(k,1)} &= (2r_{k,i}^{\prime-1})\hat{x}_{k|k-1}^3 + (2r_{k,i}^{\prime-1})\hat{x}_{k|k-1}\hat{y}_{k|k-1}^2 \\
-        &\quad+ (-2r_{k,i}^{\prime-1}s_{x,i})\hat{x}_{k|k-1}^2 + (-2r_{k,i}^{\prime-1}s_{x,i})\hat{y}_{k|k-1}^2 \\
-        &\quad+ (2r_{k,i}^{\prime-1}z'_{k,i})\hat{x}_{k|k-1} + (-2r_{k,i}^{\prime-1}s_{x,i}^2)\hat{x}_{k|k-1}\\
-        &\quad+ (-2r_{k,i}^{\prime-1}s_{y,i}^2)\hat{x}_{k|k-1} + (2r_{k,i}^{\prime-1}s_{x,i}^3) \\
-        &\quad+ (2r_{k,i}^{\prime-1}s_{x,i}s_{y,i}^2) + (-2r_{k,i}^{\prime-1}s_{x,i} z'_{k,i})\ \textrm{and}
+        \alpha_i^{(k,1)} &= (2r_{k,i}^{\prime-1})\hat{x}_{k|k-1}^3 + (2r_{k,i}^{\prime-1})\hat{x}_{k|k-1}\hat{y}_{k|k-1}^2+ (-2r_{k,i}^{\prime-1}s_{x,i})\hat{x}_{k|k-1}^2 + (-2r_{k,i}^{\prime-1}s_{x,i})\hat{y}_{k|k-1}^2 \\
+        &\quad+ (2r_{k,i}^{\prime-1}z'_{k,i})\hat{x}_{k|k-1} + (-2r_{k,i}^{\prime-1}s_{x,i}^2)\hat{x}_{k|k-1}+ (-2r_{k,i}^{\prime-1}s_{y,i}^2)\hat{x}_{k|k-1} + (2r_{k,i}^{\prime-1}s_{x,i}^3) \\
+        &\quad+ (2r_{k,i}^{\prime-1}s_{x,i}s_{y,i}^2) + (-2r_{k,i}^{\prime-1}s_{x,i} z'_{k,i})\,,
     \end{split}\\
     \begin{split}
-        \alpha_i^{(k,2)} &= (2r_{k,i}^{\prime-1})\hat{y}_{k|k-1}^3 + (2r_{k,i}^{\prime-1})\hat{x}_{k|k-1}^2\hat{y}_{k|k-1} \\
-        &\quad+ (-2r_{k,i}^{\prime-1}s_{y,i})\hat{x}_{k|k-1}^2 + (-2r_{k,i}^{\prime-1}s_{y,i})\hat{y}_{k|k-1}^2 \\
-        &\quad+ (2r_{k,i}^{\prime-1}z'_{k,i})\hat{y}_{k|k-1} + (-2r_{k,i}^{\prime-1}s_{x,i}^2)\hat{y}_{k|k-1} \\
-        &\quad+ (-2r_{k,i}^{\prime-1}s_{y,i}^2)\hat{y}_{k|k-1} + (2r_{k,i}^{\prime-1}s_{y,i}s_{x,i}^2) \\
+        \alpha_i^{(k,2)} &= (2r_{k,i}^{\prime-1})\hat{y}_{k|k-1}^3 + (2r_{k,i}^{\prime-1})\hat{x}_{k|k-1}^2\hat{y}_{k|k-1}+ (-2r_{k,i}^{\prime-1}s_{y,i})\hat{x}_{k|k-1}^2 + (-2r_{k,i}^{\prime-1}s_{y,i})\hat{y}_{k|k-1}^2 \\
+        &\quad+ (2r_{k,i}^{\prime-1}z'_{k,i})\hat{y}_{k|k-1} + (-2r_{k,i}^{\prime-1}s_{x,i}^2)\hat{y}_{k|k-1}+ (-2r_{k,i}^{\prime-1}s_{y,i}^2)\hat{y}_{k|k-1} + (2r_{k,i}^{\prime-1}s_{y,i}s_{x,i}^2) \\
         &\quad+ (2r_{k,i}^{\prime-1}s_{y,i}^3) + (-2r_{k,i}^{\prime-1}s_{y,i}z'_{k,i})\,,
     \end{split}
 \end{align*}
@@ -414,38 +407,29 @@ and
 \end{equation}
 with
 \begin{align*}
-    \begin{split}
-        \alpha_i^{(k,3)} &= (4r_{k,i}^{\prime-1})\hat{x}_{k|k-1}^2 + (-8r_{k,i}^{\prime-1}s_{x,i})\hat{x}_{k|k-1} \\
-        &\qquad+ (4r_{k,i}^{\prime-1}s_{x,i}^2)\,,
-    \end{split}\\
-    \begin{split}
-        \alpha_i^{(k,4)} &= (4r_{k,i}^{\prime-1})\hat{x}_{k|k-1}\hat{y}_{k|k-1} + (-4r_{k,i}^{\prime-1}s_{y,i})\hat{x}_{k|k-1}  \\
-        &\qquad+ (-4r_{k,i}^{\prime-1}s_{x,i})\hat{y}_{k|k-1} + (4r_{k,i}^{\prime-1}s_{x,i}s_{y,i})\,,
-    \end{split}\\
-    \alpha_i^{(k,5)} &= \alpha_i^{(k,4)}\ \textrm{and} \\
-    \begin{split}
-        \alpha_i^{(k,6)} &= (4r_{k,i}^{\prime-1})\hat{y}_{k|k-1}^2 + (-8r_{k,i}^{\prime-1}s_{y,i})\hat{y}_{k|k-1} \\
-        &\qquad+ (4r_{k,i}^{\prime-1}s_{y,i}^2)\,.
-    \end{split}
+    \alpha_i^{(k,3)} &= (4r_{k,i}^{\prime-1})\hat{x}_{k|k-1}^2 + (-8r_{k,i}^{\prime-1}s_{x,i})\hat{x}_{k|k-1} + (4r_{k,i}^{\prime-1}s_{x,i}^2)\,,\\
+    \alpha_i^{(k,4)} &= (4r_{k,i}^{\prime-1})\hat{x}_{k|k-1}\hat{y}_{k|k-1} + (-4r_{k,i}^{\prime-1}s_{y,i})\hat{x}_{k|k-1} + (-4r_{k,i}^{\prime-1}s_{x,i})\hat{y}_{k|k-1} + (4r_{k,i}^{\prime-1}s_{x,i}s_{y,i})\,,\\
+    \alpha_i^{(k,5)} &= \alpha_i^{(k,4)}\,,\\
+    \alpha_i^{(k,6)} &= (4r_{k,i}^{\prime-1})\hat{y}_{k|k-1}^2 + (-8r_{k,i}^{\prime-1}s_{y,i})\hat{y}_{k|k-1} + (4r_{k,i}^{\prime-1}s_{y,i}^2)\,.
 \end{align*}
 The above rearrangements give $\vec{i}'_{k,i}$ and $\mat{I}'_{k,i}$ as linear combinations of elements in
-\begin{equation}
+\begin{equation}\label{eq:nonlin_fusion:weights_to_broadcast}
     \begin{split}
         &\{ \hat{x}_{k|k-1}^3,\ \hat{y}_{k|k-1}^3,\ \hat{x}_{k|k-1}^2\hat{y}_{k|k-1},\ \hat{x}_{k|k-1}\hat{y}_{k|k-1}^2,\\
         &\quad \hat{x}_{k|k-1}^2,\ \hat{y}_{k|k-1}^2,\ \hat{x}_{k|k-1}\hat{y}_{k|k-1},\ \hat{x}_{k|k-1},\ \hat{y}_{k|k-1}\}\,,
-    \end{split} \label{eqn:weights_to_broadcast}
+    \end{split}
 \end{equation}
-which captures all of the private state information in $\hat{\vec{x}}_{k|k-1}$ required at the sensors. The corresponding EIF update steps \eqref{eqn:eif_info_vec_update} and \eqref{eqn:eif_info_mat_update} then become
-\begin{equation}
-    \hat{\vec{y}}_{k|k} = \hat{\vec{y}}_{k|k-1} + \sum^n_{i=1}\vec{i}'_{k,i} \label{eqn:eif_modified_vec_update}
+that capture all private state information in $\hat{\vec{x}}_{k|k-1}$ required by the sensors. The corresponding EIF update steps \eqref{eq:nonlin_fusion:eif_info_vec_update} and \eqref{eq:nonlin_fusion:eif_info_mat_update} then become
+\begin{equation}\label{eq:nonlin_fusion:eif_modified_vec_update}
+    \hat{\vec{y}}_{k|k} = \hat{\vec{y}}_{k|k-1} + \sum^n_{i=1}\vec{i}'_{k,i}
 \end{equation}
 and
-\begin{equation}
-    \mat{Y}_{k|k} = \mat{Y}_{k|k-1} + \sum^n_{i=1}\mat{I}'_{k,i}\,, \label{eqn:eif_modified_mat_update}
+\begin{equation}\label{eq:nonlin_fusion:eif_modified_mat_update}
+    \mat{Y}_{k|k} = \mat{Y}_{k|k-1} + \sum^n_{i=1}\mat{I}'_{k,i}\,,
 \end{equation}
 respectively.
 \begin{remark}
-    The above has been derived for two-dimensional localisation but can be similarly derived for the three-dimensional case. However, the number of weights increases combinatorially with the number of dimensions, thus affecting the cost of communication as well.
+    The above has been derived for two-dimensional localisation but can be similarly derived for the three-dimensional case. However, as can be seen from the rearrangements, the number of weights increases combinatorially with the state dimension, thus affecting the cost of communication as well.
 \end{remark}
 
 % 
