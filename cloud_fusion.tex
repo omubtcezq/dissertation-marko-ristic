@@ -352,7 +352,7 @@ The leakages present in the introduced method, namely the leakage of fusion weig
 % 
 
 \subsection{Simulation}\label{subsec:cloud_fusion:secfci_simulation}
-Along with the discussions above, we have implemented a simulation of the method to demonstrate its fusion accuracy when compared to the FCI algorithm on a trusted cloud. A constant-speed linear system, 
+Along with the discussions above, we have implemented a simulation of the method to demonstrate its fusion accuracy when compared to the FCI algorithm on a trusted cloud. A constant-velocity linear system, 
 \begin{equation}\label{eq:cloud_fusion:secfci_system_model}
     \vec{x}_{k+1} = 
     \begin{bmatrix}
@@ -465,10 +465,10 @@ combine information from individual sensors $i$, are computable homomorphically 
     \State Estimate $\mat{P}_i^{-1}\hat{\vec{x}}_i$ locally
     \State Estimate $\mat{P}_i^{-1}$ locally
     \LineComment{Encode and encrypt scaling, covariance and estimate components}
-    \State $s_i \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_i)}\right)\right)$
-    \State $\mat{C}_i \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\right)\right)$
-    \State $\vec{e}_i \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\hat{\vec{x}}_i\right)\right)$
-    \State Send $s_i$, $\mat{C}_i$ and $\vec{e}_i$ to fusion cloud
+    \State $\xi_i \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_i)}\right)\right)$
+    \State $\vec{b}_i \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\hat{\vec{x}}_i\right)\right)$
+    \State $\mat{B}_i \gets \mathcal{E}_{\mathsf{pk}}\left(\mathsf{E}_{0}\left(\frac{1}{\tr(\mat{P}_i)}\mat{P}_i^{-1}\right)\right)$
+    \State Send $\xi_i$, $\vec{b}_i$ and $\mat{B}_i$ to fusion cloud
     \EndProcedure
 \end{algorithmic}
 \end{algorithm}
@@ -477,12 +477,12 @@ combine information from individual sensors $i$, are computable homomorphically 
 \begin{algorithmic}[1]
     \setstretch{1.35}
     \Procedure{PartialFuse}{$\mathsf{pk}$}
-    \State Receive $s_i$, $\mat{C}_i$ and $\vec{e}_i$ for all $1\leq i \leq n$
+    \State Receive $\xi_i$, $\vec{b}_i$ and $\mat{B}_i$ for all $1\leq i \leq n$
     \LineComment{Perform homomorphic summations}
-    \State $s \gets \oplus_{i=1}^{n} s_i$
-    \State $\mat{C} \gets \oplus_{i=1}^{n} \mat{C}_i$
-    \State $\vec{e} \gets \oplus_{i=1}^{n} \vec{e}_i$
-    \State Store $s$, $\mat{C}$ and $\vec{e}$ in case of query
+    \State $\xi \gets \oplus_{i=1}^{n} \xi_i$
+    \State $\vec{b} \gets \oplus_{i=1}^{n} \vec{b}_i$
+    \State $\mat{B} \gets \oplus_{i=1}^{n} \mat{B}_i$
+    \State Store $\xi$, $\vec{b}$ and $\mat{B}$ in case of query
     \EndProcedure
 \end{algorithmic}
 \end{algorithm}
@@ -491,20 +491,20 @@ combine information from individual sensors $i$, are computable homomorphically 
 \begin{algorithmic}[1]
     \setstretch{1.35}
     \Procedure{QueryFuse}{$\mathsf{pk}$, $\mathsf{sk}$}
-    \State Query and receive $s$, $\mat{C}$ and $\vec{e}$ from fusion cloud
+    \State Query and receive $\xi$, $\vec{b}$ and $\mat{B}$ from fusion cloud
     \LineComment Decrypt and decode
-    \State $\bar{s} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(s\right)\right)$
-    \State $\bar{\mat{C}} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\mat{C}\right)\right)$
-    \State $\bar{\vec{e}} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\vec{e}\right)\right)$
+    \State $\bar{\xi} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\xi\right)\right)$
+    \State $\bar{\vec{b}} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\vec{b}\right)\right)$
+    \State $\bar{\mat{B}} \gets \mathsf{E}^{-1}_{0}\left(\mathcal{D}_{\mathsf{pk},\mathsf{sk}}\left(\mat{B}\right)\right)$
     \LineComment Compute remaining fusion operations
-    \State $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} \gets \bar{s}^{-1} \cdot \bar{\vec{e}}$
-    \State $\mat{P}_{\mathsf{fus}}^{-1} \gets \bar{s}^{-1} \cdot \bar{\mat{C}}$
+    \State $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} \gets \bar{\xi}^{-1} \cdot \bar{\vec{b}}$
+    \State $\mat{P}_{\mathsf{fus}}^{-1} \gets \bar{\xi}^{-1} \cdot \bar{\mat{B}}$
     \State \Return $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$, $\mat{P}_{\mathsf{fus}}^{-1}$
     \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 
-Along with allowing the summations to be performed homomorphically on the cloud, we note that this form of the FCI also allows the cloud's partial fusion operations to be evaluated sequentially. This can be seen in algorithm \ref{alg:cloud_fusion:secfci2_cloud_steps}, where individual components $s_i$, $\mat{C}_i$ and $\vec{e}_i$ from each sensor can continue to be sequentially aggregated as sensors send their estimate information. This, in turn, supports the dynamic joining and leaving of sensors in the network without affecting the cloud or the operations of the querying party.
+Along with allowing the summations to be performed homomorphically on the cloud, we note that this form of the FCI also allows the cloud's partial fusion operations to be evaluated sequentially. This can be seen in algorithm \ref{alg:cloud_fusion:secfci2_cloud_steps}, where individual components $\xi_i$, $\vec{b}_i$ and $\mat{B}_i$ from each sensor can continue to be sequentially aggregated as sensors send their estimate information. This, in turn, supports the dynamic joining and leaving of sensors in the network without affecting the cloud or the operations of the querying party.
 
 % 
 %  ######   #######  ##     ## ########  
@@ -576,7 +576,7 @@ Lastly, when discussing security, we recall that the partial computation of FCI 
 % 
 
 \subsection{Simulation}\label{subsec:cloud_fusion:secfci2_simulation}
-To demonstrate the accuracy of the method and compare it to the method in section \ref{sec:cloud_fusion:secfci} as well as the FCI algorithm it approximates, we have implemented a simulation of the fusion scenario. Since errors in fusion are now only introduced during real number quantisation we expect the estimation error to be smaller than that in section \ref{sec:cloud_fusion:secfci}. Code was written in the Python programming language, again using the $\mathsf{phe}$ Paillier encryption scheme library [PythonPaillier2013]. A key size of $512$ bits was used, and the constant-speed linear model in \eqref{eq:cloud_fusion:secfci_system_model} was implemented. At each timestep $k$, the system state $\vec{x}_k$ was measured by $m=4$ sensors, $1\leq i \leq 4$, with measurements $\vec{z}_{k,i}$ following the measurement models \eqref{eq:cloud_fusion:secfci_measurement_model} and covariances \eqref{eq:cloud_fusion:secfci_measurement_model_covariances}. Using a linear IF, initialised with the true state of the system, each sensor produced estimate information $\mat{P}_{k, i}^{-1}\hat{\vec{x}}_{k, i}$ and $\mat{P}_{k, i}^{-1}$, respectively, that were processed, encrypted and fused at the cloud and querying party. The fusion error results of $1000$ simulation runs are shown in figure \ref{fig:cloud_fusion:secfci2_sim_error}. 
+To demonstrate the accuracy of the method and compare it to the method in section \ref{sec:cloud_fusion:secfci} as well as the FCI algorithm it approximates, we have implemented a simulation of the fusion scenario. Since errors in fusion are now only introduced during real number quantisation we expect the estimation error to be smaller than that in section \ref{sec:cloud_fusion:secfci}. Code was written in the Python programming language, again using the $\mathsf{phe}$ Paillier encryption scheme library [PythonPaillier2013]. A key size of $512$ bits was used, and the constant-velocity linear model in \eqref{eq:cloud_fusion:secfci_system_model} was implemented. At each timestep $k$, the system state $\vec{x}_k$ was measured by $m=4$ sensors, $1\leq i \leq 4$, with measurements $\vec{z}_{k,i}$ following the measurement models \eqref{eq:cloud_fusion:secfci_measurement_model} and covariances \eqref{eq:cloud_fusion:secfci_measurement_model_covariances}. Using a linear IF, initialised with the true state of the system, each sensor produced estimate information $\mat{P}_{k, i}^{-1}\hat{\vec{x}}_{k, i}$ and $\mat{P}_{k, i}^{-1}$, respectively, that were processed, encrypted and fused at the cloud and querying party. The fusion error results of $1000$ simulation runs are shown in figure \ref{fig:cloud_fusion:secfci2_sim_error}. 
 \begin{figure}[htbp]
     \centering
     \includegraphics{figures/cloud_fusion_secfci2_sim_error.pdf}

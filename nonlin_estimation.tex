@@ -528,7 +528,7 @@ Measurement modification, number encoding and linear combination aggregation are
     \State Let $\bm{\alpha}^{(k,\epsilon)}$ represent an encryption of $\sum_{i=1}^n\alpha_{i}^{(k,\epsilon)}$
     \For{$\epsilon \gets 1$ to $6$}
         \State $\bm{\alpha}^{(k,\epsilon)} \gets \prod_{i=1}^n\bm{\alpha}_{i}^{(k,\epsilon)}\pmod{N^2}$
-        \State Compute $\mathsf{E}^{-1}_{1}(\mathcal{D}_{\mathsf{sk}_{\mathsf{a},0}}(\bm{\alpha}^{(k,\epsilon)}))$
+        \State Compute $\mathsf{E}^{-1}_{1}(\mathcal{D}_{\mathsf{pk}_{\mathsf{a}},\mathsf{sk}_{\mathsf{a},0}}(\bm{\alpha}^{(k,\epsilon)}))$
     \EndFor
     \State Construct $\sum_{i=1}^n\vec{i}'_{k,i}$ and $\sum_{i=1}^n\mat{I}'_{k,i}$ from decoded decryptions above
 
@@ -640,11 +640,17 @@ Algorithms \ref{alg:nonlin_fusion:nav_prediction}, \ref{alg:nonlin_fusion:sen_me
 % 
 
 \subsection{Security Analysis}\label{subsec:nonlin_fusion:security}
-With the privacy-preserving EIF defined in the previous section, we can now interpret the aggregation leakage of an LCAO scheme in the context of range sensor localisation. The leakage function from the $\mathsf{AggDec}$ algorithm corresponds to the information vector and matrix sums, $\sum_{i=1}^n\vec{i}'_{k,i}$ and $\sum_{i=1}^n\mat{I}'_{k,i}$, respectively. However, recalling that a compromised navigator can learn the individual sums weighted by the same weight, $\{\sum_{i=1}^n2r^{-1}_{k,i},\ \sum_{i=1}^n-r^{-1}_{k,i}s_{x,i},\ \sum_{i=1}^n-2r^{-1}_{k,i}s_{x,i},\ \dots\}$ can be leaked as well. From this leakage, we can see that private sensor information, $z'_{k,i}$, $r'_{k,i}$ and $\vec{s}_i$, is present only in their complete sums
+With the confidential EIF defined, we can interpret the aggregation leakage of an LCAO scheme in the context of range sensor localisation. The leakage function from the $\mathsf{AggDec}$ algorithm corresponds to the information vector and matrix sums, $\sum_{i=1}^n\vec{i}'_{k, i}$ and $\sum_{i=1}^n\mat{I}'_{k, i}$, respectively, but recalling that a compromised navigator can learn the individual sums weighted by the same weight, sums
+\begin{equation*}
+    \left\{\sum_{i=1}^n2r^{-1}_{k, i},\ \sum_{i=1}^n-r^{-1}_{k, i}s_{x, i},\ \sum_{i=1}^n-2r^{-1}_{k, i}s_{x, i},\ \dots\right\}
+\end{equation*}
+can be leaked as well. From this leakage, we can see that sensitive sensor information, $z'_{k, i}$, $r'_{k, i}$ and $\vec{s}_i$, is present only in their complete sums
+
 \begin{equation}\label{eq:nonlin_fusion:localisation_leakage}
-    \sum_{i=1}^nz'_{k,i}\,,\ \sum_{i=1}^nr'_{k,i}\,,\ \sum_{i=1}^ns_{x,i}\ \textrm{and}\ \sum_{i=1}^ns_{y,i}\,,
+    \sum_{i=1}^nz'_{k,i}\,,\ \sum_{i=1}^nr'_{k,i}\,,\ \sum_{i=1}^ns_{x,i} \text{ and } \sum_{i=1}^ns_{y,i}\,,
 \end{equation}
-which in practice correspond to their averages. Therefore, in the context of our proposed localisation method, LCAO leakage corresponds to the averages of sensor private information, while individual sensor information remains private.
+which in practice can be interpreted as their averages. Therefore, in the context of our proposed localisation method, LCAO leakage corresponds to the averages of sensors' sensitive information, while individual sensor information remains private.
+% TODO extend to the general case from the previous subsection
 
 % 
 %  ######  #### ##     ## 
@@ -657,7 +663,7 @@ which in practice correspond to their averages. Therefore, in the context of our
 % 
 
 \subsection{Simulation}\label{subsec:nonlin_fusion:simulation}
-As well as having shown the theoretical backing for the security of our scheme, we have simulated the proposed localisation method to evaluate its performance. A two-dimensional, linear, constant velocity process model,
+As well as having shown the theoretical backing for the security of our scheme, we have simulated the proposed localisation method to evaluate its performance. A two-dimensional, linear, constant-velocity system model,
 \begin{equation*}
     \vec{x}_{k} = 
     \begin{bmatrix}
@@ -677,7 +683,7 @@ where noise term $\vec{w}_k \sim \mathcal{N}(\vec{0}, \mat{Q})$ and
         0 & 1.3 & 0 & 5.0
     \end{bmatrix}\,,
 \end{equation*}
-was simulated and tracked with the algorithms in section~\ref{subsec:pseudocode}, using a linear Kalman filter for the navigator's local state prediction. Code was written in the C programming language using the MPI library [theopenmpiprojectOpenMPI2020] to support asynchronous computations by the sensors and the navigator. The MG1 mask generation function and the SHA256 hash function, from the OpenSSL library [theopensslprojectOpenSSL2020], were used to implement the required hash function $H$, and the Libpaillier library [bethencourtLibpaillier2010] was used for the Paillier encryption scheme. Additionally, GNU libraries, GSL [thegsldevelopmentteamGSLGNUScientific2019] and GMP [granlundGMPGNUMultiple2020], were used for algebraic operations and multiple-precision encoded integers, respectively. All execution was performed on a 3.33GHz Xeon W3680 CPU, running on the Windows Subsystem for Linux (WSL).
+was simulated and tracked with the algorithms in section~\ref{subsec:nonlin_fusion:pseudocode}, using a linear Kalman filter for the navigator's local state prediction. Code was written in the C programming language using the MPI library [theopenmpiprojectOpenMPI2020] to support asynchronous computations by the sensors and the navigator. The MG1 mask generation function and the SHA256 hash function, from the OpenSSL library [theopensslprojectOpenSSL2020], were used to implement the required hash function $H$, and the Libpaillier library [bethencourtLibpaillier2010] was used for the Paillier encryption scheme. Additionally, GNU libraries, GSL [thegsldevelopmentteamGSLGNUScientific2019] and GMP [granlundGMPGNUMultiple2020], were used for algebraic operations and multiple-precision encoded integers, respectively. All execution was performed on a 3.33GHz Xeon W3680 CPU, running on the Windows Subsystem for Linux (WSL).
 
 We have considered multiple sensor layouts, each with four sensors, to capture the dependence of estimated modified measurement variances $r'_{k,i}$ on the original measurements $z_{k,i}$. These layouts of varying sensor distances are shown next to the simulation initial state and a sample track in figure \ref{fig:sim_layouts}.
 \begin{figure}[htbp]

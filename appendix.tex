@@ -39,14 +39,14 @@ The following game between attacker and challenger defines the security notion o
     \begin{equation*}
         \sum_{i\in S}\sum^{l}_{j=1} a^{(t^*)(0)}_{i,j}\theta^{(t^*)}_j = \sum_{i \in S}\sum^{l}_{j=1} a^{(t^*)(1)}_{i,j}\theta^{(t^*)}_j\,,
     \end{equation*}
-    for weights $\theta^{(t^*)}_j$, $1\leq j\leq l$, returned by a \textit{Weight Query} with chosen instance $t^*$. The challenger then chooses a random bit $b \in \{1,0\}$ and returns encryptions 
+    for weights $\theta^{(t^*)}_j$, $1\leq j\leq l$, returned by a \textit{Weight Query} with chosen instance $t^*$. The challenger then chooses a random bit $\beta \in \{1,0\}$ and returns encryptions 
     \begin{equation*}
-        \left\langle\mathcal{E}_{\mathsf{pk}_{\mathsf{a}},\mathsf{sk}_{\mathsf{a}, i}}\left(\sum^l_{j=1}a^{(t^*)(b)}_{i,j}\theta^{(t^*)}_j\right)\ \middle|\ i\in S\right\rangle\,.
+        \left\langle\mathcal{E}_{\mathsf{pk}_{\mathsf{a}},\mathsf{sk}_{\mathsf{a}, i}}\left(\sum^l_{j=1}a^{(t^*)(\beta)}_{i,j}\theta^{(t^*)}_j\right)\ \middle|\ i\in S\right\rangle\,.
     \end{equation*}
     \item[More Queries] The attacker can now perform more encryptions and submit queries, so long as the queries do not break the requirements in the Challenge stage. That is, $S \subseteq U$.
-    \item[Guess] At the end, the attacker outputs a bit $b^\prime$ and wins the game if and only if $b^\prime = b$. The advantage of an attacker $\mathcal{A}$ is defined as
+    \item[Guess] At the end, the attacker outputs a bit $\beta^\prime$ and wins the game if and only if $\beta^\prime = \beta$. The advantage of an attacker $\mathcal{A}$ is defined as
     \begin{equation*}
-        \mathsf{Adv}^{LCAO}(\mathcal{A}) \coloneqq \left\lvert \Pr [b^\prime=b] - \frac{1}{2}\right\rvert\,.
+        \mathsf{Adv}^{LCAO}(\mathcal{A}) \coloneqq \left\lvert \Pr [\beta^\prime=\beta] - \frac{1}{2}\right\rvert\,.
     \end{equation*} 
 \end{description}
 
@@ -114,14 +114,14 @@ for \textit{any} negligible functions $\eta_1$, $\eta_2$ and security parameter 
         \end{equation*}
         to $\mathcal{C}$. The received response will be of the form 
         \begin{equation*}
-            \left\langle(N+1)^{\sum^l_{j=1}a^{(t^*)(b)}_{i,j}\theta^{(t^*)}_j}H(t^*)^{\mathsf{sk}_{\mathsf{a},i}}\ \middle|\ i\in U\right\rangle\,,
+            \left\langle(N+1)^{\sum^l_{j=1}a^{(t^*)(\beta)}_{i,j}\theta^{(t^*)}_j}H(t^*)^{\mathsf{sk}_{\mathsf{a},i}}\ \middle|\ i\in U\right\rangle\,,
         \end{equation*}
-        for an unknown $b \in \{0,1\}$. Multiply series elements by $\tilde{\rho}_i^N$, $1\leq i\leq n$, for randomly chosen $\tilde{\rho}_i \in \mathbb{Z}_N$ and return
+        for an unknown $\beta \in \{0,1\}$. Multiply series elements by $\tilde{\rho}_i^N$, $1\leq i\leq n$, for randomly chosen $\tilde{\rho}_i \in \mathbb{Z}_N$ and return
         \begin{equation*}
-            \left\langle(N+1)^{\sum^l_{j=1}a^{(t^*)(b)}_{i,j}\theta^{(t^*)}_j}\tilde{\rho}_i^N H(t^*)^{\mathsf{sk}_{\mathsf{a},i}}\ \middle|\ i\in U\right\rangle
+            \left\langle(N+1)^{\sum^l_{j=1}a^{(t^*)(\beta)}_{i,j}\theta^{(t^*)}_j}\tilde{\rho}_i^N H(t^*)^{\mathsf{sk}_{\mathsf{a},i}}\ \middle|\ i\in U\right\rangle
         \end{equation*}
         to $\mathcal{A}$.
-        \item[Guess] When $\mathcal{A}$ makes guess $b'$, make the same guess $b'$ to $\mathcal{C}$.
+        \item[Guess] When $\mathcal{A}$ makes guess $\beta'$, make the same guess $\beta'$ to $\mathcal{C}$.
     \end{description}
 
     In the above construction, $\mathcal{C}$ follows the Joye-Libert scheme exactly, and to $\mathcal{A}$, $\mathcal{A}'$ follows our presented scheme exactly. Since $\mathcal{A}'$ runs in polynomial-time to security parameter when $\mathcal{A}$ does, and no non-negligible advantage adversary to $\mathcal{C}$ exists, we conclude that no non-negligible advantage adversary $\mathcal{A}$ exists. That is, there exists a negligible function $\eta$, such that

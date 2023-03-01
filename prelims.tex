@@ -30,8 +30,8 @@ Sensor and estimate data that we consider is primarily Bayesian in nature and ty
 % 
 
 \subsection{Kalman Filter}\label{subsec:prelims:kf}
-The Kalman filter (KF) [orig kf] is a popular and well-studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^d$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{d \times d}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ [kf uses]. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^d$ at each timestep $k$, following the linear process model
-\begin{equation}\label{eq:prelims:lin_gauss_process_model}
+The Kalman filter (KF) [orig kf] is a popular and well-studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^d$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{d \times d}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ [kf uses]. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^d$ at each timestep $k$, following the linear system model
+\begin{equation}\label{eq:prelims:lin_gauss_system_model}
     \vec{x}_k = \mat{F}_k \vec{x}_{k-1} + \vec{w}_k\,,
 \end{equation}
 where $\vec{w}_k \sim \mathcal{N}(\vec{0}, \mat{Q}_k)$ with known covariance $\mat{Q}_k \in \mathbb{R}^{d \times d}$. Similarly, measurements $\vec{z}_k \in \mathbb{R}^m$ are assumed to follow the linear measurement model
@@ -71,7 +71,7 @@ One of the reasons for the ubiquity and popularity of the KF introduced in secti
 \begin{equation}
     \mat{P}_{k|k} = \mathbb{E}\left\{\left(\vec{x}_k - \hat{\vec{x}}_{k|k}\right)\left(\vec{x}_k - \hat{\vec{x}}_{k|k}\right)^\top\right\}\,,
 \end{equation}
-and computed by \eqref{eq:prelims:kf_cov_predict} and \eqref{eq:prelims:kf_cov_update}, can be shown to equal the theoretical lower bound on the covariance of an unbiased estimator when process and measurement models \eqref{eq:prelims:lin_gauss_process_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, respectively, capture the estimated environment exactly [huag refs for crlb]. This property will be used in later cryptographic discussions in this thesis to guarantee estimator performances in terms of MSE. Further reading on the definitions and proofs of KF optimality can be found in [crlb,huag,etc].
+and computed by \eqref{eq:prelims:kf_cov_predict} and \eqref{eq:prelims:kf_cov_update}, can be shown to equal the theoretical lower bound on the covariance of an unbiased estimator when system and measurement models \eqref{eq:prelims:lin_gauss_system_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, respectively, capture the estimated environment exactly [huag refs for crlb]. This property will be used in later cryptographic discussions in this thesis to guarantee estimator performances in terms of MSE. Further reading on the definitions and proofs of KF optimality can be found in [crlb,huag,etc].
 
 % 
 % ######## ##    ## ######## 
@@ -84,8 +84,8 @@ and computed by \eqref{eq:prelims:kf_cov_predict} and \eqref{eq:prelims:kf_cov_u
 % 
 
 \subsection{Extended Kalman Filter}\label{subsec:prelims:ekf}
-The extended Kalman filter (EKF) is a recursive state estimation filter applicable to non-linear models and closely related to the linear KF [ekf paper,huag+chap]. The filter produces estimates and their covariances at each timestep by linearising models at the current estimate and evaluating the filter similarly to the KF. As in the KF, a true state $\vec{x}_k$ is assumed to follow known models. The process model is now non-linear and given by
-\begin{equation}\label{eq:prelims:nonlin_gauss_process_model}
+The extended Kalman filter (EKF) is a recursive state estimation filter applicable to non-linear models and closely related to the linear KF [ekf paper,huag+chap]. The filter produces estimates and their covariances at each timestep by linearising models at the current estimate and evaluating the filter similarly to the KF. As in the KF, a true state $\vec{x}_k$ is assumed to follow known models. The system model is now non-linear and given by
+\begin{equation}\label{eq:prelims:nonlin_gauss_system_model}
     \vec{x}_k = \vec{f}_k(\vec{x}_{k-1}) + \vec{w}_k\,,
 \end{equation}
 where again $\vec{w}_k \sim \mathcal{N}(\vec{0}, \mat{Q}_k)$ with known covariance $\mat{Q}_k$. Similarly, measurements are assumed to follow the non-linear measurement model
@@ -104,7 +104,7 @@ with Jacobian
 \begin{equation}\label{eq:prelims:ekf_predict_jacobian}
     \hat{\mat{F}}_k = \left.\frac{\partial \vec{f}_k}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k-1|k-1}}
 \end{equation}
-linearising the process model at the latest estimate for estimate error covariance prediction. The EKF \textit{update} step is given by
+linearising the system model at the latest estimate for estimate error covariance prediction. The EKF \textit{update} step is given by
 \begin{equation}\label{eq:prelims:ekf_est_update}
     \hat{\vec{x}}_{k|k} = \hat{\vec{x}}_{k|k-1}+\mat{P}_{k|k-1}\hat{\mat{H}}_k^\top\left(\hat{\mat{H}}_k\mat{P}_{k|k-1}\hat{\mat{H}}_k^\top + \mat{R}_k\right)^{-1}\left(\vec{z}_k-\vec{h}_k(\hat{\vec{x}}_{k|k-1})\right)
 \end{equation}
@@ -116,7 +116,7 @@ with Jacobian
 \begin{equation}\label{eq:prelims:ekf_update_jacobian}
     \hat{\mat{H}}_k = \left.\frac{\partial \vec{h}_k}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k|k-1}}
 \end{equation}
-linearising the measurement model. Unlike the linear KF, by linearising the models the EKF propagates Gaussian model noises in its estimates that may not be Gaussian in reality, even when process and measurement models \eqref{eq:prelims:nonlin_gauss_process_model} and \eqref{eq:prelims:nonlin_gauss_measurement_model}, respectively, are exactly correct. For this reason, the EKF does not hold the same guarantees on optimality as the KF does. To a similar effect, highly non-linear models or inaccurate models can lead to greater inaccuracies and divergence of estimates from true states in EKF estimates. Despite these downsides, its scalability and efficiency have made the EKF an industry-standard estimation filter for non-linear systems [smth on uses of ekf]. More details on the EKF and its derivation can be found in [huag+chap].
+linearising the measurement model. Unlike the linear KF, by linearising the models the EKF propagates Gaussian model noises in its estimates that may not be Gaussian in reality, even when system and measurement models \eqref{eq:prelims:nonlin_gauss_system_model} and \eqref{eq:prelims:nonlin_gauss_measurement_model}, respectively, are exactly correct. For this reason, the EKF does not hold the same guarantees on optimality as the KF does. To a similar effect, highly non-linear models or inaccurate models can lead to greater inaccuracies and divergence of estimates from true states in EKF estimates. Despite these downsides, its scalability and efficiency have made the EKF an industry-standard estimation filter for non-linear systems [smth on uses of ekf]. More details on the EKF and its derivation can be found in [huag+chap].
 
 % 
 % #### ######## 
@@ -129,7 +129,7 @@ linearising the measurement model. Unlike the linear KF, by linearising the mode
 % 
 
 \subsection{Information Filter}\label{subsec:prelims:if}
-The information filter (IF) is an algebraic reformulation of the KF from section \ref{subsec:prelims:kf} [niehsenInformationFusionBased2002, Mutambara, another]. The information form of the filter simplifies the update step of the filter making it more suitable when multiple independent measurements are present at the same timestep. The key difference of the IF is the storing and propagation of the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ rather than the estimate and its error covariance, $\hat{\vec{x}}_{k|k'}$ and $\mat{P}_{k|k'}$, stored by the KF. When assuming the same linear and Gaussian models \eqref{eq:prelims:lin_gauss_process_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, the information vector and matrix are related to the estimate and its covariance by
+The information filter (IF) is an algebraic reformulation of the KF from section \ref{subsec:prelims:kf} [niehsenInformationFusionBased2002, Mutambara, another]. The information form of the filter simplifies the update step of the filter making it more suitable when multiple independent measurements are present at the same timestep. The key difference of the IF is the storing and propagation of the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ rather than the estimate and its error covariance, $\hat{\vec{x}}_{k|k'}$ and $\mat{P}_{k|k'}$, stored by the KF. When assuming the same linear and Gaussian models \eqref{eq:prelims:lin_gauss_system_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, the information vector and matrix are related to the estimate and its covariance by
 \begin{equation}\label{eq:prelims:info_vec_defn}
     \hat{\vec{y}}_{k|k'} = \mat{P}_{k|k'}^{-1}\hat{\vec{x}}_{k|k'}
 \end{equation}
@@ -162,7 +162,7 @@ and
     \mat{I}_k = \mat{H}_k^\top\mat{R}_k^{-1}\mat{H}_k\,.
 \end{equation}
 
-Since all information related to measurements and their sensors are captured in $\vec{i}_k$ and $\mat{I}_k$, namely the measured value $\vec{z}_k$, measurement model $\mat{H}_k$ and measurement error $\mat{R}_k$, sequential IF update steps required in the presence of multiple sensors are easily computed as a summation of this information from each sensor. That is, if we consider the same process model \eqref{eq:prelims:lin_gauss_process_model} and multiple sensors $i$, $1\leq i\leq n$, making independent measurements that follow models
+Since all information related to measurements and their sensors are captured in $\vec{i}_k$ and $\mat{I}_k$, namely the measured value $\vec{z}_k$, measurement model $\mat{H}_k$ and measurement error $\mat{R}_k$, sequential IF update steps required in the presence of multiple sensors are easily computed as a summation of this information from each sensor. That is, if we consider the same system model \eqref{eq:prelims:lin_gauss_system_model} and multiple sensors $i$, $1\leq i\leq n$, making independent measurements that follow models
 \begin{equation}
     \vec{z}_{k,i} = \mat{H}_{k,i} \vec{x}_k + \vec{v}_{k,i}\,,
 \end{equation}
@@ -195,7 +195,7 @@ The easily computed summation has led to the IF being particularly suited to dis
 % 
 
 \subsection{Extended Information Filter}\label{subsec:prelims:eif}
-The extended information filter (EIF) is an algebraic reformulation of the EKF and represents a non-linear model extension to the linear IF [thrun, another]. As with the IF, its simplification of the update step to a trivial sum has led to its adoption in suitable distributed environments with multiple sensors and a desire to reduce communicational costs [tobias garritsen thesis]. Similarly, the EIF estimates and propagates the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ that relate to the state estimate and its covariance by \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, respectively. Assuming the non-linear process model \eqref{eq:prelims:nonlin_gauss_process_model} and multiple sensors $i$, $1\leq i \leq n$, making independent non-linear measurements that follow models
+The extended information filter (EIF) is an algebraic reformulation of the EKF and represents a non-linear model extension to the linear IF [thrun, another]. As with the IF, its simplification of the update step to a trivial sum has led to its adoption in suitable distributed environments with multiple sensors and a desire to reduce communicational costs [tobias garritsen thesis]. Similarly, the EIF estimates and propagates the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ that relate to the state estimate and its covariance by \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, respectively. Assuming the non-linear system model \eqref{eq:prelims:nonlin_gauss_system_model} and multiple sensors $i$, $1\leq i \leq n$, making independent non-linear measurements that follow models
 \begin{equation}
     \vec{z}_{k,i} = \vec{h}_{k,i}\left(\vec{x}_k\right) + \vec{v}_{k,i}\,,
 \end{equation}
@@ -207,7 +207,7 @@ and
 \begin{equation}\label{eq:prelims:eif_info_mat_predict}
     \mat{Y}_{k|k-1} = \left(\hat{\mat{F}}_k\mat{Y}_{k-1|k-1}^{-1}\hat{\mat{F}}_k^\top + \mat{Q}_k\right)^{-1}\,,
 \end{equation}
-with Jacobian linearising the process model
+with Jacobian linearising the system model
 \begin{equation}
     \hat{\mat{F}}_k = \left.\frac{\partial \vec{f}_k}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k-1|k-1}}\,.
 \end{equation}
@@ -244,7 +244,7 @@ Similarly to the EKF, the linearisation of models leads to estimation errors mak
 % 
 
 \subsection{Covariance Intersection and Fast Covariance Intersection}\label{subsec:prelims:fci}
-In the filters presented in the previous sections, measurements from the same timestep must be independent for sequential update steps to fuse them correctly. That is, non-zero cross-correlations between measurements can lead to overly confident estimate error covariances and estimation track divergence [crosscor paper]. In some cases, this independence of measurements cannot be guaranteed and a conservative fusion method is required to obtain a final estimate and its error covariance using all available measurements. A typical scenario is the fusion of local estimator estimates themselves, such as those produced by separate KF, IF, EKF or EIF instances, that may contain cross-correlations due to shared process model assumptions during estimation [ci and dependence ref]. Covariance intersection (CI), is a time-independent fusion algorithm that fuses estimates or measurements and their error covariances when cross-correlations are unknown [julierNondivergentEstimation] and produces estimates that are guaranteed to be conservative, that is, not overly confident in the error of resulting fused estimates. CI is particularly well suited to fusing estimates $\hat{\vec{x}}_i$ and covariances $\mat{P}_i$ of sensor $i$ in the information form, as given in \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, such that the fusion of $n$ information vectors $\mat{P}_i^{-1}\hat{\vec{x}}_i$, $1\leq i\leq n$, and information matrices $\mat{P}_i^{-1}$, $1\leq i\leq n$, produces a fused information vector $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$ and matrix $\mat{P}_{\mathsf{fus}}^{-1}$. It is given by
+In the filters presented in the previous sections, measurements from the same timestep must be independent for sequential update steps to fuse them correctly. That is, non-zero cross-correlations between measurements can lead to overly confident estimate error covariances and estimation track divergence [crosscor paper]. In some cases, this independence of measurements cannot be guaranteed and a conservative fusion method is required to obtain a final estimate and its error covariance using all available measurements. A typical scenario is the fusion of local estimator estimates themselves, such as those produced by separate KF, IF, EKF or EIF instances, that may contain cross-correlations due to shared system model assumptions during estimation [ci and dependence ref]. Covariance intersection (CI), is a time-independent fusion algorithm that fuses estimates or measurements and their error covariances when cross-correlations are unknown [julierNondivergentEstimation] and produces estimates that are guaranteed to be conservative, that is, not overly confident in the error of resulting fused estimates. CI is particularly well suited to fusing estimates $\hat{\vec{x}}_i$ and covariances $\mat{P}_i$ of sensor $i$ in the information form, as given in \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, such that the fusion of $n$ information vectors $\mat{P}_i^{-1}\hat{\vec{x}}_i$, $1\leq i\leq n$, and information matrices $\mat{P}_i^{-1}$, $1\leq i\leq n$, produces a fused information vector $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$ and matrix $\mat{P}_{\mathsf{fus}}^{-1}$. It is given by
 \begin{equation}\label{eq:prelims:ci_info_vec}
     \mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} = \sum_{i=1}^n \omega_i \mat{P}_i^{-1} \hat{\vec{x}}_i
 \end{equation}
@@ -383,15 +383,15 @@ Similarly, encryption $\mathcal{E}_{\mathsf{pk}}(\cdot)$, decryption $\mathcal{D
 \subsection{Joye-Libert Aggregation Scheme}\label{subsec:prelims:joye_libert_agg}
 The Joye-Libert privacy-preserving aggregation scheme [joyeScalableSchemePrivacyPreserving2013] is a scheme defined for $n+1$ parties, where $n$ participants have their data aggregated by an aggregator that performs the homomorphic summation. It is defined on time-series data, indexed by timestep $k$, and meets the security notion AO. Similarly to the Paillier scheme in section \ref{subsec:prelims:paillier}, it bases its security on the DCRA, however, an aggregation scheme generates secret keys for individual participants and the aggregating party, requiring an additional trusted party to perform an initial key generation and distribution step.
 
-Key generation is computed by choosing two equal-length and sufficiently large primes $p$ and $q$, and computing $N=pq$. A hash function $H:\mathbb{Z} \rightarrow \mathbb{Z}_{N^2}^*$ is defined and the scheme's public key is set to $\mathsf{pk}_{\mathsf{A}}=(N, H)$. $n$ secret keys are generated by choosing $\mathsf{sk}_{\mathsf{A}, i}$, $1\leq i\leq n$, uniformly from $\mathbb{Z}_{N^2}$ and distributing them to $n$ participants (whose data is to be aggregated). The last secret key is set as
+Key generation is computed by choosing two equal-length and sufficiently large primes $p$ and $q$, and computing $N=pq$. A hash function $H:\mathbb{Z} \rightarrow \mathbb{Z}_{N^2}^*$ is defined and the scheme's public parameters are set to $\mathsf{pub}=(N, H)$. $n$ secret keys are generated by choosing $\mathsf{sk}_i$, $1\leq i\leq n$, uniformly from $\mathbb{Z}_{N^2}$ and distributing them to $n$ participants (whose data is to be aggregated). The last secret key is set as
 \begin{equation}
-    \mathsf{sk}_{\mathsf{A},0} = -\sum^{n}_{i=1}\mathsf{sk}_{\mathsf{A},i}\,,
+    \mathsf{sk}_0 = -\sum^{n}_{i=1}\mathsf{sk}_i\,,
 \end{equation}
 and sent to the aggregator.
 
 At any timestep $k$, a participant $i$ can encrypt time-series plaintext data $a^{(k)}_{i} \in \mathbb{Z}_N$ to ciphertext $c^{(k)}_{i} \in \mathbb{Z}_{N^2}$ with
 \begin{equation}
-    c^{(k)}_{i} = \mathcal{E}_{\mathsf{pk}_{\mathsf{A}},\mathsf{sk}_{\mathsf{A},i}}\left(a^{(k)}_{i}\right) = (N+1)^{a^{(k)}_{i}} H(k)^{\mathsf{sk}_i} \pmod{N^2}\,.
+    c^{(k)}_{i} = \mathcal{E}_{\mathsf{sk}_i}\left(a^{(k)}_{i}\right) = (N+1)^{a^{(k)}_{i}} H(k)^{\mathsf{sk}_i} \pmod{N^2}\,.
 \end{equation}
 Here, we can consider $H(k)^{\mathsf{sk}_i}$ the noise term which hides the easily computable discrete logarithm $(N+1)^{a^{(k)}_{i}} \pmod{N^2}$.
 
@@ -401,14 +401,14 @@ When all encryptions $c^{(k)}_{i}$, $1\leq i\leq n$ are sent to the aggregator, 
 \end{equation}
 and
 \begin{equation}\label{eq:prelims:joye_libert_agg_dec}
-    \sum^{n}_{i=1}a^{(k)}_{i} = \mathcal{D}_{\mathsf{pk}_{\mathsf{A}},\mathsf{sk}_{\mathsf{A},0}}\left(c^{(k)}\right) = \frac{H(k)^{\mathsf{sk}_{\mathsf{A},0}}c^{(k)}-1}{N} \pmod{N}\,.
+    \sum^{n}_{i=1}a^{(k)}_{i} = \mathcal{D}_{\mathsf{sk}_0}\left(c^{(k)}\right) = \frac{H(k)^{\mathsf{sk}_0}c^{(k)}-1}{N} \pmod{N}\,.
 \end{equation}
-Correctness follows from $\sum^{n}_{i=0}\mathsf{sk}_{\mathsf{A},i} = 0$, and thus
+Correctness follows from $\sum^{n}_{i=0}\mathsf{sk}_i = 0$, and thus
 \begin{equation*}
     \begin{split}
-        &H(k)^{\mathsf{sk}_{\mathsf{A},0}}\prod^{n}_{i=1}c^{(k)}_{i} \pmod{N^2} \\
-        \equiv &H(k)^{\mathsf{sk}_{\mathsf{A},0}}\prod^{n}_{i=1}(N+1)^{a^{(k)}_{i}} H(k)^{\mathsf{sk}_{\mathsf{A},i}} \pmod{N^2} \\
-        \equiv &H(k)^{\sum^n_{j=0}\mathsf{sk}_{\mathsf{A},j}} \prod^{n}_{i=1}(N+1)^{a^{(k)}_{i}} \pmod{N^2} \\
+        &H(k)^{\mathsf{sk}_0}\prod^{n}_{i=1}c^{(k)}_{i} \pmod{N^2} \\
+        \equiv &H(k)^{\mathsf{sk}_0}\prod^{n}_{i=1}(N+1)^{a^{(k)}_{i}} H(k)^{\mathsf{sk}_i} \pmod{N^2} \\
+        \equiv &H(k)^{\sum^n_{j=0}\mathsf{sk}_j} \prod^{n}_{i=1}(N+1)^{a^{(k)}_{i}} \pmod{N^2} \\
         \equiv &(N+1)^{\sum^n_{i=1}a^{(k)}_{i}} \pmod{N^2}\,,
     \end{split}
 \end{equation*}
