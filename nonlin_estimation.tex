@@ -628,6 +628,13 @@ Algorithms \ref{alg:nonlin_fusion:nav_prediction}, \ref{alg:nonlin_fusion:sen_me
 % 
 
 \subsection{Solvable Sub-Class of Non-Linear Measurement Models}\label{subsec:nonlin_fusion:solvable_nonlin_class}
+So far in this chapter, we have presented a method for measurement fusion in the context of range-only navigation that meets our desired security goals. As originally introduced, this solution aims to establish the foundations for a general fusion method for non-linear measurements that achieves the same data confidentiality guarantees and can itself be generalised to solving a sub-class of non-linear measurement problems not limited to range-only navigation. Recalling our aim of rewriting \eqref{eq:nonlin_fusion:measurement_vec} and \eqref{eq:nonlin_fusion:measurement_mat} as a linear combination of functions of $\hat{\vec{x}}_{k|k-1}$, and noting that this was possible when the measurement function $h_i$ could be rewritten in the same way, a more general solution can be seen. That is, \textit{any} non-linear measurement functions $\vec{h}_{k,i}$ that can be written in the form
+\begin{equation}\label{eq:nonlin_fusion:measurement_func_of_solvable_class}
+    \vec{h}_{k,i}(\vec{x}) = \sum_{j=1}^\nu a_j\vec{\mathcal{H}}_j(\vec{x})\,,
+\end{equation}
+where all functions $\vec{\mathcal{H}}_j$, $1\leq j\leq \nu$, do not depend on any sensitive sensor information, are sufficient for rearranging measurement vectors and matrices, $\vec{i}_{k, i}$ and $\mat{I}_{k, i}$, in a similar form and applying the scheme in section \ref{sec:nonlin_fusion:lcao_scheme} to the distributed fusion problem. 
+
+To stress the applicability of the solution to this sub-class of non-linear problems, we note that the presented solution with range-only measurements does not directly fit into this category as shown in section \ref{subsec:nonlin_fusion:measurement_modification}, requiring a modification to measurements to achieve the desired form in \eqref{eq:nonlin_fusion:measurement_func_of_solvable_class}. Similarly, other non-linear measurements that do not directly suit the required form but can be modified accordingly are also solvable by the presented method.
 
 % 
 %  ######  ########  ######  
