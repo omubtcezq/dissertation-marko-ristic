@@ -356,16 +356,20 @@ Along with the discussions above, we have implemented a simulation of the method
 \begin{equation}\label{eq:cloud_fusion:secfci_system_model}
     \vec{x}_{k+1} = 
     \begin{bmatrix}
-        1 & 0.5 & 0 & 0\\
-        0 & 1 & 0 & 0\\
-        0 & 0 & 1 & 0.5\\
-        0 & 0 & 0 & 1
-    \end{bmatrix}\vec{x}_k + \vec{w}_k\,,\quad \vec{w}_k\sim\mathcal{N}\left(\vec{0},10^{-3}\cdot
+        1 & 0 & 0.5 & 0\\
+        0 & 1 & 0   & 0.5\\
+        0 & 0 & 1   & 0\\
+        0 & 0 & 0   & 1
+    \end{bmatrix}\vec{x}_k + \vec{w}_k\,,
+\end{equation}
+with noise term
+\begin{equation}
+    \vec{w}_k\sim\mathcal{N}\left(\vec{0},\ \frac{1}{10^{3}}\cdot
     \begin{bmatrix}
-        0.42 & 1.25 & 0 & 0\\
-        1.25 & 5.0 & 0 & 0\\
-        0 & 0 & 0.42 & 1.25\\
-        0 & 0 & 1.25 & 5.0
+        0.42 & 0    & 1.25 & 0\\
+        0    & 0.42 & 0    & 1.25\\
+        1.25 & 0    & 5.0  & 0\\
+        0    & 1.25 & 0    & 5.0
     \end{bmatrix}
     \right)\,,
 \end{equation}
@@ -374,10 +378,10 @@ was simulated and measured by four independent position sensors $1\leq i\leq 4$,
     \vec{z}_{k,i} = 
     \begin{bmatrix}
         1 & 0 & 0 & 0\\
-        0 & 0 & 1 & 0
+        0 & 1 & 0 & 0
      \end{bmatrix}\vec{x}_k + \vec{v}_{k,i}\,,\qquad \vec{v}_{k,i}\sim\mathcal{N}\left(\vec{0},\mat{R}_i\right)\,,
 \end{equation}
-with covariances sampled independently, resulting in
+with noise term covariances sampled independently, resulting in
 \begin{equation}\label{eq:cloud_fusion:secfci_measurement_model_covariances}
     \begin{split}
         &\mat{R}_1 = 
