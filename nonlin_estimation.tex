@@ -628,13 +628,13 @@ Algorithms \ref{alg:nonlin_fusion:nav_prediction}, \ref{alg:nonlin_fusion:sen_me
 % 
 
 \subsection{Solvable Sub-Class of Non-Linear Measurement Models}\label{subsec:nonlin_fusion:solvable_nonlin_class}
-So far in this chapter, we have presented a method for measurement fusion in the context of range-only navigation that meets our desired security goals. As originally introduced, this solution aims to establish the foundations for a general fusion method for non-linear measurements that achieves the same data confidentiality guarantees and can itself be generalised to solving a sub-class of non-linear measurement problems not limited to range-only navigation. Recalling our aim of rewriting \eqref{eq:nonlin_fusion:measurement_vec} and \eqref{eq:nonlin_fusion:measurement_mat} as a linear combination of functions of $\hat{\vec{x}}_{k|k-1}$, and noting that this was possible when the measurement function $h_i$ could be rewritten in the same way, a more general solution can be seen. That is, \textit{any} non-linear measurement functions $\vec{h}_{k,i}$ that can be written in the form
+So far in this chapter, we have presented a method for measurement fusion in the context of range-only navigation that meets our desired security goals. The solution can be generalised to solving a sub-class of non-linear measurement problems not limited to range-only navigation and aims to establish the foundations for a general fusion method for non-linear measurements that achieves the same data confidentiality guarantees. Recalling our aim of rewriting \eqref{eq:nonlin_fusion:measurement_vec} and \eqref{eq:nonlin_fusion:measurement_mat} as a linear combination of functions of $\hat{\vec{x}}_{k|k-1}$, and noting that this was possible when the measurement function $h_i$ could be rewritten in the same way, a more general solution can be seen. That is, \textit{any} non-linear measurement functions $\vec{h}_{k,i}$ that can be written in the form
 \begin{equation}\label{eq:nonlin_fusion:measurement_func_of_solvable_class}
     \vec{h}_{k,i}(\vec{x}) = \sum_{j=1}^\nu a_j\vec{\mathcal{H}}_j(\vec{x})\,,
 \end{equation}
-where all functions $\vec{\mathcal{H}}_j$, $1\leq j\leq \nu$, do not depend on any sensitive sensor information, are sufficient for rearranging measurement vectors and matrices, $\vec{i}_{k, i}$ and $\mat{I}_{k, i}$, in a similar form and applying the scheme in section \ref{sec:nonlin_fusion:lcao_scheme} to the distributed fusion problem. 
+where all functions $\vec{\mathcal{H}}_j$, $1\leq j\leq \nu$, do not depend on any sensitive sensor information, are sufficient for rearranging corresponding measurement vectors and matrices, $\vec{i}_{k, i}$ and $\mat{I}_{k, i}$, in a similar form and applying the scheme in section \ref{sec:nonlin_fusion:lcao_scheme} to the distributed fusion problem. 
 
-To stress the applicability of the solution to this sub-class of non-linear problems, we note that the presented solution with range-only measurements does not directly fit into this category as shown in section \ref{subsec:nonlin_fusion:measurement_modification}, requiring a modification to measurements to achieve the desired form in \eqref{eq:nonlin_fusion:measurement_func_of_solvable_class}. Similarly, other non-linear measurements that do not directly suit the required form but can be modified accordingly are also solvable by the presented method.
+To stress the applicability of this solution to the sub-class of non-linear problems, we note that the presented method using range-only measurements does not directly fit into this category, as shown in section \ref{subsec:nonlin_fusion:measurement_modification}, requiring modification to measurements to achieve the desired form in \eqref{eq:nonlin_fusion:measurement_func_of_solvable_class}. Similarly, other non-linear measurements that do not directly suit the required form but can be modified accordingly are also solvable by the presented method.
 
 % 
 %  ######  ########  ######  
@@ -647,17 +647,17 @@ To stress the applicability of the solution to this sub-class of non-linear prob
 % 
 
 \subsection{Security Analysis}\label{subsec:nonlin_fusion:security}
-With the confidential EIF defined, we can interpret the aggregation leakage of an LCAO scheme in the context of range sensor localisation. The leakage function from the $\mathsf{AggDec}$ algorithm corresponds to the information vector and matrix sums, $\sum_{i=1}^n\vec{i}'_{k, i}$ and $\sum_{i=1}^n\mat{I}'_{k, i}$, respectively, but recalling that a compromised navigator can learn the individual sums weighted by the same weight, sums
+With the confidential EIF defined in section \ref{subsec:nonlin_fusion:pseudocode}, we can interpret the aggregation leakage of an LCAO scheme in the context of range sensor localisation. The leakage function from the $\mathsf{AggDec}$ algorithm corresponds to the information vector and matrix sums, $\sum_{i=1}^n\vec{i}'_{k, i}$ and $\sum_{i=1}^n\mat{I}'_{k, i}$, respectively, but recalling that a compromised navigator can learn the individual sums weighted by the same weight, the sums
 \begin{equation*}
     \left\{\sum_{i=1}^n2r^{-1}_{k, i},\ \sum_{i=1}^n-r^{-1}_{k, i}s_{x, i},\ \sum_{i=1}^n-2r^{-1}_{k, i}s_{x, i},\ \dots\right\}
 \end{equation*}
 can be leaked as well. From this leakage, we can see that sensitive sensor information, $z'_{k, i}$, $r'_{k, i}$ and $\vec{s}_i$, is present only in their complete sums
-
 \begin{equation}\label{eq:nonlin_fusion:localisation_leakage}
     \sum_{i=1}^nz'_{k,i}\,,\ \sum_{i=1}^nr'_{k,i}\,,\ \sum_{i=1}^ns_{x,i} \text{ and } \sum_{i=1}^ns_{y,i}\,,
 \end{equation}
-which in practice can be interpreted as their averages. Therefore, in the context of our proposed localisation method, LCAO leakage corresponds to the averages of sensors' sensitive information, while individual sensor information remains private.
-% TODO extend to the general case from the previous subsection
+which can in practice be interpreted as the leakage of their averages. Therefore, in the context of our proposed localisation method, LCAO leakage corresponds to the averages of sensors' sensitive information, while individual sensor information remains private.
+
+Considering the generalisation of the method discussed in section \ref{subsec:nonlin_fusion:solvable_nonlin_class}, the leakage of an LCAO scheme in the context of general measurement fusion can be interpreted similarly. Sensitive sensor information when measurement functions are in the form \eqref{eq:nonlin_fusion:measurement_func_of_solvable_class} result in only their sums being present in associated leaked measurement vectors and matrix sums, $\sum_{i=1}^n\vec{i}_{k, i}$ and $\sum_{i=1}^n\mat{I}_{k, i}$, corresponding to leakage of average sensitive information only.
 
 % 
 %  ######  #### ##     ## 
@@ -670,53 +670,56 @@ which in practice can be interpreted as their averages. Therefore, in the contex
 % 
 
 \subsection{Simulation}\label{subsec:nonlin_fusion:simulation}
-As well as having shown the theoretical backing for the security of our scheme, we have simulated the proposed localisation method to evaluate its performance. A two-dimensional, linear, constant-velocity system model,
-\begin{equation*}
+As well as having shown the theoretical backing for the security of our scheme, we have simulated the proposed localisation method to evaluate its performance. As in the previous chapter, a two-dimensional, constant-velocity linear system model,
+\begin{equation}\label{eq:nonlin_fusion:simulation_system_model}
     \vec{x}_{k} = 
     \begin{bmatrix}
         1 & 0 & 0.5 & 0\\
-        0 & 1 & 0 & 0.5\\
-        0 & 0 & 1 & 0\\
-        0 & 0 & 0 & 1
-    \end{bmatrix} \cdot \vec{x}_{k-1} + \vec{w}_k\,,
-\end{equation*}
-where noise term $\vec{w}_k \sim \mathcal{N}(\vec{0}, \mat{Q})$ and
-\begin{equation*}
-    \mat{Q} = \frac{1}{10^3} \cdot
+        0 & 1 & 0   & 0.5\\
+        0 & 0 & 1   & 0\\
+        0 & 0 & 0   & 1
+    \end{bmatrix}\vec{x}_{k-1} + \vec{w}_k\,,
+\end{equation}
+with noise term
+\begin{equation}
+    \vec{w}_k\sim\mathcal{N}\left(\vec{0},\ \frac{1}{10^{3}}\cdot
     \begin{bmatrix}
-        0.4 & 0 & 1.3 & 0\\
-        0 & 0.4 & 0 & 1.3\\
-        1.3 & 0 & 5.0 & 0\\
-        0 & 1.3 & 0 & 5.0
-    \end{bmatrix}\,,
-\end{equation*}
-was simulated and tracked with the algorithms in section~\ref{subsec:nonlin_fusion:pseudocode}, using a linear Kalman filter for the navigator's local state prediction. Code was written in the C programming language using the MPI library [theopenmpiprojectOpenMPI2020] to support asynchronous computations by the sensors and the navigator. The MG1 mask generation function and the SHA256 hash function, from the OpenSSL library [theopensslprojectOpenSSL2020], were used to implement the required hash function $H$, and the Libpaillier library [bethencourtLibpaillier2010] was used for the Paillier encryption scheme. Additionally, GNU libraries, GSL [thegsldevelopmentteamGSLGNUScientific2019] and GMP [granlundGMPGNUMultiple2020], were used for algebraic operations and multiple-precision encoded integers, respectively. All execution was performed on a 3.33GHz Xeon W3680 CPU, running on the Windows Subsystem for Linux (WSL).
+        0.42 & 0    & 1.25 & 0\\
+        0    & 0.42 & 0    & 1.25\\
+        1.25 & 0    & 5.0  & 0\\
+        0    & 1.25 & 0    & 5.0
+    \end{bmatrix}
+    \right)\,,
+\end{equation}
+was simulated, the navigator used a linear Kalman filter for local state prediction while the algorithms in section \ref{subsec:nonlin_fusion:pseudocode} were used for measurement updates. Code was written in the C programming language using the MPI library [theopenmpiprojectOpenMPI2020] to support asynchronous computations by the sensors and the navigator. The MG1 mask generation function and the SHA256 hash function from the OpenSSL library [theopensslprojectOpenSSL2020] were used to implement hash function $H$, and the Libpaillier library [bethencourtLibpaillier2010] was used for the Paillier encryption scheme. Additionally, GNU libraries, GSL [thegsldevelopmentteamGSLGNUScientific2019] and GMP [granlundGMPGNUMultiple2020], were used for algebraic operations and multiple-precision encoded integers, respectively. All timed executions were performed on a 3.33GHz Xeon W3680 CPU, running on the Windows Subsystem for Linux (WSL).
 
-We have considered multiple sensor layouts, each with four sensors, to capture the dependence of estimated modified measurement variances $r'_{k,i}$ on the original measurements $z_{k,i}$. These layouts of varying sensor distances are shown next to the simulation initial state and a sample track in figure \ref{fig:sim_layouts}.
+To capture the dependence of the estimated modified measurement variances $r'_{k, i}$ on original measurements $z_{k, i}$, we considered multiple sensor layouts, each with four sensors, with varying average sensor distances from the navigator. The layouts along with the initial state and a sample track are shown visually in figure \ref{fig:nonlin_fusion:simulation_layouts}.
 \begin{figure}[htbp]
     \centering
     \includegraphics{figures/layouts.pdf}
-    \caption{Different simulation layouts with varying distances between navigator and sensors.}
-    \label{fig:sim_layouts}
+    \caption{Considered simulation layouts with varying distances between navigator and sensors.}
+    \label{fig:nonlin_fusion:simulation_layouts}
+    % TODO Make bigger and make colours match the correct colour scheme. Don't need Subfigures since axes are shared and subtitles are actual titles.
 \end{figure}
-To demonstrate the accuracy of the method, we have compared the root mean square error (RMSE) of the privacy-preserving filter to the standard EIF using unmodified measurements, which is algebraically equivalent to the EKF typically used in industry for linearising non-linear state estimation. Estimation in each layout from figure \ref{fig:sim_layouts} consisted of $50$ filter iterations and was run $1000$ times. Unmodified measurement variances were taken as $r_{k,i}=5$ for all $k>0$ and a large fractional precision factor, $\phi=2^{32}$, was chosen. The results can be seen in figure \ref{fig:sim_layout_errors}.
+To demonstrate the accuracy of the method, we compared the mean square error (MSE) of the presented filter to the standard EIF using unmodified measurements, algebraically equivalent to the industry-standard EKF. Estimation in each layout from figure \ref{fig:nonlin_fusion:simulation_layouts} consisted of $50$ filter iterations and was run $1000$ times. Unmodified measurement variances were chosen as $r_{k, i}=5$ for all $k>0$ and a large fractional precision factor, $\phi=2^{32}$, was chosen. Simulation results can be seen in figure \ref{fig:nonlin_fusion:simulation_layout_errors}.
 \begin{figure}[htbp]
     \centering
     \includegraphics{figures/layout_errors.pdf}
-    \caption{Average RMSE of our privacy-preserving filter and the standard EIF for different layouts.}
-    \vspace{-\baselineskip}
-    \label{fig:sim_layout_errors}
+    \caption{Average MSE of the presented confidential filter for the different layouts.}
+    \label{fig:nonlin_fusion:simulation_layout_errors}
+    % Make MSE instead of RMSE and fix the size. X-axis should read the same as in previous simulation figures. The difference line is not needed.
 \end{figure}
-From these results, we can see a strong similarity in filter performance between the privacy-preserving method and that of the traditional EIF. We can also see that the varying average distances between sensors and the navigator have little impact on the differences in performance. We attribute this similarity in RMSE to the conservativeness of estimated modified measurement variances $r'_{k,i}$, eliminating additional filter divergences, and to the high fractional precision factor, keeping computations consistent with the floating-point arithmetic of the EIF.
+From these results, we see the similarity in performance between the presented confidential localisation filter and that of the unmodified EIF. We also see that varying the distances between sensors and the navigator has little impact on the performance of the presented method. We can attribute the similar performance to the conservativeness of estimated modified measurement variances $r'_{k, i}$, eliminating additional filter divergences, and to the high fractional precision factor $\phi$, keeping computations consistent with the floating-point arithmetic of the EIF.
 
-In addition to filter error, computational performance is important to consider when relying on cryptographic methods. Figure \ref{fig:sim_timing} shows the averages of $10$ execution times when varying the numbers of sensors and key sizes (bit lengths of $N$). Here, increasing the number of sensors primarily affects the number of inter-process communications and aggregation steps due to the asynchronous implementation.
+In addition to filter performance, computational performance is also an important factor to consider in real-time applications relying on cryptographic methods. Figure \ref{fig:nonlin_fusion:simulation_timing} shows the averages of $10$ execution times when varying the numbers of sensors and key sizes (bit lengths of $N$). Here, increasing the number of sensors primarily affected the number of inter-process communications and aggregation steps due to the asynchronous C implementation.
 \begin{figure}[htbp]
     \centering
     \includegraphics{figures/timing.pdf}
-    \caption{Runtimes for varying key sizes and numbers of sensors.}
-    \label{fig:sim_timing}
+    \caption{Average simulation runtimes with varying key sizes and numbers of sensors.}
+    \label{fig:nonlin_fusion:simulation_timing}
+    % Use points not x's, and make the figure bigger.
 \end{figure}
-We can see that the predominant computational costs stem from cryptographic computations and are directly dependent on the chosen key size. In practice, choosing a key size should take into account the duration of secrecy and the secret key lifetime. When relying on the DCRA for security, the current recommendation for encrypting government documents is the use of $2048$ bit length keys [barkerRecommendationPairwiseKey2019]. For our implementation and aforementioned hardware, this results in a filter update roughly every $1.7s$. In a scenario where sensors are mobile and past navigations can be made public, reduced key sizes can be considered, while a further decrease in computation time could be achieved with code optimisations and more powerful hardware.
+We can see that the predominant computational costs stem from cryptographic computations and are directly dependent on the chosen key size. In practice, choosing a key size should take into account the duration of secrecy and the secret key lifetime. For example, when relying on the DCRA for security, as is the case for the scheme presented in section \ref{sec:nonlin_fusion:lcao_scheme}, a key length of $2048$ bits is recommended for encrypting government documents [barkerRecommendationPairwiseKey2019]. For our implementation and the aforementioned hardware, a $2048$ bit long key results in a filter update roughly every $1.7s$. However, if sensors are mobile and past navigations are not considered confidential, reduced key sizes may be sufficient. Further, a greater decrease in computation time may be achieved with additional code optimisations and more powerful hardware, not considered in this work.
 
 % 
 %  .d8888b.   .d88888b.  888b    888  .d8888b.  
@@ -733,4 +736,4 @@ We can see that the predominant computational costs stem from cryptographic comp
 % 
 
 \section{Conclusions on Confidential Distributed Non-Linear Measurement Fusion}\label{sec:nonlin_fusion:conclusion}
-We have presented a localisation filter in the presence of range-only sensors, which preserves both navigator and sensor privacies. A suitable cryptographic scheme has been introduced and a filter implementation compared and evaluated. Privacy-preserving range-only localisation is suitable for use in environments where sensor networks are untrusted or location is considered private and we hope to extend the method to broader measurement models in the future. Additional future work includes exploring more computationally efficient encryption schemes, the security implications of sensors that are not only honest-but-curious and expanding the LCAO notion to enforce the consistent broadcast assumption.
+In this chapter, we have presented a localisation filter that, in the presence of range-only sensors, keeps private sensor information and navigator estimates confidential. A suitable cryptographic notion and scheme have been introduced and an implementation of the filter and scheme used to evaluate estimate and computational performance. The method has additionally been generalised to any non-linear measurement models fitting the form in section \ref{subsec:nonlin_fusion:solvable_nonlin_class} and can find applications in a variety of environments where sensor networks are untrusted or estimates are considered private. Future work on the topic of confidential data fusion includes more computationally efficient schemes meeting the LCAO notion, relaxing the honest-but-curious assumption of malicious sensors and expanding the LCAO notion to enforce the consistent broadcast assumption.
