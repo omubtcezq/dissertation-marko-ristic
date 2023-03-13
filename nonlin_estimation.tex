@@ -35,58 +35,61 @@ The communication between the navigator and sensors in our estimation problem wi
 
 At every \textit{instance} $t$ (used to distinguish from an estimation \textit{timestep}), the navigator first broadcasts $l$ weights $\theta_j^{(t)}$, $1\leq j\leq l$, to all sensors $i$, $1\leq i \leq n$, who individually compute linear combinations $e^{(t)}_i=\sum^l_{j=1}a_{j,i}^{(t)}\theta_i^{(t)}$ based on their measurement data $a_{j,i}$. Linear combinations are then sent back to the navigator, who computes their sum $\sum^n_{i=1}e^{(t)}_{i}$. This two-step linear combination aggregation protocol has been visually displayed in figure \ref{fig:nonlin_fusion:aggregation_steps}.
 \begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[font=\footnotesize,scale=0.95]
-    % Step 1
-    \node at (3.25,5.5) {1. Broadcast and Combination Step};
-    % Navigator
-    \fill (3.25,4.75) [pyplotblue!70] ellipse (0.4 and 0.4);
-    \pic[xscale=0.22,yscale=0.3] at (3.25,4.9225) {plane};
-    % Sensors
-    \node at (1.5,1.375) {Sensor $1$};
-    \fill [pyplotorange!70] (0.25,1.625) rectangle (2.875,2.625);
-    \node at (1.625,2.125) {$\displaystyle l_1^{(t)} \!=\! \sum^m_{j=1}a_{1,j}^{(t)}\omega_j^{(t)}$};
-    \node at (5,1.375) {Sensor $n$};
-    \fill [pyplotorange!70] (3.625,1.625) rectangle (6.25,2.625);
-    \node at (5,2.125) {$\displaystyle l_n^{(t)} \!=\! \sum^m_{j=1}a_{n,j}^{(t)}\omega_j^{(t)}$};
-    \fill [black] (3.5,2.125) circle (0.05);
-    \fill [black] (3,2.125) circle (0.05);
-    \fill [black] (3.25,2.125) circle (0.05);
-    % Lines
-    \draw [-latex] plot[smooth, tension=.7] coordinates {(3.5,4.25) (5,2.875)};
-    \draw [-latex] plot[smooth, tension=.7] coordinates {(3,4.25) (1.5,2.875)};
-    \fill [lightgray] (2.125,3.875) rectangle (4.375,3.125);
-    \node at (3.25,3.5) {$\langle\omega_1^{(t)},\dots ,\omega_m^{(t)}\rangle$};
-    
-    % Step 2
-    \node at (3.25,0.25) {2. Aggregation Step};
-    % Navigator
-    \fill [pyplotblue!70] (1.375,-2) rectangle (5.125,-0.25);
-    \pic[xscale=0.22,yscale=0.3] at (3.25,-0.4775) {plane};
-    \node at (3.25,-1.375) {$\displaystyle \sum^{n}_{i=1}\sum^{m}_{j=1} a_{i,j}^{(t)}\omega_j^{(t)} = \sum^n_{i=1}l^{(t)}_{i}$};
-    % Sensors
-    \node at (1.25,-3.875) {Sensor $1$};
-    \fill  (5.25,-3.25) [pyplotorange!70] ellipse (0.4 and 0.4);
-    \node at (5.25,-3.875) {Sensor $n$};
-    \fill  (1.25,-3.25) [pyplotorange!70] ellipse (0.4 and 0.4);
-    \fill [black] (2.75,-3.25) circle (0.05);
-    \fill [black] (3.75,-3.25) circle (0.05);
-    \fill [black] (3.25,-3.25) circle (0.05);
-    % Lines
-    \draw [-latex] plot[smooth, tension=.7] coordinates {(5,-2.75) (4.5,-2.25)};
-    \draw [-latex] plot[smooth, tension=.7] coordinates {(1.5,-2.75) (2,-2.25)};
-    \fill [lightgray] (1.625,-2.5) rectangle (2.25,-3);
-    \node at (2,-2.75) {$l_1^{(t)}$};
-    \fill [lightgray] (4.25,-2.5) rectangle (4.875,-3);
-    \node at (4.625,-2.75) {$l_n^{(t)}$};
-    
-    % Bounding rectangles
-    \draw [gray] (0,6) rectangle (6.5,1);
-    \draw [gray] (0,0.75) rectangle (6.5,-4.25);
-\end{tikzpicture}
+\begin{subfigure}[htbp]{\textwidth}
+    \centering
+    \vspace{\baselineskip}
+    \begin{tikzpicture}
+        % Navigator
+        \fill (3.25,5) [pyplotblue!70] ellipse (0.4 and 0.4);
+        \pic[xscale=0.22,yscale=0.3] at (3.25,5.15) {plane};
+        % Broadcast
+        \draw [-latex] plot[smooth, tension=.7] coordinates {(3.75,4.5) (5.25,2.875)};
+        \draw [-latex] plot[smooth, tension=.7] coordinates {(2.75,4.5) (1.25,2.875)};
+        \node at (3.25,3.5) {$\langle\theta_1^{(t)},\dots ,\theta_l^{(t)}\rangle$};
+        % Sensors
+        \fill [pyplotorange!70] (-0.5,0.75) rectangle (2.5,2.75);
+        \node at (1,2) {$\displaystyle e_1^{(t)} = \sum^l_{j=1}a_{1,j}^{(t)}\theta_j^{(t)}$};
+        \node at (1,1) {Sensor $1$};
+        
+        \fill [pyplotorange!70] (4,0.75) rectangle (7,2.75);
+        \node at (5.5,2) {$\displaystyle e_n^{(t)} = \sum^l_{j=1}a_{n,j}^{(t)}\theta_j^{(t)}$};
+        \node at (5.5,1) {Sensor $n$};
+        % Dots
+        \fill [black] (3.5,1.75) circle (0.05);
+        \fill [black] (3,1.75) circle (0.05);
+        \fill [black] (3.25,1.75) circle (0.05);
+    \end{tikzpicture}
+    \vspace{\baselineskip}
+    \caption{Broadcast and Combination Step.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[htbp]{\textwidth}
+    \centering
+    \vspace{\baselineskip}
+    \begin{tikzpicture}
+        % Navigator
+        \fill [pyplotblue!70] (1,3.25) rectangle (5.5,5.5);
+        \pic[xscale=0.22,yscale=0.3] at (3.25,5.15) {plane};
+        \node at (3.25,4) {$\displaystyle \sum^{n}_{i=1}\sum^l_{j=1} a_{i,j}^{(t)}\theta_j^{(t)} = \sum^n_{i=1}e^{(t)}_i$};
+        % Sensors
+        \fill  [pyplotorange!70] (6.75,1) rectangle (4.75,1.5);
+        \node at (5.75,1.25) {Sensor $n$};
+        \fill  [pyplotorange!70] (1.75,1) rectangle (-0.25,1.5);
+        \node at (0.75,1.25) {Sensor $1$};
+        \fill [black] (3,1.25) circle (0.05);
+        \fill [black] (3.5,1.25) circle (0.05);
+        \fill [black] (3.25,1.25) circle (0.05);
+        % Broadcast
+        \draw [-latex] plot[smooth, tension=.7] coordinates {(5.5,1.75) (4.5,3)};
+        \node at (1,2.5) {$e_1^{(t)}$};
+        \draw [-latex] plot[smooth, tension=.7] coordinates {(1,1.75) (2,3)};
+        \node at (5.5,2.5) {$e_n^{(t)}$};
+    \end{tikzpicture}
+    \vspace{\baselineskip}
+    \caption{Aggregation Step.}
+\end{subfigure}
 \caption{Required linear combination aggregation steps at instance $t$.}
 \label{fig:nonlin_fusion:aggregation_steps}
-% TODO make two subfigures instead. Current text labels should be figure captions. No bounding boxes are required. Update variables as well
 \end{figure}
 In addition, we note that an alternative approach to the two-step protocol is computing $\sum^{l}_{j=1}(\theta_j^{(t)}\sum^{n}_{i=1} a_{i,j}^{(t)})$ at the navigator, requiring only values $a_{i,j}^{(t)}$, $1\leq j \leq l$, to be sent from each sensor $i$. We justify the use of bi-directional communication by reducing communication costs when the number of weights is larger than the number of sensors, $l>n$, and by sending fewer weights in the presence of repeats, as will be shown to be the case in section \ref{subsec:nonlin_fusion:applying_lca_scheme}.
 
@@ -542,79 +545,74 @@ Measurement modification, number encoding and linear combination aggregation are
 
 Algorithms \ref{alg:nonlin_fusion:nav_prediction}, \ref{alg:nonlin_fusion:sen_measurement} and \ref{alg:nonlin_fusion:nav_update} have also been summarised graphically in figure \ref{fig:nonlin_fusion:alg_steps}. Here, $\mathcal{E}_{\mathsf{pk}_{\mathsf{a}},\mathsf{sk}_{\mathsf{a},i}}(\cdot)$ and $\mathsf{E}_{\delta}(\cdot)$ denote elementwise operations with the same parameters.
 \begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[font=\footnotesize,scale=0.95]
-    % Prediction
-    \draw [gray] (0,3) rectangle (6.5,8);
-    \node at (3.25,7.5) {\small 1. Prediction};
-
-    % Navigator
-    \fill  [pyplotblue!70] (2,7) rectangle (4.5,5.75);
-    \pic[xscale=0.22,yscale=0.3] at (3.25,6.7975) {plane};
-    \node at (3.25,6.0625) {$\hat{\vec{x}}_{k|k-1}$, $\mat{P}_{k|k-1}$};
-    
-    % Sensors
-    \fill  (1.25,4) [pyplotorange!70] ellipse (0.4 and 0.4);
-    \node at (1.25,3.375) {Sensor $1$};
-    \fill  (5.25,4) [pyplotorange!70] ellipse (0.4 and 0.4);
-    \node at (5.25,3.375) {Sensor $n$};
-        
-    \fill [black] (2.75,4) circle (0.05);
-    \fill [black] (3.25,4) circle (0.05);
-    \fill [black] (3.75,4) circle (0.05);
-        
-    % Arrows
-    \draw [-latex] plot[smooth, tension=.7] coordinates {(3,5.5) (1.75,4.25)};
-    \draw [-latex] plot[smooth, tension=.7] coordinates {(3.5,5.5) (4.75,4.25)};
-    
-    \fill [lightgray]  (0.25,5.375) rectangle (6.25,4.625);
-    \node at (3.25,5) {$\left\langle\mathcal{E}_{pk_0}(\mathsf{E}_0(\omega)) \,|\, \omega \!\in\! \{\hat{x}^3_{k|k-1}, \hat{y}^3_{k|k-1}, \dots\}\right\rangle$};
-    
-    
-    % Measurement
-    \draw [gray] (0,-2.25) rectangle (6.5,2.75);
-    \node at (3.25,2.25) {\small 2. Measurement};
-    
-    % Navigator
-    \fill  (3.25,1.5) [pyplotblue!70] ellipse (0.4 and 0.4);
-    \pic[xscale=0.22,yscale=0.3] at (3.25,1.6725) {plane};
-        
-    % Sensors
-    \fill  [pyplotorange!70] (6.25,-1.625)  rectangle (4.25,-0.625);
-    \node at (1.25,-1.875) {Sensor $1$};
-    \fill  [pyplotorange!70] (2.25,-1.625)  rectangle (0.25,-0.625);
-    \node at (5.25,-1.875) {Sensor $n$};
-    
-    \node at (1.25,-1.125) {$z'_{k,1}$, $r'_{k,1}$};
-    \node at (5.25,-1.125) {$z'_{k,n}$, $r'_{k,n}$};
-    
-    \fill [black] (2.75,-1.125) circle (0.05);
-    \fill [black] (3.25,-1.125) circle (0.05);
-    \fill [black] (3.75,-1.125) circle (0.05);
-    
-    % Arrows
-    \draw [-latex] plot[smooth, tension=.7] coordinates {(1.25,-0.5) (3,1)};
-    \draw [-latex] plot[smooth, tension=.7] coordinates {(5.25,-0.5) (3.5,1)};
-    
-    \fill [lightgray]  (0.375,0.75) rectangle (3.125,-0.25);
-    \node[align=center] at (1.75,0.25) {$\mathcal{E}_{pk_0,sk_1}(\mathsf{E}_1(\vec{i}'_{k,1}))$,\\$\mathcal{E}_{pk_0,sk_1}(\mathsf{E}_1(\mat{I}'_{k,1}))$};
-    \fill [lightgray]  (3.375,0.75) rectangle (6.125,-0.25);
-    \node[align=center] at (4.75,0.25) {$\mathcal{E}_{pk_0,sk_n}(\mathsf{E}_1(\vec{i}'_{k,n}))$,\\$\mathcal{E}_{pk_0,sk_n}(\mathsf{E}_1(\mat{I}'_{k,n}))$};
-    
-    
-    % Update
-    \draw [gray] (0,-5.75) rectangle (6.5,-2.5);
-    \node at (3.25,-3) {\small 3. Update};
-    
-    % Navigator
-    \fill  [pyplotblue!70] (1.5,-3.5) rectangle (5,-5.5);
-    \pic[xscale=0.22,yscale=0.3] at (3.25,-3.8275) {plane};
-    \node at (3.25,-4.625) {$\sum_{i=1}^n \vec{i}'_{k,i}$, $\sum_{i=1}^n\mat{I}'_{k,i}$};
-    \node at (3.25,-5.125) {$\hat{\vec{x}}_{k|k}$, $\mat{P}_{k|k}$};
-\end{tikzpicture}
-\caption{Procedure at timestep $k$ for the proposed confidential range-only EIF.}
+\begin{subfigure}[htbp]{\textwidth}
+    \centering
+    \vspace{\baselineskip}
+    \begin{tikzpicture}
+        % Navigator
+        \fill  [pyplotblue!70] (1.75,5.5) rectangle (4.75,3.75);
+        \pic[xscale=0.22,yscale=0.3] at (3.25,5.15) {plane};
+        \node at (3.25,4.25) {$\hat{\vec{y}}_{k|k-1}$, $\mat{Y}_{k|k-1}$};
+        % Sensors
+        \fill  [pyplotorange!70] (6.75,0.75) rectangle (4.75,1.25);
+        \node at (5.75,1) {Sensor $n$};
+        \fill  [pyplotorange!70] (1.75,0.75) rectangle (-0.25,1.25);
+        \node at (0.75,1) {Sensor $1$};
+        \fill [black] (3,1) circle (0.05);
+        \fill [black] (3.5,1) circle (0.05);
+        \fill [black] (3.25,1) circle (0.05);
+        % Broadcast
+        \draw [-latex] plot[smooth, tension=.7] coordinates {(1.5,2) (1,1.5)};
+        \draw [-latex] plot[smooth, tension=.7] coordinates {(5,2) (5.5,1.5)};
+         \draw [] plot[smooth, tension=.7] coordinates {(3,3.5) (2.5,3)};
+        \draw [] plot[smooth, tension=.7] coordinates {(3.5,3.5) (4,3)};
+        \node at (3.25,2.5) {$\left\langle\mathcal{E}_{\mathsf{pk}_\mathsf{a}}(\mathsf{E}_0(\theta))\ |\ \theta \in \{\hat{x}^3_{k|k-1}, \hat{y}^3_{k|k-1}, \dots\}\right\rangle$};
+    \end{tikzpicture}
+    \vspace{\baselineskip}
+    \caption{Prediction.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[htbp]{\textwidth}
+    \centering
+    \vspace{\baselineskip}
+    \begin{tikzpicture}
+        % Navigator
+        \fill  (3.25,5) [pyplotblue!70] ellipse (0.4 and 0.4);
+        \pic[xscale=0.22,yscale=0.3] at (3.25,5.15) {plane};
+        % Sensors
+        \fill  [pyplotorange!70] (1.75,1.25)  rectangle (-0.25,2.75);
+        \node at (0.75,1.5) {Sensor $1$};
+        \node at (0.75,2.25) {$z'_{k,1}$, $r'_{k,1}$};
+        \fill  [pyplotorange!70] (6.75,1.25)  rectangle (4.75,2.75);
+        \node at (5.75,1.5) {Sensor $n$};
+        \node at (5.75,2.25) {$z'_{k,n}$, $r'_{k,n}$};
+        \fill [black] (3,2) circle (0.05);
+        \fill [black] (3.5,2) circle (0.05);
+        \fill [black] (3.25,2) circle (0.05);
+        % Broadcast
+        \draw [-latex] plot[smooth, tension=.7] coordinates {(1.25,3) (2.75,4.5)};
+        \draw [-latex] plot[smooth, tension=.7] coordinates {(5.25,3) (3.75,4.5)};
+        \node[align=center] at (0,4) {$\mathcal{E}_{\mathsf{pk}_{\mathsf{a}},\mathsf{sk}_{\mathsf{a},1}}(\mathsf{E}_1(\vec{i}'_{k,1}))$,\\$\mathcal{E}_{\mathsf{pk}_{\mathsf{a}},\mathsf{sk}_{\mathsf{a},1}}(\mathsf{E}_1(\mat{I}'_{k,1}))$};
+        \node[align=center] at (6.5,4) {$\mathcal{E}_{\mathsf{pk}_{\mathsf{a}},\mathsf{sk}_{\mathsf{a},n}}(\mathsf{E}_1(\vec{i}'_{k,n}))$,\\$\mathcal{E}_{\mathsf{pk}_{\mathsf{a}},\mathsf{sk}_{\mathsf{a},n}}(\mathsf{E}_1(\mat{I}'_{k,n}))$};
+    \end{tikzpicture}
+    \vspace{\baselineskip}
+    \caption{Measurement.}
+\end{subfigure}
+\begin{subfigure}[htbp]{\textwidth}
+    \centering
+    \vspace{\baselineskip}
+    \begin{tikzpicture}
+        % Navigator
+        \fill  [pyplotblue!70] (1.5,5.5) rectangle (5,3.375);
+        \pic[xscale=0.22,yscale=0.3] at (3.25,5.15) {plane};
+        \node at (3.25,4.25) {$\sum_{i=1}^n \vec{i}'_{k,i}$, $\sum_{i=1}^n\mat{I}'_{k,i}$};
+        \node at (3.25,3.75) {$\hat{\vec{y}}_{k|k}$, $\mat{Y}_{k|k}$};
+    \end{tikzpicture}
+    \vspace{\baselineskip}
+    \caption{Update.}
+\end{subfigure}
+\caption{Procedure at timestep $k$ for the proposed confidential range-only measurement EIF.}
 \label{fig:nonlin_fusion:alg_steps}
-% TODO change the x and P to y and Y as per the EIF. Make parts subfigures as with the previous diagram.
 \end{figure}
 
 % 
@@ -696,10 +694,9 @@ was simulated, the navigator used a linear Kalman filter for local state predict
 To capture the dependence of the estimated modified measurement variances $r'_{k, i}$ on original measurements $z_{k, i}$, we considered multiple sensor layouts, each with four sensors, with varying average sensor distances from the navigator. The layouts along with the initial state and a sample track are shown visually in figure \ref{fig:nonlin_fusion:simulation_layouts}.
 \begin{figure}[htbp]
     \centering
-    \includegraphics{figures/layouts.pdf}
-    \caption{Considered simulation layouts with varying distances between navigator and sensors.}
+    \includegraphics{figures/nonlin_fusion_simulation_layouts.pdf}
+    \caption{Considered simulation layouts with varying distances between a sample navigator track and sensors.}
     \label{fig:nonlin_fusion:simulation_layouts}
-    % TODO Make bigger and make colours match the correct colour scheme. Don't need Subfigures since axes are shared and subtitles are actual titles.
 \end{figure}
 To demonstrate the accuracy of the method, we compared the mean square error (MSE) of the presented filter to the standard EIF using unmodified measurements, algebraically equivalent to the industry-standard EKF. Estimation in each layout from figure \ref{fig:nonlin_fusion:simulation_layouts} consisted of $50$ filter iterations and was run $1000$ times. Unmodified measurement variances were chosen as $r_{k, i}=5$ for all $k>0$ and a large fractional precision factor, $\phi=2^{32}$, was chosen. Simulation results can be seen in figure \ref{fig:nonlin_fusion:simulation_layout_errors}.
 \begin{figure}[htbp]
