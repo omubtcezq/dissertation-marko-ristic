@@ -3,7 +3,7 @@ import pickle
 import matplotlib.pyplot as plt
 import plotting as pltng
 
-SAVE_FIGS = False
+SAVE_FIGS = True
 pltng.init_matplotlib_params(SAVE_FIGS, True)
 
 LAYOUT_TRACK_FILEPATH = 'C:/Users/ristic/Documents/GIT_REPOS/PrivateEIFLocalisationCode/input/debug_track_001.txt'
@@ -126,7 +126,7 @@ def layouts_plot():
         plots.append(p)
 
     # Legend
-    fig.legend((plots[0], i_s, scatters[0]), (r'Ground Truth', r'$\hat{\vec{x}}_{0|0}$ and $\mat{P}_{0|0}$', r'Sensors'), loc='upper center', ncol=3)
+    fig.legend((plots[0], i_s, scatters[0]), (r'Ground Truth', r'Initial Estimate', r'Sensors'), loc='upper center', ncol=3)
     # Shared axis labels
     fig.supxlabel(r'Location $x$')
     fig.supylabel(r'Location $y$')
@@ -155,14 +155,12 @@ def layouts_plot():
  
 """
 def estimation_plot():
-    #(output_filepath_base, distance_layout_list, distance_layout_labels, sim_timesteps, width, eif_filepath_base)
-    #('output_evaluation/layout_%s_nav_mean_errors.txt', ['small', 'normal', 'big', 'verybig'], ['Small', 'Normal', 'Large', 'Very Large'], 50)
     # Read store sim data
     sims = pickle.load(open("code/nonlin_fusion_sims.p", "rb"))
 
     # Width fixed for template, the rest is eye-balled
-    fig, axs = plt.subplots(4,1, figsize=(0.7*5.78853, 2*0.7*5.78853), sharex=True, sharey=False)
-    #plt.subplots_adjust(wspace=0, hspace=0.375, top=0.81, bottom=0.0825, left=0.16, right=0.84)
+    fig, axs = plt.subplots(4,1, figsize=(0.7*5.78853, 1.5*0.7*5.78853), sharex=True, sharey=True)
+    plt.subplots_adjust(hspace=0.5, top=0.9)
     
     enc_plot_handles = []
     eif_plot_handles = []
@@ -172,15 +170,15 @@ def estimation_plot():
         ax.grid()
         # Hide bottom tick of all but bottom plot
         if i < len(LAYOUT_NAMES)-1:
-            ax.tick_params(labelcolor='none', bottom=False)
+            ax.tick_params(bottom=False)
         # Plot error of our method
         mean_enc_errors = sims['estimation'][LAYOUT_TAGS[i]]['mean_enc_errors']
         # Skip first point (initial point is good estimate with bad covariance)
-        ph_enc, = ax.plot([x for x in list(range(ESTIMATION_SIM_TIMESTEPS))][1:], mean_enc_errors[1:])
+        ph_enc, = ax.plot([x for x in list(range(ESTIMATION_SIM_TIMESTEPS))][1:], mean_enc_errors[1:], color='tab:blue')
         enc_plot_handles.append(ph_enc)
         # Plot error of normal eif
         mean_eif_errors = sims['estimation'][LAYOUT_TAGS[i]]['mean_eif_errors']
-        ph_eif, = ax.plot([x for x in list(range(ESTIMATION_SIM_TIMESTEPS))][1:], mean_eif_errors[1:], linestyle='--')
+        ph_eif, = ax.plot([x for x in list(range(ESTIMATION_SIM_TIMESTEPS))][1:], mean_eif_errors[1:], color='tab:orange', linestyle=':')
         eif_plot_handles.append(ph_eif)
 
     # Shared axis labels
@@ -218,9 +216,10 @@ def timing_plot():
     fig = plt.figure()
     fig.set_size_inches(w=0.7*5.78853, h=0.75*0.7*5.78853)
     ax = fig.add_subplot(111)
-    plt.subplots_adjust(left=0.175, right=0.825, bottom=0.16, top=0.63)
+    ax.grid()
+    plt.subplots_adjust(top=0.75)
     #ax.grid(linestyle='dashed')
-    ax.set_axisbelow(True)
+    #ax.set_axisbelow(True)
 
     plot_handles = []
     for b in range(len(TIMING_BIT_LENGTHS)):
@@ -229,13 +228,14 @@ def timing_plot():
 
     # Set the ticks to be all of the sensor amounts tested
     ax.set_xticks(TIMING_SENSOR_COUNTS)
+    ax.set_yticks([0,50,100,150])
 
     # Used gloabl axis labels to match the other figures
-    fig.supxlabel(r'Number of sensors')
-    fig.supylabel(r'Runtime ($s$)')
+    ax.set_xlabel(r'Number of sensors')
+    ax.set_ylabel(r'Runtime ($s$)')
 
     # Legend
-    fig.legend(handles=plot_handles, title='Key Length (bits)', loc='upper center', ncol=2)
+    fig.legend(handles=plot_handles, title='Key Length (bits)', loc='upper center', ncol=3)
 
     if SAVE_FIGS:
         plt.savefig('figures/nonlin_fusion_simulation_timing.pdf')
@@ -250,6 +250,6 @@ def timing_plot():
 
 
 #create_python_sim_data()
-#layouts_plot()
+layouts_plot()
 estimation_plot()
 timing_plot()

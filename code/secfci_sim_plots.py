@@ -310,11 +310,11 @@ def secfci_error_plot():
     #g033_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][2])**2) for sim in sims]) for k in ks]
     g05_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][3])**2) for sim in sims]) for k in ks]
 
-    ax.plot(ks, fci_errs, marker='', label=r'FCI Benchmark')
-    ax.plot(ks, g05_errs, marker='', label=r'$g=0.5$')
+    ax.plot(ks, g01_errs, marker='', color='tab:blue', label=r'$g=0.1$')
+    ax.plot(ks, g02_errs, marker='', color='tab:green', label=r'$g=0.2$')
     #ax.plot(ks, g033_errs, marker='', label=r'$g=0.33$')
-    ax.plot(ks, g02_errs, marker='', label=r'$g=0.2$')
-    ax.plot(ks, g01_errs, marker='', linestyle='--', label=r'$g=0.1$')
+    ax.plot(ks, g05_errs, marker='', color='tab:red', label=r'$g=0.5$')
+    ax.plot(ks, fci_errs, marker='', color='tab:orange', linestyle=':', label=r'FCI Benchmark')
     
     ax.set_xlabel(r'Simulation Timestep')
     ax.set_ylabel(r'Mean Square Error (MSE)')
@@ -390,9 +390,9 @@ def secfci2_error_plot():
     secfci_errs = [np.mean([sum((sim['gt'][k] - sim['secfci'][k][0][1])**2) for sim in sims]) for k in ks]
     secfci2_errs = [np.mean([sum((sim['gt'][k] - sim['secfci2'][k])**2) for sim in sims]) for k in ks]
 
-    ax.plot(ks, fci_errs, marker='', label=r'FCI Benchmark')
-    ax.plot(ks, secfci_errs, marker='', label=r'Leaking Weights ($g=0.2$)')
-    ax.plot(ks, secfci2_errs, marker='', linestyle='--', label=r'Without Leaking Weights')
+    ax.plot(ks, secfci2_errs, marker='', color='tab:blue', label=r'Without Leaking Weights')
+    ax.plot(ks, secfci_errs, marker='', color='tab:green', label=r'Leaking Weights ($g=0.2$)')
+    ax.plot(ks, fci_errs, marker='', color='tab:orange', linestyle=':', label=r'FCI Benchmark')
 
     ax.set_xlabel(r'Simulation Timestep')
     ax.set_ylabel(r'Mean Square Error (MSE)')

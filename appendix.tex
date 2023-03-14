@@ -20,7 +20,7 @@ The following game between attacker and challenger defines the security notion o
     \begin{enumerate}
         \item \textit{Encryption:} The attacker chooses a value $x$ and computes an encryption of $x$ under the aggregator's public key $\mathsf{pk}_{\mathsf{a}}$, obtaining $\mathcal{E}_{\mathsf{pk}_{\mathsf{a}}}(x)$.
         \item \textit{Weight Queries:} The attacker chooses an instance $t$ and receives the weights for that instance encrypted with the aggregator's public key, $\mathcal{E}_{\mathsf{pk}_{\mathsf{a}}}(\theta^{(t)}_{j})$, $1\leq j\leq l$.
-        \item \textit{Combine Queries:} The attacker chooses a tuple $(i,t,a^{(t)}_{i,1},\dots,a^{(t)}_{i,l})$ such that for any two chosen combine query tuples $(i,t,a^{(t)}_{i,1},\dots,a^{(t)}_{i,l})$ and $(i^\prime,t^\prime,a^{\prime(t^\prime)}_{i^\prime,1},\dots,a^{\prime(t^\prime)}_{i^\prime,l})$, the following condition holds:
+        \item \textit{Combine Queries:} The attacker chooses a tuple $(i,t,a^{(t)}_{i,1},\dots,a^{(t)}_{i,l})$ such that for any two chosen query tuples $(i,t,a^{(t)}_{i,1},\dots,a^{(t)}_{i,l})$ and $(i^\prime,t^\prime,a^{\prime(t^\prime)}_{i^\prime,1},\dots,a^{\prime(t^\prime)}_{i^\prime,l})$, the following condition holds:
         \begin{equation*}
             i = i^\prime \wedge t = t^\prime \implies a^{(t)}_{i,j} = a^{\prime(t^\prime)}_{i',j},\ 1\leq j\leq l\,.
         \end{equation*}
@@ -73,6 +73,7 @@ The following game between attacker and challenger defines the security notion o
 % 
 
 \chapter{Cryptographic Proof for Meeting the LCAO Notion}\label{app:lca_scheme_proof}
+% Might need to be a little bit more complicated since the aggregator in AO is another aggregation key holder but in LCAO they are not (still possible anyway)
 The scheme in section \ref{sec:nonlin_fusion:lcao_scheme} will be shown to meet LCAO by contrapositive. We show that for any adversary $\mathcal{A}$ playing against a challenger using the scheme, we can always create an adversary $\mathcal{A}'$ playing against a challenger $\mathcal{C}$ using the Joye-Libert scheme, such that
 \begin{equation*}
     \mathsf{Adv}^{LCAO}(\mathcal{A}) > \eta_1(\kappa) \implies \mathsf{Adv}^{AO}(\mathcal{A}') > \eta_2(\kappa)\,,
@@ -84,17 +85,17 @@ for \textit{any} negligible functions $\eta_1$, $\eta_2$ and security parameter 
         \item[Setup] When receiving $N$ and $H$ as public parameters from $\mathcal{C}$, choose an $l>1$ and give public parameter $H$, number of weights $l$, and $\mathsf{pk}_{\mathsf{a}}=N$ to $\mathcal{A}$.
         \item[Queries] Handle queries from $\mathcal{A}$:
         \begin{description}
-            \item[\textit{Weight Query}] When $\mathcal{A}$ submits a weight query $t$, choose weights $\theta^{(t)}_j$, $1\leq j\leq l$, and random values $\rho_j \in \mathbb{Z}_N$, $1\leq j\leq l$, and return encryptions 
+            \item[Weight Query] When $\mathcal{A}$ submits a weight query $t$, choose weights $\theta^{(t)}_j$, $1\leq j\leq l$, and random values $\rho_j \in \mathbb{Z}_N$, $1\leq j\leq l$, and return encryptions 
             \begin{equation*}
                 (N+1)^{\theta^{(t)}_{j}}\rho_j^N\pmod{N^2},\ 1\leq j\leq l\,,
             \end{equation*}
             to $\mathcal{A}$.
-            \item[\textit{Combine Query}] When $\mathcal{A}$ submits combine query $(i, t, a^{(t)}_{i,1},\dots,a^{(t)}_{i,l})$, choose weights $\theta^{(t)}_j$, $1\leq j\leq l$, if not already chosen for the instance $t$, and make an AO encryption query $(i, t, \sum^l_{j=1}a^{(t)}_{i,j}\theta^{(t)}_j)$ to $\mathcal{C}$. The received response will be of the form $(N+1)^{\sum^l_{j=1}a^{(t)}_{i,j}\theta^{(t)}_j}H(t)^{\mathsf{sk}_{\mathsf{a},i}}$; multiply it by $\tilde{\rho}^N$ for a random $\tilde{\rho} \in \mathbb{Z}_N$ and return 
+            \item[Combine Query] When $\mathcal{A}$ submits a combine query $(i, t, a^{(t)}_{i,1},\dots,a^{(t)}_{i,l})$, choose the weights $\theta^{(t)}_j$, $1\leq j\leq l$, if not already chosen for the instance $t$, and make an AO encryption query $(i, t, \sum^l_{j=1}a^{(t)}_{i,j}\theta^{(t)}_j)$ to $\mathcal{C}$. The received response will be of the form $(N+1)^{\sum^l_{j=1}a^{(t)}_{i,j}\theta^{(t)}_j}H(t)^{\mathsf{sk}_{\mathsf{a},i}}$; multiply it by $\tilde{\rho}^N$ for a random $\tilde{\rho} \in \mathbb{Z}_N$ and return 
             \begin{equation*}
                 (N+1)^{\sum^l_{j=1}a^{(t)}_{i,j}\theta^{(t)}_j}\tilde{\rho}^N H(t)^{\mathsf{sk}_{\mathsf{a},i}} \pmod{N^2}
             \end{equation*}
             to $\mathcal{A}$.
-            \item[\textit{Compromise Query}] When $\mathcal{A}$ submits compromise query $i$, make the same compromise query $i$ to $\mathcal{C}$, and return the recieved secret key $\mathsf{sk}_{\mathsf{a},i}$ to $\mathcal{A}$.
+            \item[Compromise Query] When $\mathcal{A}$ submits compromise query $i$, make the same compromise query $i$ to $\mathcal{C}$, and return the recieved secret key $\mathsf{sk}_{\mathsf{a},i}$ to $\mathcal{A}$.
         \end{description}
         \item[Challenge] When $\mathcal{A}$ submits challenge series
         \begin{equation*}
