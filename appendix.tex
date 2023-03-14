@@ -131,3 +131,32 @@ for \textit{any} negligible functions $\eta_1$, $\eta_2$ and security parameter 
     \end{equation*}
     for security parameter $\kappa$. Lastly, the function $H$ used by our scheme is treated as a random oracle in the Joye-Libert AO proof and will, therefore, prove our scheme secure in the random oracle model as well.
 \end{proof}
+
+% 
+% 8888888b.  8888888b.  8888888 888     888      8888888b.  8888888b.   .d88888b.   .d88888b.  8888888888 
+% 888   Y88b 888   Y88b   888   888     888      888   Y88b 888   Y88b d88P" "Y88b d88P" "Y88b 888        
+% 888    888 888    888   888   888     888      888    888 888    888 888     888 888     888 888        
+% 888   d88P 888   d88P   888   Y88b   d88P      888   d88P 888   d88P 888     888 888     888 8888888    
+% 8888888P"  8888888P"    888    Y88b d88P       8888888P"  8888888P"  888     888 888     888 888        
+% 888        888 T88b     888     Y88o88P        888        888 T88b   888     888 888     888 888        
+% 888        888  T88b    888      Y888P         888        888  T88b  Y88b. .d88P Y88b. .d88P 888        
+% 888        888   T88b 8888888     Y8P          888        888   T88b  "Y88888P"   "Y88888P"  888        
+%                                                                                                         
+%                                                                                                         
+%                                                                                                         
+% 
+
+\chapter{Proof Sketch for Meeting the Covariance Privilege Notion}\label{app:priv_est_proof_sketch}
+Since a cryptographically pseudorandom stream cipher is used in section \ref{subsec:gaussian_keystream}, the stream integers $q_t$, and therefore the uniform samples $u_t$ and normal Gaussian samples $z_t$, are indistinguishable to those generated from a truly random stream for any PPT estimator without the secret key. We persist with the previous assumption that floating-point representations of $z_t$ are sufficiently close to Gaussian and assume the KF to provide optimal estimation when using floats, as is standard in the state-of-the-art. Using the $\mathsf{Setup}$ and $\mathsf{Noise}$ algorithms for our scheme now leads to pseudorandom noisy measurements $\vec{y}^\prime_k$ that are indistinguishable from measurements following the unprivileged measurement model \eqref{eqn:unprivileged_measurement_model}. We can now compute a lower-bound $\mat{P}_k^{\prime(l)}$ for any unprivileged estimator as $\mat{P}_0^{\prime(l)}=\mat{0}$ and
+\begin{equation}\label{eqn:unprivileged_lower_bound_error_cov}
+   \begin{split}
+      \mat{P}_k^{\prime(l)} =& \Bigl( \mat{I} - (\mat{F}_k\mat{P}_{k-1}^{\prime(l)}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^\top \cdot \\
+      &\quad\bigl(\mat{H}_k(\mat{F}_k\mat{P}_{k-1}^{\prime(l)}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^\top + \mat{R}_k+\mat{Z}\bigr)^{-1}\mat{H}_k\Bigr)\cdot\\
+      &\Bigl(\mat{F}_k\mat{P}_{k-1}^{\prime(l)}\mat{F}_k^\top + \mat{Q}_k\Bigr)\,.
+   \end{split}
+\end{equation}
+Taking the difference of \eqref{eqn:unprivileged_lower_bound_error_cov} and \eqref{eqn:lower_bound_error_cov} produces the series
+\begin{equation}\label{eqn:covariance_difference_series}
+   \mat{D}_k = \mat{P}_k^{\prime(l)} - \mat{P}_k^{(l)}\,,
+\end{equation}
+for $k>0$, which can be tuned by the parameter $\mat{Z}$. Since both series $\mat{P}_k^{(l)}$ and $\mat{P}_k^{\prime(l)}$ give the lowest possible error covariance of the respective estimators, an estimator knowing model \eqref{eqn:linear_measurement_model} can always be created for one knowing only model \eqref{eqn:unprivileged_measurement_model} such that their error covariances at any time step $k$ differ by at least $\mat{D}_k$. A reduction proof can be easily constructed, where the existence of an unprivileged estimator in our scheme, that can produce estimates such that \eqref{eqn:cov_privilege} does not hold, can be used to construct an estimator with an error covariance lower than $\mat{P}_k^{\prime(l)}$ given a known model of the form \eqref{eqn:unprivileged_measurement_model}. As no such estimator exists, we conclude that our scheme meets $\{\mat{D}_1,\mat{D}_2,\dots\}$-Covariance Privilege for Models $\mathcal{M}_S$ and $\mathcal{M}_M$, when $\mathcal{M}_S$ and $\mathcal{M}_M$ are Gaussian and linear. This concludes our proof sketch.
