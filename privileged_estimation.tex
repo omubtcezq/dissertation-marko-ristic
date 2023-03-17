@@ -16,9 +16,9 @@
 % 
 
 \section{Problem Formulation}\label{sec:priv_estimation:problem}
-In this chapter, we look at the problem of formalising estimation performances from a cryptographic perspective and allowing meaningful cryptographic guarantees when comparing estimators. The scenario that we will use to build this formalisation is one where system and measurement models are known and stochastic, and state estimators can have access to secret keys, providing them with a certain privilege. Estimators holding no keys are termed unprivileged. Our goal is to develop a single-sensor scheme that quantifies and cryptographically guarantees the difference between privileged and unprivileged estimator errors when models are Gaussian and linear. Further, we look at the extension to multiple sensors and the effect of fusion on cryptographic estimation performance guarantees as well as the applicability of the method to non-linear models.
+In this chapter, we look at the problem of formalising estimation performances from a cryptographic perspective and allowing meaningful cryptographic guarantees when comparing estimators. The scenario that we will use to build this formalisation is one where system and measurement models are known and stochastic, and state estimators can have access to secret keys, providing them with a certain privilege. Estimators holding no keys are termed unprivileged. Our goal is to develop a single-sensor scheme that quantifies and cryptographically guarantees a difference between privileged and unprivileged estimator performances when both estimators have access to the same measurements and when models are Gaussian and linear. Further, we look at the extension to multiple sensors and the effect of fusion on cryptographic estimation performance guarantees as well as the applicability of the method to non-linear models.
 
-To capture the aim of comparing a privileged and unprivileged estimator, we must first define how to assess the estimation difference between them, and which algorithms are required to characterise a privileged estimation scheme. After giving relevant formal cryptographic definitions, the considered concrete single-sensor privileged estimation problem and its extension to multiple sensors are presented.
+To capture the aim of comparing a privileged and unprivileged estimator, we first define how to assess the estimation difference between them, and which algorithms are required to characterise a privileged estimation scheme. After giving relevant formal cryptographic definitions, the considered single-sensor privileged estimation problem and its extension to multiple sensors are presented.
 
 % 
 %  ######  ########  ##    ## ########  ########  #######     ########  ########   #######  ########  
@@ -55,7 +55,7 @@ In addition to the scheme above, we also give the following definitions to help 
     is a function that returns a matrix $\mat{A}$ such that $\mat{A}$ is a valid covariance ($\mat{A}\succ 0$ and $\mat{A}=\mat{A}^\top$) and for each of its eigenvalues $a\in\mathsf{eig}(\mat{A})$, there exists a negligible function [Def. 3.4][katzIntroductionModernCryptography2008] $\eta$ such that $a\leq\eta(\kappa)$.
 \end{definition}
 
-Now we introduce the security notion that captures the formal requirements of the problem we want to solve.
+Now we can give the security notion that captures the formal requirements of the estimation difference we want to capture.
 \begin{definition}\label{def:priv_estimation:covariance_privilege_notion}
     A privileged estimation scheme meets the notion \textit{$\{\mat{D}_1,\mat{D}_2,\dots\}$-Covariance Privilege for Models $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$} if for any PPT estimator $\mathcal{A}$, there exists a PPT estimator $\mathcal{A}^\prime$, such that
     \begin{equation}\label{eq:priv_estimation:covariance_privilege}
@@ -81,7 +81,7 @@ Informally, the above definition states that no estimator that can only access u
 % 
 
 \subsection{Estimation Problem}\label{subsec:priv_estimation:estimation_problem}
-Here we give the specific estimation models that will be considered in the single-sensor case and used as the base of the presented solution with a provable estimation difference. The system model gives the state $\vec{x}_k\in\mathbb{R}^d$ at an integer timestep $k$ and is given by
+To make use of the introduced cryptographic notion, we consider specific estimation models to use in the single-sensor case when developing a privileged estimation scheme with a provable estimation performance difference between privileged and unprivileged estimators. A system model gives the state $\vec{x}_k\in\mathbb{R}^d$ at an integer timestep $k$ and is given by
 \begin{equation}\label{eq:priv_estimation:system_model}
     \vec{x}_k = \mat{F}_k\vec{x}_{k-1} + \vec{w}_k\,,
 \end{equation}
@@ -91,7 +91,7 @@ with noise term $\vec{w}_k\sim \mathcal{N}(\vec{0}, \mat{Q}_k)$ and a known non-
 \end{equation}
 with noise term $\vec{v}_k\sim \mathcal{N}(\vec{0}, \mat{R}_k)$ and a known non-zero covariance $\mat{R}_k\in \mathbb{R}^{m\times m}$.
 
-The sensor producing measurements $\vec{z}_k$ is also associated with a secret key $\mathsf{sk}_{\mathsf{g}}$ that is used to distinguish between the capabilities of privileged and unprivileged estimators. An extension of the single-sensor scheme to multiple privileges is discussed further in section \ref{sec:priv_estimation:privileged_estimation}.
+In this scenario, the sensor holds a secret key $\mathsf{sk}_{\mathsf{g}}$ that it uses to modify its measurements. Privileged estimators hold the shared key while unprivileged estimators do not. The extension to a single-sensor multiple-privilege scheme is also briefly considered and discussed further in section \ref{sec:priv_estimation:privileged_estimation}.
 
 % 
 % ######## ##     ##  ######     ########  ########   #######  ########  
@@ -104,22 +104,22 @@ The sensor producing measurements $\vec{z}_k$ is also associated with a secret k
 % 
 
 \subsection{Multi-Sensor Problem}\label{subsec:priv_estimation:fusion_problem}
-As well as a single-sensor problem, we are interested in environments where multiple sensors are present and the fusion of their measurements can lead to better estimation accuracy of the measured system. In these environments, we want to provide levels of privilege to state estimators such that those with a higher privilege can perform better than those with a lower one while taking into consideration the estimation benefits from fusing additional measurements. We again consider linear and Gaussian models, where the state $\vec{x}_k \in \mathbb{R}^d$ follows the system model \eqref{eq:priv_estimation:system_model}. Measurements $\vec{z}_{k,i} \in \mathbb{R}^m$ are now indexed by sensor $i$, $1\leq i\leq n$, and follow the measurement models
+As well as the single-sensor problem, we are also interested in the extension to environments with multiple sensors, where the fusion of measurements can also lead to better estimation performance irrespective of privilege. Here, we only consider multiple privileges, such that estimators with a higher privilege should perform better than those with a lower one while taking into consideration the estimation benefits from fusing additional measurements. We again consider linear and Gaussian models, where the state $\vec{x}_k \in \mathbb{R}^d$ follows the system model \eqref{eq:priv_estimation:system_model}. Measurements $\vec{z}_{k,i} \in \mathbb{R}^m$ are now indexed by sensor $i$, $1\leq i\leq n$, and follow the measurement models
 \begin{equation}\label{eq:priv_estimation:multi_sensor_measurement_models}
     \vec{y}_{k,i} = \mat{H}_{k,i} \vec{x}_k + \vec{v}_{k,i}\,,
 \end{equation}
-with white noise term $\vec{v}_{k,i} \sim \mathcal{N}(\vec{0},\mat{R}_{k,i})$ and covariances $\mat{R}_{k,i} \in \mathbb{R}^{m \times m}$ are known. In addition to these models, we assume that all sensors $i$ are synchronised in timesteps $k$ to simplify later cryptographic evaluation.
+with noise terms $\vec{v}_{k,i} \sim \mathcal{N}(\vec{0},\mat{R}_{k,i})$ and known non-zero covariances $\mat{R}_{k,i} \in \mathbb{R}^{m \times m}$. In addition to these models, we assume that all sensors $i$ are synchronised in timesteps $k$ to simplify later cryptographic evaluation.
 
-Each of the sensors also holds a secret key $\mathsf{sk}_i$, which can be made available to estimators of appropriate privilege. The privileges that we consider, in terms of access to keys and measurements, will be defined by sequential sensors. That is, in the presence of $N$ sensors, we consider exactly $N$ possible privilege levels, where each privilege $p>0$ corresponds to holding the sequential secret keys $\mathsf{sk}_j$, $1\leq j \leq p$, while being unprivileged, $p=0$, corresponds to holding none. We assume that estimators have access to all ``privileged measurements'', those from sensors whose keys they hold, and can additionally fuse ``unprivileged measurements'' from those whose keys they do not hold. To simplify notation, we will consider access to unprivileged measurements to be sequential as well, and can therefore capture their capabilities by letting $\mathsf{e}^{[p,q]}$ denote an estimator with privilege $p$ and access to measurements from $q\geq p$ sensors $i$, $1\leq i \leq q$.
+Now, each sensor holds its own secret key $\mathsf{sk}_{\mathsf{g}, i}$, $1\leq i\leq n$, which is shared with estimators of appropriate privileges. The privileges that we consider, in terms of access to keys and measurements, will be defined by sequential sensor access. That is, in the presence of $n$ sensors, we will consider exactly $n$ possible privilege levels, where each privilege $\pi>0$ corresponds to holding the sequential secret keys $\mathsf{sk}_{\mathsf{g},j}$, $1\leq j\leq \pi$, while being unprivileged, $\pi=0$, corresponds to holding none. Additionally, we assume that estimators have access to all privileged measurements, those from sensors whose keys they hold, but can fuse additional unprivileged measurements, from those whose keys they do not hold. To simplify notation, we consider access to unprivileged measurements to be sequential as well, and can therefore capture estimator capabilities by letting $\mathsf{e}^{[\pi,\tau]}$ denote an estimator with privilege $\pi$ and access to measurements from $\tau\geq\pi$ sensors $i$, $1\leq i\leq \tau$.
 
-To cryptographically guarantee the difference between estimation performances, we will use the notion of covariance privilege [risticCryptographicallyPrivilegedState2022]. As we desire better performance for privileged estimators than unprivileged ones as well as to limit the gained performance from fusing unprivileged measurements, two differences will be considered.
+Multiple measurements and the effects of privilege and fusion on estimation performance complicate the cryptographic analysis in the case of multiple sensors. To demonstrate that a presented scheme guarantees better performance for higher privilege estimators while limiting the benefit from fusing unprivileged measurements, the covariance privilege notion in section \ref{subsec:priv_estimation:crypto_problem} will be used to guarantee two estimation performance differences for each privilege $\pi$.
 \begin{description}
-  \item[Performance Loss Lower Bound] We want to guarantee a lower bound on the estimation performance loss of any unprivileged estimator $\mathsf{e}^{[0,N]}$ on a privilege-$p$ estimator $\mathsf{e}^{[p,p]}$ with measurements following our scheme. Naturally, this will remain a lower bound when unprivileged estimators have access to fewer unprivileged measurements or privileged estimators have access to more.
-  \item[Performance Gain Upper Bound] We want to guarantee an upper bound on the estimation performance gain of any estimator $\mathsf{e}^{[p,N]}$ on a privilege-$p$ estimator $\mathsf{e}^{[p,p]}$ with measurements following our scheme. Here, the bound remains an upper bound when fewer unprivileged measurements are fused.
+  \item[Performance Loss Lower Bound] Here, we aim to guarantee a lower bound on the estimation performance loss of any unprivileged estimator $\mathsf{e}^{[0, n]}$ on a privilege-$\pi$ estimator $\mathsf{e}^{[\pi,\pi]}$. Naturally, this will remain a lower bound when unprivileged estimators have access to fewer unprivileged measurements or privileged estimators have access to more.
+  \item[Performance Gain Upper Bound] This bound aims to guarantee an upper bound on the estimation performance gain of any estimator $\mathsf{e}^{[\pi, n]}$ on a privilege-$\pi$ estimator $\mathsf{e}^{[\pi,\pi]}$. The bound similarly remains an upper bound when fewer unprivileged measurements are fused.
 \end{description}
-The resulting scheme should be such that at least two parameters are responsible for choosing the values of these two bounds.
+Lastly, a suitable scheme should be one with at least two free parameters responsible for controlling the values of these two bounds.
 \begin{remark}
-  We stress that the two bounds that will be guaranteed only bound the performances of estimators of the specified forms. That is, nothing is said about estimators which may corrupt sensors to obtain keys beyond their privilege or additional unprivileged measurements. Bounds on leakage caused by corrupting sensors can in some cases be captured by estimators of a new form $\mathsf{e}^{[p^\prime,q^\prime]}$, but are in general beyond the scope of this work.
+  We stress that the two bounds that will be guaranteed only bound the performances of estimators of the specified forms. That is, nothing is said about estimators which may corrupt sensors to obtain keys beyond their privilege or additional unprivileged measurements. Bounds on leakage caused by corrupting sensors can in some cases be captured by estimators of a new form $\mathsf{e}^{[\pi^\prime,\tau^\prime]}$, but are in general beyond the scope of this thesis.
 \end{remark}
 
 
