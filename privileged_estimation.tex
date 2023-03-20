@@ -151,19 +151,19 @@ In this section, we propose a privileged estimation scheme meeting the security 
 % 
 
 \subsection{Gaussian Keystream}\label{subsec:priv_estimation:est_gaussian_keystream}
-To generate the desired pseudorandom Gaussian noise that can be added to existing measurements, the sensor first generates a typical cryptographic pseudorandom bitstream with its secret key $\mathsf{sk}_{\mathsf{g}}$. This can be done with any cryptographic stream cipher and reduces the security of the method to a single, well-studied and replaceable component. This bitstream can be interpreted as sequential pseudorandom integers $u_t \in \mathbb{N}$, of a suitable size, for sequence indices $t>0$ and used to generate a sequence of pseudorandom uniform real numbers $a_t\ \dot{\sim}\ \mathcal{U}(0,1)$.
+To generate the desired pseudorandom Gaussian noise that can be added to existing measurements, the sensor first generates a typical cryptographic pseudorandom bitstream with its secret key $\mathsf{sk}_{\mathsf{g}}$. This can be done with any cryptographic stream cipher and reduces the security of the method to a single, well-studied and replaceable component. This bitstream can be interpreted as sequential pseudorandom integers of a suitable size and used to generate a sequence of pseudorandom uniform real numbers $\upsilon_t\ \dot{\sim}\ \mathcal{U}(0,1)$ for sequence indices $t>0$.
 
-We note that this conversion to real numbers $a_t$ is cryptographically non-trivial due to the floating-point representation of $a_t$. Since a true representation of $\mathcal{U}(0,1)$ is not possible, the pseudorandomness of the samples $a_t$ is affected, and meeting the desired cryptographic notion is complicated. For now, we will assume that the uniform floating-point numbers (floats) are sufficiently close to true uniform reals, as is the current industry standard, and rely on any common method for choosing the bit size of integers $u_t$ and the pseudorandom generation of uniforms $a_t$, [goualardGeneratingRandomFloatingPoint2020]. In section [sec:scheme\_security], we will state and further discuss this assumption.
+Here, we note that the conversion to real numbers $\upsilon_t$ is cryptographically non-trivial due to floating-point representation affecting the pseudorandomness of the samples, and complicating the meeting of a desired cryptographic notion. Instead, we assume that floating-point numbers are sufficiently close to real numbers and rely on any common method for choosing the bit size of pseudorandom integers and the generation of uniform numbers $\upsilon_t$ [goualardGeneratingRandomFloatingPoint2020]. This assumption will be further discussed with the security of the presented scheme in section \ref{subsec:priv_estimation:est_security}.
 
-Given the sufficiently uniform pseudorandom floats $a_t$, we are left with generating a series of pseudorandom standard normal Gaussian samples, which can be readily computed using the Box-Muller transform [paleyFourierTransformsComplex1934], by
+With this assumption, we are left with generating a series of pseudorandom standard normal Gaussian samples, which can be readily computed using the Box-Muller transform [paleyFourierTransformsComplex1934]. This is given by
 \begin{equation}
-   b_t = \sqrt{-2\ln (a_t)}\cos(2\pi u_{t+1})
+   \psi_t = \sqrt{-2\ln (\upsilon_t)}\cos(2\pi \upsilon_{t+1})
 \end{equation}
 and
 \begin{equation}
-   b_{t+1} = \sqrt{-2\ln (a_t)}\sin(2\pi u_{t+1})\,,
+  \psi_{t+1} = \sqrt{-2\ln (\upsilon_t)}\sin(2\pi \upsilon_{t+1})\,,
 \end{equation}
-obtaining two, independent, standard normal Gaussian samples from two uniform ones. This Gaussian keystream can then be used by a privileged estimation scheme to add arbitrary pseudorandom multivariate Gaussian noises.
+obtaining two, independent, standard normal Gaussian samples from two uniform ones. This Gaussian keystream can then be used by a privileged estimation scheme to add arbitrary pseudorandom multivariate Gaussian noises to sensor measurements.
 
 % 
 % ##     ##  #######  ########  
@@ -176,14 +176,15 @@ obtaining two, independent, standard normal Gaussian samples from two uniform on
 % 
 
 \subsection{Measurement Modification}\label{subsec:priv_estimation:est_measurement_mod}
-To use the series of pseudorandom Gaussian samples $z_t$, $t>0$, at the sensor and privileged estimator, they need to be converted to $n$-dimension zero-mean multivariate Gaussian samples suitable for use in the measurement model \eqref{eqn:linear_measurement_model}, at every time step $k$. As we want control over the difference in estimation error between privileged and unprivileged estimators, we do so by including the symmetric matrix parameter $\mat{Z}\succ 0$, in a way that added pseudorandom noise $\vec{p}_k$ at time step $k$ is such that $\vec{p}_k\ \dot{\sim}\ \mathcal{N}(\vec{0},\mat{Z})$. Given $\mat{Z}$, $\vec{p}_k$ is computed using the next $n$ Gaussian keystream samples, that is $(k-1)n+1\leq t\leq kn$, as
+To generate noise that can be added by the sensor and removed by a privileged estimator using the introduced series of pseudorandom Gaussian samples $\psi_t$, $t>0$, a conversion to a $d$-dimension zero-mean multivariate Gaussian sample is required at every timestep $k$. As control over the difference in estimation error between privileged and unprivileged estimators is desired, a symmetric matrix parameter $\mat{S}\succ 0$ is introduced, such that added pseudorandom noise $\vec{g}_k$ follow distribution $\vec{g}_k\ \dot{\sim}\ \mathcal{N}(\vec{0},\mat{S})$. Given $\mat{S}$, $\vec{g}_k$ can be computed using the next $d$ Gaussian keystream samples $\psi_t$, $(k-1)d+1\leq t\leq kd$, as
 \begin{equation}
-   \vec{p}_k = \mat{A}\cdot
+   \vec{g}_k = \mat{S}^{\frac{1}{2}}\cdot
    \begin{bmatrix}
-      z_{(k-1)n+1} & \dots & z_{kn}
+      \psi_{(k-1)d+1} & \dots & \psi_{kd}
    \end{bmatrix}^\top\,,
 \end{equation}
-for any matrix $\mat{A}$ such that $\mat{A}\mat{A}^\top=\mat{Z}$. We also note that for the correct removal of noise terms $\vec{p}_k$ by the privileged estimator, index information $k$ is required when communication channels are lossy or have some delay. While estimation over the internet may use the indexing information already present in TCP/IP, for the remainder of the work we consider the case when all measurements arrive, in order, and neglect additional index information for the sake of simplicity.
+for any matrix $\mat{S}^{\frac{1}{2}}$ such that $\mat{S}^{\frac{1}{2}}\mat{S}^{\frac{1}{2}\top}=\mat{S}$. We also note that for the correct removal of noise terms $\vec{g}_k$ by the privileged estimator, index information $k$ is required when communication channels are lossy or have some delay. While estimation over the internet may use the indexing information already present in TCP/IP, for the remainder of the work we consider the case when all measurements arrive, in order, and neglect additional index information for the sake of simplicity.
+% Remove above and add the fact that sensors and estimators are synchornised in the problem (note that multi-sensor problem already states that the sensors are in sync)
 
 Before estimation, we assume that the secret key $\mathsf{sk}$, required for generating the Gaussian keystream in section [subsec:gaussian\_keystream], has been shared between the sensor and privileged estimator. During estimation, the sensor modifies measurements $\vec{y}_k$ by
 \begin{equation}\label{eqn:modified_measurement_priv}
