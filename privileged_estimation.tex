@@ -114,8 +114,8 @@ Now, each sensor holds its own secret key $\mathsf{sk}_{\mathsf{g}, i}$, $1\leq 
 
 Multiple measurements and the effects of privilege and fusion on estimation performance complicate the cryptographic analysis in the case of multiple sensors. To demonstrate that a presented scheme guarantees better performance for higher privilege estimators while limiting the benefit from fusing unprivileged measurements, the covariance privilege notion in section \ref{subsec:priv_estimation:crypto_problem} will be used to guarantee two estimation performance differences for each privilege $\pi$.
 \begin{description}
-  \item[Performance Loss Lower Bound] Here, we aim to guarantee a lower bound on the estimation performance loss of any unprivileged estimator $\mathsf{e}^{[0, n]}$ on a privilege-$\pi$ estimator $\mathsf{e}^{[\pi,\pi]}$. Naturally, this will remain a lower bound when unprivileged estimators have access to fewer unprivileged measurements or privileged estimators have access to more.
-  \item[Performance Gain Upper Bound] This bound aims to guarantee an upper bound on the estimation performance gain of any estimator $\mathsf{e}^{[\pi, n]}$ on a privilege-$\pi$ estimator $\mathsf{e}^{[\pi,\pi]}$. The bound similarly remains an upper bound when fewer unprivileged measurements are fused.
+    \item[Performance Loss Lower Bound] Here, we aim to guarantee a lower bound on the estimation performance loss of any unprivileged estimator $\mathsf{e}^{[0, n]}$ on a privilege-$\pi$ estimator $\mathsf{e}^{[\pi,\pi]}$. Naturally, this will remain a lower bound when unprivileged estimators have access to fewer unprivileged measurements or privileged estimators have access to more.
+    \item[Performance Gain Upper Bound] This bound aims to guarantee an upper bound on the estimation performance gain of any estimator $\mathsf{e}^{[\pi, n]}$ on a privilege-$\pi$ estimator $\mathsf{e}^{[\pi,\pi]}$. The bound similarly remains an upper bound when fewer unprivileged measurements are fused.
 \end{description}
 Lastly, a suitable scheme should be one with at least two free parameters responsible for controlling the values of these two bounds.
 \begin{remark}
@@ -157,11 +157,11 @@ Here, we note that the conversion to real numbers $\upsilon_t$ is cryptographica
 
 With this assumption, we are left with generating a series of pseudorandom standard normal Gaussian samples, which can be readily computed using the Box-Muller transform [paleyFourierTransformsComplex1934]. This is given by
 \begin{equation}
-   \psi_t = \sqrt{-2\ln (\upsilon_t)}\cos(2\pi \upsilon_{t+1})
+    \psi_t = \sqrt{-2\ln (\upsilon_t)}\cos(2\pi \upsilon_{t+1})
 \end{equation}
 and
 \begin{equation}
-  \psi_{t+1} = \sqrt{-2\ln (\upsilon_t)}\sin(2\pi \upsilon_{t+1})\,,
+    \psi_{t+1} = \sqrt{-2\ln (\upsilon_t)}\sin(2\pi \upsilon_{t+1})\,,
 \end{equation}
 obtaining two, independent, standard normal Gaussian samples from two uniform ones. This Gaussian keystream can then be used by a privileged estimation scheme to add arbitrary pseudorandom multivariate Gaussian noises to sensor measurements.
 
@@ -178,29 +178,29 @@ obtaining two, independent, standard normal Gaussian samples from two uniform on
 \subsection{Measurement Modification}\label{subsec:priv_estimation:est_measurement_mod}
 To generate noise that can be added by the sensor and removed by a privileged estimator using the introduced series of pseudorandom Gaussian samples $\psi_t$, $t>0$, a conversion to a $d$-dimension zero-mean multivariate Gaussian sample is required at every timestep $k$. As control over the difference in estimation error between privileged and unprivileged estimators is desired, a symmetric matrix parameter $\mat{S}\succ 0$ is introduced, such that added pseudorandom noise $\vec{g}_k$ follow distribution $\vec{g}_k\ \dot{\sim}\ \mathcal{N}(\vec{0},\mat{S})$. Given $\mat{S}$, $\vec{g}_k$ can be computed using the next $d$ Gaussian keystream samples $\psi_t$, $(k-1)d+1\leq t\leq kd$, as
 \begin{equation}
-   \vec{g}_k = \mat{S}^{\frac{1}{2}}\cdot
-   \begin{bmatrix}
-      \psi_{(k-1)d+1} & \dots & \psi_{kd}
-   \end{bmatrix}^\top\,,
+    \vec{g}_k = \mat{S}^{\frac{1}{2}}\cdot
+    \begin{bmatrix}
+        \psi_{(k-1)d+1} & \dots & \psi_{kd}
+    \end{bmatrix}^\top\,,
 \end{equation}
 for any matrix $\mat{S}^{\frac{1}{2}}$ such that $\mat{S}^{\frac{1}{2}}\mat{S}^{\frac{1}{2}\top}=\mat{S}$. We also note that for the correct removal of noise terms $\vec{g}_k$ by the privileged estimator, index information $k$ is required when communication channels are lossy or have some delay. While estimation over the internet may use the indexing information already present in TCP/IP, for the remainder of the work we consider the case when all measurements arrive, in order, and neglect additional index information for the sake of simplicity.
 % Remove above and add the fact that sensors and estimators are synchornised in the problem (note that multi-sensor problem already states that the sensors are in sync)
 
 Before estimation, we assume that the secret key $\mathsf{sk}$, required for generating the Gaussian keystream in section [subsec:gaussian\_keystream], has been shared between the sensor and privileged estimator. During estimation, the sensor modifies measurements $\vec{y}_k$ by
 \begin{equation}\label{eqn:modified_measurement_priv}
-   \vec{y}^\prime_k = \vec{y}_k + \vec{p}_k\,,
+    \vec{y}^\prime_k = \vec{y}_k + \vec{p}_k\,,
 \end{equation}
 resulting in a new measurement model
 \begin{equation}
-   \vec{y}^\prime_k = \mat{H}_k\vec{x}_k + \vec{v}_k + \vec{p}_k\,,
+    \vec{y}^\prime_k = \mat{H}_k\vec{x}_k + \vec{v}_k + \vec{p}_k\,,
 \end{equation}
 with $\vec{v}_k\sim \mathcal{N}(\vec{0},\mat{R}_k)$ and $\vec{p}_k\ \dot{\sim}\ \mathcal{N}(\vec{0},\mat{Z})$. There are now two estimation problems present for the privileged and unprivileged estimator, respectively.
 \begin{description}
-   \item[Privileged estimation] The estimator that holds the secret key $\mathsf{sk}$ can compute the Gaussian key stream $z_t$, $t>0$, and therefore the added noise vectors $\vec{p}_k$ at every time step $k$. Computing $\vec{y}_k = \vec{y}^\prime_k - \vec{p}_k$ given the noisy measurements results in the original measurements following measurement model \eqref{eqn:linear_measurement_model} exactly.
+    \item[Privileged estimation] The estimator that holds the secret key $\mathsf{sk}$ can compute the Gaussian key stream $z_t$, $t>0$, and therefore the added noise vectors $\vec{p}_k$ at every time step $k$. Computing $\vec{y}_k = \vec{y}^\prime_k - \vec{p}_k$ given the noisy measurements results in the original measurements following measurement model \eqref{eqn:linear_measurement_model} exactly.
    \item[Unprivileged estimation] In the case where pseudorandomness is indistinguishable from randomness, as is the case at an unprivileged estimator when using a cryptographically secure keystream and $\mathsf{sk}$ is not known, noisy measurements are indistinguishable from those following the unprivileged measurement model 
-   \begin{equation}\label{eqn:unprivileged_measurement_model}
-      \vec{y}^\prime_k = \mat{H}_k\vec{x}_k + \vec{v}^\prime_k\,,
-   \end{equation}
+    \begin{equation}\label{eqn:unprivileged_measurement_model}
+        \vec{y}^\prime_k = \mat{H}_k\vec{x}_k + \vec{v}^\prime_k\,,
+    \end{equation}
    with $\vec{v}^\prime_k\sim \mathcal{N}(\vec{0},\mat{R}_k+\mat{Z})$, exactly.
 \end{description}
 
