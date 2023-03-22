@@ -40,7 +40,7 @@ To formalize this, we introduce the following notations and definitions. We assu
     A \textit{privileged estimation scheme} is a pair of probabilistic algorithms $(\mathsf{Setup},\mathsf{Noise})$, given by
     \begin{description}
         \item[$\mathsf{Setup}(\mathcal{M}_{\mathsf{S}}, \mathcal{M}_{\mathsf{M}}, \kappa)$] On the input of models $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$, and the security parameter $\kappa$, public parameters $\mathsf{pub}$ and a secret key $\mathsf{sk}_{\mathsf{g}}$ are created.
-        \item[$\mathsf{Noise}(\mathsf{pub}, \mathsf{sk}_{\mathsf{g}}, k, \mathcal{M}_{\mathsf{S}}, \mathcal{M}_{\mathsf{M}}, \vec{z}_1, \dots, \vec{z}_k)$] On input of public parameters $\mathsf{pub}$, secret key $\mathsf{sk}_{\mathsf{g}}$, timestep $k$, models $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$, and measurements $\vec{z}_1,\dots,\vec{z}_k$, a privileged and unprivileged modified measurement (with no required model constraints) is returned, $\vec{z}_k^{\{\mathsf{p}\}}$ and $\vec{z}_k^{\{\mathsf{up}\}}$, respectively.
+        \item[$\mathsf{Noise}(\mathsf{pub}, \mathsf{sk}_{\mathsf{g}}, k, \mathcal{M}_{\mathsf{S}}, \mathcal{M}_{\mathsf{M}}, \vec{z}_1, \dots, \vec{z}_k)$] On input of public parameters $\mathsf{pub}$, secret key $\mathsf{sk}_{\mathsf{g}}$, timestep $k$, models $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$, and measurements $\vec{z}_1,\dots,\vec{z}_k$, a privileged and unprivileged modified measurement (with no required model constraints) are returned, $\vec{z}_k^{\{\mathsf{p}\}}$ and $\vec{z}_k^{\{\mathsf{up}\}}$, respectively.
     \end{description}
 \end{definition}
 In addition to the scheme above, we also give the following definitions to help formalize our desired security notion.
@@ -261,7 +261,7 @@ Intuitively, we can see that the two types of estimators have the difference bet
 % \end{equation}
 % for all $1 \leq i\leq G$.
 
-% From \eqref{eq:priv_estimation:est_mult_covariance_restriction} we can see that privilege levels are significantly restricted in relative estimation performance. We have demonstrated this method due to its simplicity and relation to the single level scheme, however, alternative methods involving multiple or overlapping keys may allow weaker restrictions and will be considered in future work.
+% From \eqref{eq:priv_estimation:est_mult_covariance_restriction} we can see that privilege levels are significantly restricted in relative estimation performance. We have demonstrated this method due to its simplicity and relation to the single privilege scheme, however, alternative methods involving multiple or overlapping keys may allow weaker restrictions and will be considered in future work.
 
 % 
 %  ######  ########  ######  
@@ -274,56 +274,36 @@ Intuitively, we can see that the two types of estimators have the difference bet
 % 
 
 \subsection{Security Analysis}\label{subsec:priv_estimation:est_security}
-The security of the proposed scheme will be primarily considered in the single level privileged estimation case as introduced in section [subsec:adding\_privilege\_noise] and a proof sketch will be provided to show how the proposed scheme meets the cryptographic notion in definition \ref{def:cov_privilege_security_notion}. The extension to multiple privilege levels as described in section [subsec:mult\_privileges] will be informally discussed afterward.
+Recalling definition \ref{def:priv_estimation:covariance_privilege_notion}, we aim to show how the notion is met by the proposed estimation scheme. Before the proof sketch, we look at our scheme in the context of a formal privileged estimation scheme with model constraints and give some relevant optimality properties.
 
-% 
-% ..######..####.##....##..######...##.......########
-% .##....##..##..###...##.##....##..##.......##......
-% .##........##..####..##.##........##.......##......
-% ..######...##..##.##.##.##...####.##.......######..
-% .......##..##..##..####.##....##..##.......##......
-% .##....##..##..##...###.##....##..##.......##......
-% ..######..####.##....##..######...########.########
-% 
-
-\subsubsection{Single Privilege}
-Recalling definition \ref{def:cov_privilege_security_notion}, we aim to show how the notion is met by our single privilege level estimation scheme. Before the proof sketch, we look at our scheme in the context of a formal privileged estimation scheme with model constraints and give some relevant optimality properties.
-
-We consider the stochastic system model \eqref{eqn:linear_system_model} and measurement model \eqref{eqn:linear_measurement_model} exactly, that is, any linear models with known covariance, zero-mean, Gaussian additive noises. We define these as our model conditions and capture all relevant parameters from the respective equations in $\mathcal{M}_S$ and $\mathcal{M}_M$. Our scheme fulfills the two required algorithms for a privileged estimation scheme, $\mathsf{Setup}$ and $\mathsf{Noise}$, as follows.
+We consider the stochastic system model \eqref{eq:priv_estimation:system_model} and measurement model \eqref{eq:priv_estimation:single_sensor_measurement_model} exactly, that is, any linear models with known covariance, zero-mean, Gaussian additive noises. We define these as our model conditions and capture all relevant parameters from the respective equations in $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$. Our scheme meets the definition of a formal privileged estimation scheme by defining the required algorithms $\mathsf{Setup}$ and $\mathsf{Noise}$ as
 \begin{description}
-   \item[$\mathsf{Setup}$] Initialize a cryptographically indistinguishable stream cipher with the parameter $\kappa$, set the secret key $\mathsf{sk}$ to the stream cipher key and include an initial filter estimate $\hat{\vec{x}}_0$, error covariance $\mat{P}_0$ and added noise covariance $\mat{Z}$ in the public parameters $\mathsf{pub}$.
-   \item[$\mathsf{Noise}$] Computed by \eqref{eqn:modified_measurement_priv}, returning $\vec{y}^\prime_k$ as the noisy measurement at time step $k$, with added pseudorandom Gaussian noise computed from the stream cipher using $\mathsf{sk}$.
+   \item[$\mathsf{Setup}(\mathcal{M}_{\mathsf{S}}, \mathcal{M}_{\mathsf{M}}, \kappa)$] Initialize a cryptographically indistinguishable stream cipher with the parameter $\kappa$, set the secret key $\mathsf{sk}_{\mathsf{g}}$ to the stream cipher key and include an initial filter estimate $\hat{\vec{x}}_0$, error covariance $\mat{P}_0$ and added noise covariance $\mat{S}$ in the public parameters $\mathsf{pub}$.
+   \item[$\mathsf{Noise}(\mathsf{pub}, \mathsf{sk}_{\mathsf{g}}, k, \mathcal{M}_{\mathsf{S}}, \mathcal{M}_{\mathsf{M}}, \vec{z}_1, \dots, \vec{z}_k)$] Using the stream cipher key $\mathsf{sk}_{\mathsf{g}}$ and public parameters $\mathsf{pub}$, creating an unprivileged measurement by \eqref{eq:priv_estimation:est_modified_measurement}. Set and return the privileged measurement $\vec{z}^{\{\mathsf{p}\}}_k=\vec{z}_k$ and unprivileged measurement $\vec{z}^{\{\mathsf{up}\}}_k=\vec{z}^\prime_k$.
 \end{description}
-Additionally, we note that in the above $\mathsf{Setup}$ algorithm, the inclusion of the initial state and added noise covariance are not a requirement for the security of the scheme, but merely make relevant estimation parameters public for completeness.
+Here, we note that in the $\mathsf{Setup}$ algorithm above, the inclusion of an initial state estimate, its error covariance and the generated noise covariance in the public parameters $\mathsf{pub}$ are present only for the completeness of the cryptographic definition and not a requirement for the security of the scheme.
 
-The idea behind our security proof relies on the optimality of the linear Kalman Filter (KF) [haugBayesianEstimationTracking2012]. Given an initial estimate and its error covariance, the KF produces posterior estimates with the minimum mean square error (MSE) achievable for \textit{any} estimator when all measurements $\vec{y}_1,\dots,\vec{y}_k$ are observed, models are Gaussian and linear, and the same initialization is used. Since the KF also preserves initial error covariance order,
+The idea behind our proof sketch relies on the optimality of the linear Kalman Filter (KF) introduced in section \ref{subsec:prelims:kf_opt}. Given an initial estimate and its error covariance, the KF produces updated estimates with the minimum mean square error (MSE) achievable for \textit{any} estimator when all measurements $\vec{z}_1,\dots,\vec{z}_k$ are observed, models are Gaussian and linear, and the same initialization is used. Since the KF also preserves the initial error covariance order,
 \begin{equation}
    \mat{P}_k \preceq \mat{P}_k^\prime \implies \mat{P}_{k+1} \preceq \mat{P}_{k+1}^\prime\,,
 \end{equation}
-we can define an error covariance lower-bound $\mat{P}_k^{(l)}$ for all possible initialisations by setting $\mat{P}_0^{(l)} = \mat{0}$ and computing the posterior KF error covariance using the combined predict and update equations
-\begin{equation}\label{eqn:lower_bound_error_cov}
+for two different filter estimate error covariances $\mat{P}_k$ and $\mat{P}_k^\prime$, we can define an error covariance lower-bound $\mat{P}_k^{(l)}$ for all possible initialisations by setting $\mat{P}_0^{(l)} = \mat{0}$ and computing the KF error covariance using the combined predict and update equations
+\begin{equation}\label{eq:priv_estimation:est_lower_bound_error_cov}
    \begin{split}
-      \mat{P}_k^{(l)} =& \Bigl( \mat{I} - (\mat{F}_k\mat{P}_{k-1}^{(l)}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^\top \cdot \\
-      &\quad\bigl(\mat{H}_k(\mat{F}_k\mat{P}_{k-1}^{(l)}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^\top + \mat{R}_k\bigr)^{-1}\mat{H}_k\Bigr)\cdot\\
-      &\Bigl(\mat{F}_k\mat{P}_{k-1}^{(l)}\mat{F}_k^\top + \mat{Q}_k\Bigr)\,.
+      \mat{P}_k^{(l)} =& \Bigl( \mat{I} - (\mat{F}_k\mat{P}_{k-1}^{(l)}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^\top \bigl(\mat{H}_k(\mat{F}_k\mat{P}_{k-1}^{(l)}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^\top + \mat{R}_k\bigr)^{-1}\mat{H}_k\Bigr)\cdot\\
+      &\quad\Bigl(\mat{F}_k\mat{P}_{k-1}^{(l)}\mat{F}_k^\top + \mat{Q}_k\Bigr)\,.
    \end{split}
 \end{equation}
-This gives us a lower-bound at every time step $k$, such that
+This gives us a lower bound at every timestep $k$, such that
 \begin{equation}
-   \mat{P}_k^{(l)} \preceq \mathsf{Cov}\left[\mathcal{A}\left(k, \mathcal{M}_S, \mathcal{M}_M, \vec{y}_1,\dots,\vec{y}_k\right) - \vec{x}_k \right]
+   \mat{P}_k^{(l)} \preceq \mathsf{Cov}\left[\mathcal{A}\left(k, \mathcal{M}_{\mathsf{S}}, \mathcal{M}_{\mathsf{M}}, \vec{z}_1,\dots,\vec{z}_k\right) - \vec{x}_k \right]
 \end{equation}
-for any estimator $\mathcal{A}$ following definition \ref{def:estimator} and any Gaussian and linear models $\mathcal{M}_S$ and $\mathcal{M}_M$. This leads us to the security proof sketch.
+for \textit{any} estimator $\mathcal{A}$ following definition \ref{def:priv_estimation:crypto_estimator} and any Gaussian and linear models $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$. The detailed security proof sketch can be found in appendix \ref{app:priv_est_proof_sketch}.
 
-\begin{theorem}\label{thm:prooved_thm}
-   Our single privilege estimation scheme in section [subsec:adding\_privilege\_noise] meets $\{\mat{D}_1,\mat{D}_2,\dots\}$-Covariance Privilege for Models $\mathcal{M}_S$ and $\mathcal{M}_M$, for a computable series $\mat{D}_k$, $k>0$ dependent on a noise parameter $\mat{Z}$, when $\mathcal{M}_S$ and $\mathcal{M}_M$ are Gaussian and linear.
-\end{theorem}
-
-% SKETCH PROOF IS IN THE APPENDIX NOW
-
-In addition to the proof sketch, we stress caution when accepting a cryptographic guarantee in terms of models $\mathcal{M}_S$ and $\mathcal{M}_M$ when used to estimate a measured physical process or approximate continuous quantities. The following assumptions are made in this scenario.
+In addition to the proof sketch, we stress some comments on accepting cryptographic guarantees in terms of estimation models $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$ when used to estimate a physical process or approximate continuous models. The following assumptions are made in this scenario.
 \begin{description}
-   \item[Exact models] When assigning a model to a physical process, any cryptographic guarantees concerning the model assume the process follows the model \textit{exactly}. It is often the case that models assume a Bayesian interpretation of probability (a stochastic state) or are chosen to simplify estimation, resulting in the possibility of better estimation given alternative or more complicated models. Although the standard for state estimation, we state the assumption to highlight the distinction between models and a physical process.
-   \item[Floating-point approximation] As stated in section [subsec:gaussian\_keystream] and the proof sketch above, floating-point approximations to real numbers complicate cryptographic guarantees when relying on proofs using real numbers such as KF optimality. While optimal estimation with floats is beyond the scope of this work, the prevalence of floats in decades of state estimation justifies the assumption of sufficient similarity and the insignificance of associated error introduced to the security notion.
+   \item[Exact models] When assigning a model to a physical process, any cryptographic guarantees about the model assumes it describes the process \textit{exactly}. Often, models assume a Bayesian interpretation of probability (a stochastic state) or are chosen to simplify estimation, resulting in the possibility of better estimation given alternative or more complicated models. Although the standard for state estimation, we state the assumption to highlight the distinction between models and a physical process.
+   \item[Floating-point approximation] As stated in section \ref{subsec:priv_estimation:est_gaussian_keystream} and the proof sketch in appendix \ref{app:priv_est_proof_sketch}, floating-point approximations to real numbers complicate cryptographic guarantees when relying on proofs using real numbers such as KF optimality. While optimal estimation with floating-point numbers is beyond the scope of this thesis, their prevalence in the field of state estimation justifies the assumption of sufficient similarity and the insignificance of associated error introduced to the security notion.
 \end{description}
 
 % 
@@ -354,6 +334,7 @@ In addition to the proof sketch, we stress caution when accepting a cryptographi
 % 
 
 \subsubsection{Non-Linear Systems}
+As the presented scheme provides a provable performance difference between privileged and unprivileged estimators when models are Gaussian and linear, it also leaves the question of what can be said about the covariance privilege notion when models are arbitrary non-linear functions. 
 
 % 
 %  ######  #### ##     ## 
