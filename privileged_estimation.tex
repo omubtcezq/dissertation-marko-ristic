@@ -334,7 +334,7 @@ In addition to the proof sketch, we stress some comments on accepting cryptograp
 % 
 
 \subsubsection{Non-Linear Systems}
-As the presented scheme provides a provable performance difference between privileged and unprivileged estimators when models are Gaussian and linear, it also leaves the question of what can be said about the covariance privilege notion when models are arbitrary non-linear functions. 
+As the presented scheme provides a provable performance difference between privileged and unprivileged estimators when models are Gaussian and linear, it leaves the question of what can be said about the covariance privilege notion in our scheme when models are arbitrary non-linear functions. The basis of our cryptographic guarantee is that optimal estimators for the considered models are known and therefore guarantee a certain difference between privileged and unprivileged estimators' performances. Here, we assume that models are exact but accept that the cryptographic guarantee is useful even when physical processes are not modelled perfectly, as long as optimal linear estimators exist and estimate the process sufficiently well. With this reasoning, we argue that the covariance privilege proof sketch can be similarly applied to non-linear methods when using a non-linear (and non-optimal) estimator. In this case, the difference is no longer cryptographically guaranteed, even if models were exact, since better estimators may exist. However, a derivable difference in performance between known and well-performing estimators, with access to privileged and unprivileged measurements, respectively, still provides meaningful and valuable security information.
 
 % 
 %  ######  #### ##     ## 
