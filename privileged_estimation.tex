@@ -183,7 +183,7 @@ To generate noise that can be added by the sensor and removed by a privileged es
         \psi_{(k-1)d+1} & \dots & \psi_{kd}
     \end{bmatrix}^\top\,,
 \end{equation}
-for any matrix $\mat{S}^{\frac{1}{2}}$ such that $\mat{S}^{\frac{1}{2}}\mat{S}^{\frac{1}{2}\top}=\mat{S}$. We also note that for the correct removal of noise terms $\vec{g}_k$ by the privileged estimator, index information $k$ is required and available when sensors and estimators are synchronised in timestep.
+for any matrix $\mat{S}^{\frac{1}{2}}$ such that $\mat{S}^{\frac{1}{2}}\mat{S}^{\frac{1}{2}\top}=\mat{S}$. We also note that for the correct removal of noise terms $\vec{g}_k$ by the privileged estimator, index information $k$ is required and available when sensors and estimators are synchronised in timestep $k$.
 
 Using the noise in \eqref{eq:priv_estimation:est_gaussian_noise_stream}, the sensor can now modify measurements $\vec{z}_k$ by
 \begin{equation}\label{eq:priv_estimation:est_modified_measurement}
@@ -196,72 +196,14 @@ resulting in a new measurement model
 with noise terms $\vec{v}_k\sim \mathcal{N}(\vec{0},\mat{R}_k)$ and $\vec{g}_k\ \dot{\sim}\ \mathcal{N}(\vec{0},\mat{S})$. This leads to two estimation problems for the privileged and unprivileged estimators, respectively.
 \begin{description}
     \item[Privileged estimation] An estimator that holds the secret key $\mathsf{sk}_{\mathsf{g}}$ can compute the Gaussian key stream $\psi_t$, $t>0$, and therefore the added noise vectors $\vec{g}_k$ at every timestep $k$. Given the modified measurements \eqref{eq:priv_estimation:est_modified_measurement}, computing $\vec{z}_k = \vec{z}^\prime_k - \vec{g}_k$  obtains measurements following the measurement model \eqref{eq:priv_estimation:single_sensor_measurement_model} exactly.
-    \item[Unprivileged estimation] In the case where pseudorandomness is indistinguishable from randomness, as is the case for an unprivileged estimator when a cryptographically secure keystream is used and the secret key $\mathsf{sk}){\mathsf{g}}$ is not known, modified measurements are indistinguishable from those following the unprivileged measurement model 
+    \item[Unprivileged estimation] In the case where pseudorandomness is indistinguishable from randomness, as is the case for an unprivileged estimator when a cryptographically secure keystream is used and the secret key $\mathsf{sk}_{\mathsf{g}}$ is not known, modified measurements are indistinguishable from those following the unprivileged measurement model 
     \begin{equation}\label{eq:priv_estimation:est_unpriv_measurement_model}
         \vec{z}^\prime_k = \mat{H}_k\vec{x}_k + \vec{v}^\prime_k\,,
     \end{equation}
    with $\vec{v}^\prime_k\sim \mathcal{N}(\vec{0},\mat{R}_k+\mat{S})$, exactly.
 \end{description}
 
-Intuitively, we can see that the two types of estimators have the difference between their estimation errors dependent on matrix $\mat{S}$. When discussing security in section \ref{subsec:priv_estimation:est_security}, we will show that the best possible error covariances achievable by privileged and unprivileged estimators can be computed exactly for both measurement models and that their difference gives the series $\mat{D}_k$, $k>0$, suitable for the notion in definition \ref{def:priv_estimation:covariance_privilege_notion}.
-
-% 
-% ##     ## ##     ## ##       ########    ########  ########  #### ##     ## 
-% ###   ### ##     ## ##          ##       ##     ## ##     ##  ##  ##     ## 
-% #### #### ##     ## ##          ##       ##     ## ##     ##  ##  ##     ## 
-% ## ### ## ##     ## ##          ##       ########  ########   ##  ##     ## 
-% ##     ## ##     ## ##          ##       ##        ##   ##    ##   ##   ##  
-% ##     ## ##     ## ##          ##       ##        ##    ##   ##    ## ##   
-% ##     ##  #######  ########    ##       ##        ##     ## ####    ###    
-% 
-
-% \subsection{Multiple Privileges}\label{subsec:priv_estimation:est_mult_privileges}
-% As introduced in the estimation problem, we also briefly consider an extension to multiple privileges in the single-sensor problem. Here, we consider $G$ secret keys $\mathsf{sk}_{\mathsf{g}}^{[i]}$, $1\leq i\leq G$, all available to the sensor, with the aim that access to any single secret key gives an estimator a different privilege and a different best possible performance. We put forward one possible scheme that achieves this based on the single privilege scheme in section \ref{subsec:priv_estimation:est_measurement_mod} and discuss some of its limitations.
-
-% Each key $\mathsf{sk}_{\mathsf{g}}^{[i]}$ has an associated covariance $\mat{S}^{[i]}$, $1\leq i\leq G$, that it uses to generate $d$-dimensional noise $\vec{g}^{[i]}_k$ at each timestep $k$ as in the single privilege scheme. Sensor measurements are modified by adding noise from all keystreams as
-% \begin{equation}\label{eq:priv_estimation:est_mult_modified_measurement}
-%    \vec{z}_k^{\prime\prime} = \vec{z}_k + \vec{g}^{[1]}_k + \cdots + \vec{g}^{[G]}_k\,,
-% \end{equation}
-% with $\vec{g}^{[i]}_k\ \dot{\sim}\ \mathcal{N}(\vec{0}, \mat{S}^{[i]})$, $1\leq i\leq G$. From \eqref{eq:priv_estimation:est_mult_modified_measurement}, we see that obtaining any single key $\mathsf{sk}_{\mathsf{g}}^{[i]}$ leads to a measurement model where only a single pseudorandom Gaussian sample, of covariance $\mat{S}^{[i]}$, can be removed, resulting in measurements indistinguishable from those following the measurement model
-% \begin{equation}
-%    \vec{z}_k^{[i]} = \mat{H}_k\vec{x}_k + \vec{v}^{[i]}_k\,,
-% \end{equation}
-% where $\vec{v}^{[i]}_k\sim \mathcal{N}(\vec{0},\mat{R}_k+\mat{E}^{[i]})$, with
-% \begin{equation}\label{eq:priv_estimation:est_mult_priv_covariances}
-%    \mat{E}^{[i]} = \sum^G_{j=1,j \neq i}\mat{S}^{[j]}\,.
-% \end{equation}
-% As values $\mat{E}^{[i]}$ directly correspond to the relative estimation performances of each privilege level, we are also interested in the numerical restrictions when choosing these matrices. For the models to be valid for any measurement covariance $\mat{R}_k$, it is clear that $\mat{E}^{[i]}\succ 0$ and $\mat{E}^{[i]}=\mat{E}^{[i]}\top$ must hold for all $1\leq i\leq G$, but due to the dependence of $\mat{S}^{[i]}$, there is an additional restriction required to ensure all values of $\mat{S}^{[i]}$ remain valid covariances as well. From \eqref{eq:priv_estimation:est_mult_priv_covariances} we can write
-% \begin{equation}
-%    \begin{bmatrix}
-%       \mat{0} & \mat{I} & \mat{I} & \cdots & \mat{I}\\
-%       \mat{I} & \mat{0} & \mat{I} & \cdots & \mat{I}\\
-%       \vdots & \ddots & \ddots & \ddots & \vdots\\
-%       \mat{I} & \cdots & \mat{I} & \mat{0} & \mat{I}\\
-%       \mat{I} & \cdots & \mat{I} & \mat{I} & \mat{0}
-%    \end{bmatrix}
-%    \begin{bmatrix}
-%       \mat{S}^{[1]}\\
-%       \mat{S}^{[2]}\\
-%       \vdots\\
-%       \mat{S}^{[G-1]}\\
-%       \mat{S}^{[G]}
-%    \end{bmatrix}
-%    =
-%    \begin{bmatrix}
-%       \mat{E}^{[1]}\\
-%       \mat{E}^{[2]}\\
-%       \vdots\\
-%       \mat{E}^{[G-1]}\\
-%       \mat{E}^{[G]}
-%    \end{bmatrix}\,,
-% \end{equation}
-% which, when rearranged and the conditions $\mat{S}^{[i]}\succ 0$ are taken into account, gives the additional requirement
-% \begin{equation}\label{eq:priv_estimation:est_mult_covariance_restriction}
-%    \mat{E}^{[i]} \prec \frac{1}{G-1}\sum_{j=1}^{G}\mat{E}^{[j]}
-% \end{equation}
-% for all $1 \leq i\leq G$.
-
-% From \eqref{eq:priv_estimation:est_mult_covariance_restriction} we can see that privilege levels are significantly restricted in relative estimation performance. We have demonstrated this method due to its simplicity and relation to the single privilege scheme, however, alternative methods involving multiple or overlapping keys may allow weaker restrictions and will be considered in future work.
+Intuitively, we can see that the two types of estimators have the difference between their estimation errors dependent on matrix $\mat{S}$.
 
 % 
 %  ######  ########  ######  
@@ -276,10 +218,10 @@ Intuitively, we can see that the two types of estimators have the difference bet
 \subsection{Security Analysis}\label{subsec:priv_estimation:est_security}
 Recalling definition \ref{def:priv_estimation:covariance_privilege_notion}, we aim to show how the notion is met by the proposed estimation scheme. Before the proof sketch, we look at our scheme in the context of a formal privileged estimation scheme with model constraints and give some relevant optimality properties.
 
-We consider the stochastic system model \eqref{eq:priv_estimation:system_model} and measurement model \eqref{eq:priv_estimation:single_sensor_measurement_model} exactly, that is, any linear models with known covariance, zero-mean, Gaussian additive noises. We define these as our model conditions and capture all relevant parameters from the respective equations in $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$. Our scheme meets the definition of a formal privileged estimation scheme by defining the required algorithms $\mathsf{Setup}$ and $\mathsf{Noise}$ as
+We consider the stochastic system model \eqref{eq:priv_estimation:system_model} and measurement model \eqref{eq:priv_estimation:single_sensor_measurement_model} exactly, that is, any linear models with known covariance, zero-mean, Gaussian additive noises. We define these as our model conditions and capture all relevant parameters in the respective equations in $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$. Our scheme meets the definition of a formal privileged estimation scheme by defining the required algorithms $\mathsf{Setup}$ and $\mathsf{Noise}$ as
 \begin{description}
     \item[$\mathsf{Setup}(\mathcal{M}_{\mathsf{S}}, \mathcal{M}_{\mathsf{M}}, \kappa)$] Initialize a cryptographically indistinguishable stream cipher with the parameter $\kappa$, set the secret key $\mathsf{sk}_{\mathsf{g}}$ to the stream cipher key and include an initial filter estimate $\hat{\vec{x}}_0$, error covariance $\mat{P}_0$ and added noise covariance $\mat{S}$ in the public parameters $\mathsf{pub}$.
-    \item[$\mathsf{Noise}(\mathsf{pub}, \mathsf{sk}_{\mathsf{g}}, k, \mathcal{M}_{\mathsf{S}}, \mathcal{M}_{\mathsf{M}}, \vec{z}_1, \dots, \vec{z}_k)$] Using the stream cipher key $\mathsf{sk}_{\mathsf{g}}$ and public parameters $\mathsf{pub}$, creating an unprivileged measurement by \eqref{eq:priv_estimation:est_modified_measurement}. Set and return the privileged measurement $\vec{z}^{\{\mathsf{p}\}}_k=\vec{z}_k$ and unprivileged measurement $\vec{z}^{\{\mathsf{up}\}}_k=\vec{z}^\prime_k$.
+    \item[$\mathsf{Noise}(\mathsf{pub}, \mathsf{sk}_{\mathsf{g}}, k, \mathcal{M}_{\mathsf{S}}, \mathcal{M}_{\mathsf{M}}, \vec{z}_1, \dots, \vec{z}_k)$] Using the stream cipher key $\mathsf{sk}_{\mathsf{g}}$ and public parameters $\mathsf{pub}$, create an unprivileged measurement by \eqref{eq:priv_estimation:est_modified_measurement}. Set and return the privileged measurement $\vec{z}^{\{\mathsf{p}\}}_k=\vec{z}_k$ and unprivileged measurement $\vec{z}^{\{\mathsf{up}\}}_k=\vec{z}^\prime_k$.
 \end{description}
 Here, we note that in the $\mathsf{Setup}$ algorithm above, the inclusion of an initial state estimate, its error covariance and the generated noise covariance in the public parameters $\mathsf{pub}$ are present only for the completeness of the cryptographic definition and not a requirement for the security of the scheme.
 
@@ -344,23 +286,6 @@ In addition to the proof sketch, we stress some comments on accepting cryptograp
 \end{description}
 
 % 
-% .##.....##.##.....##.##.......########
-% .###...###.##.....##.##..........##...
-% .####.####.##.....##.##..........##...
-% .##.###.##.##.....##.##..........##...
-% .##.....##.##.....##.##..........##...
-% .##.....##.##.....##.##..........##...
-% .##.....##..#######..########....##...
-% 
-
-% \subsubsection{Multiple Additional Noises}
-% We have not defined a security notion for multiple levels of privileged estimation from section [subsec:mult\_privileges], but an intuitive and informal extension is briefly described here. 
-
-% A suitable notion would require that for any subset of corrupted estimators, and thus estimators with any subset of secret keys $S \subseteq \{\mathsf{sk}_i,\,1\leq i\leq N\}$, who are given noisy measurements $\vec{y}_k^{\prime\prime}$, an estimator given true measurements $\vec{y}_k$ can be constructed such that the difference between the corrupted subset's error covariance and its own is at least $\mat{D}^{(S)}_k$ at time step $k$. Although this definition requires a series $\mat{D}^{(S)}_k$ for every possible subset of keys, $S$, complicating its formal specification, it captures the exact advantage of every such subset producing a general definition.
-
-% Given the structure of our scheme in section [subsec:mult\_privileges], it can be readily seen how the above notion would be met. Similarly to the single level case, the KF can be used to compute the minimum error covariances for all compromised key subsets as well as for an estimator with the true measurements, and the relevant difference series $\mat{D}^{(S)}_k$ can be defined. 
-
-% 
 % .##....##..#######..##....##.........##.......####.##....##
 % .###...##.##.....##.###...##.........##........##..###...##
 % .####..##.##.....##.####..##.........##........##..####..##
@@ -384,7 +309,7 @@ As the presented scheme provides a provable performance difference between privi
 % 
 
 \subsection{Simulation}\label{subsec:priv_estimation:est_simulation}
-A simulation of the presented privileged estimation scheme is presented here in addition to the theoretical backing. As in previous chapters, we simulated the two-dimension time-invariant constant velocity system model,
+Simulation results of the presented privileged estimation scheme are shown here in addition to the theoretical backing above. As in previous chapters, we simulated the two-dimension time-invariant constant velocity system model,
 \begin{equation}\label{eq:priv_estimation:est_simulation_system_model}
     \vec{x}_k = 
     \begin{bmatrix}
@@ -431,7 +356,7 @@ The sensor added pseudorandom Gaussian samples with a covariance $\mat{S}=35 \cd
     \includegraphics{figures/single_level_bounded.pdf}
     \caption{Privileged estimation with bounded error covariance.}
     \label{fig:priv_estimation:est_sim_bounded}
-    % TODO Make larger and make the colours match. Also add a grid
+    % TODO Make larger and make the colours match. Also, add a grid
  \end{figure}
 As expected, it can be seen that the privileged estimator's error covariance trace is lower than the unprivileged estimator's and that the privileged estimator has a lower MSE. The difference in trace between the two estimators has also been plotted and equals the trace of the series \eqref{eq:priv_estimation:covariance_difference_series} due to the simulation initial error covariance $\mat{0}$.
 
@@ -442,28 +367,18 @@ The second simulation considers an unobservable system where only state velocity
         0 & 0 & 1 & 0\\
         0 & 0 & 0 & 1
     \end{bmatrix}
-    \vec{x}_k + \vec{v}_k
+    \vec{x}_k + \vec{v}_k\,,
 \end{equation}
-and the same values for $\mat{R}_k$ and $\mat{Z}$ as in the bounded case. Figure \ref{fig:priv_estimation:est_sim_bounded} shows the average error covariance traces and MSE of estimation from $1000$ simulation with models \eqref{eq:priv_estimation:est_simulation_system_model} and \eqref{eq:priv_estimation:est_simulation_measurement_model_unbounded} and shows similar results.
+and the same noise distribution and keystream covariance $\mat{S}$ as in the bounded case. Figure \ref{fig:priv_estimation:est_sim_unbounded} shows the average error covariance traces and MSE of estimation from $1000$ simulation runs with models \eqref{eq:priv_estimation:est_simulation_system_model} and \eqref{eq:priv_estimation:est_simulation_measurement_model_unbounded} and shows similar results.
 \begin{figure}[htbp]
    \centering
    \includegraphics{figures/single_level_unbounded.pdf}
    \caption{Privileged estimation with unbounded error covariance.}
    \label{fig:priv_estimation:est_sim_unbounded}
-   % TODO Make larger and make the colours match. Also add a grid
+   % TODO Make larger and make the colours match. Also, add a grid
 \end{figure}
 
-% Lastly, a simulation of multiple privilege levels was also performed using the bounded error covariance measurement model and using pseudorandom Gaussian samples such that $\mat{E}_1=20 \cdot \mat{I}$, $\mat{E}_2=14 \cdot \mat{I}$, and $\mat{E}_3=17 \cdot \mat{I}$ for estimators holding the single keys $\mathsf{sk}_1$, $\mathsf{sk}_2$ and $\mathsf{sk}_3$, respectively. Note that the three matrices $\mat{E}_i$, $1 \leq i \leq 3$ satisfy \eqref{eqn:mult_covariance_restriction}. Figure \ref{fig:multiple_bounded} again shows the average traces and MSE of estimation from 1000 runs and displays the distinct difference in estimation error of the different privilege levels. Additionally, two special cases that bound all estimators are included, one holding all privilege level keys and another holding none.
-
-% \begin{figure}[htbp]
-%    \centering
-%    \includegraphics{figures/multiple_level.pdf}
-%    \caption{Estimation with multiple privilege levels.}
-%    \label{fig:multiple_bounded}
-% \end{figure}
-
 Both figures capture the difference in estimation error between the best possible estimators given the simulated processes (in terms of MSE) and support the security proof sketch in section \ref{subsec:priv_estimation:est_security}.
-
 
 % 
 % 8888888b.  8888888b.  8888888 888     888      8888888888 888     888  .d8888b.  8888888888 
