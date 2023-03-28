@@ -57,19 +57,17 @@ Provable Estimation Performances
 	Problem Formulation
 		Formal Cryptographic Problem
 		Estimation Problem
-		Multi-sensor Problem
+		Multi-Sensor Problem
 	Privileged Estimation for Linear Systems
 		Gaussian Keystream
 		Measurement Modification
-		Multiple Privileges
 		Security Analysis
-			Single Privilege
-				Proof Sketch
-			Multiple Privileges
+			Proof Sketch
+			Implicit Assumptions
 			Non-Linear Systems
 		Simulation
 	Privileged Fusion for Linear Systems
-		Noise Generation
+		Correlated Gaussian Keystreams
 		Measurement Modification
 		Noise Distribution
 		Security Analysis
