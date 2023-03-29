@@ -163,7 +163,18 @@ and
 \begin{equation}
     \psi_{t+1} = \sqrt{-2\ln (\upsilon_t)}\sin(2\pi \upsilon_{t+1})\,,
 \end{equation}
-obtaining two, independent, standard normal Gaussian samples from two uniform ones. This Gaussian keystream can then be used by a privileged estimation scheme to add arbitrary pseudorandom multivariate Gaussian noises to sensor measurements.
+obtaining two, independent, standard normal Gaussian samples from two uniform ones. To generate noise that can be added by the sensor and removed by a privileged estimator using this series, a conversion to a $d$-dimension zero-mean multivariate Gaussian sample is required at every timestep $k$. As control over the difference in estimation error between privileged and unprivileged estimators is desired, a symmetric matrix parameter $\mat{S}\succ 0$ is introduced, such that added pseudorandom noise $\vec{g}_k$ follows distribution $\vec{g}_k\ \dot{\sim}\ \mathcal{N}(\vec{0},\mat{S})$. Given $\mat{S}$, $\vec{g}_k$ can be computed using the next $d$ Gaussian keystream samples,
+\begin{equation}\label{eq:priv_estimation:est_gaussian_standard_noise_stream}
+    \vec{\psi}_k =
+    \begin{bmatrix}
+        \psi_{(k-1)d+1} & \dots & \psi_{kd}
+    \end{bmatrix}^\top\,,
+\end{equation}
+as
+\begin{equation}\label{eq:priv_estimation:est_gaussian_noise_stream}
+    \vec{g}_k = \mat{S}^{\frac{1}{2}}\vec{\psi}_k
+\end{equation}
+for any matrix $\mat{S}^{\frac{1}{2}}$ such that $\mat{S}^{\frac{1}{2}}\mat{S}^{\frac{1}{2}\top}=\mat{S}$. We also note that for the correct removal of noise terms $\vec{g}_k$ by the privileged estimator, index information $k$ is required but available when sensors and estimators are synchronised, as per the problem definition.
 
 % 
 % ##     ##  #######  ########  
@@ -176,15 +187,6 @@ obtaining two, independent, standard normal Gaussian samples from two uniform on
 % 
 
 \subsection{Measurement Modification}\label{subsec:priv_estimation:est_measurement_mod}
-To generate noise that can be added by the sensor and removed by a privileged estimator using the introduced series of pseudorandom Gaussian samples $\psi_t$, $t>0$, a conversion to a $d$-dimension zero-mean multivariate Gaussian sample is required at every timestep $k$. As control over the difference in estimation error between privileged and unprivileged estimators is desired, a symmetric matrix parameter $\mat{S}\succ 0$ is introduced, such that added pseudorandom noise $\vec{g}_k$ follows distribution $\vec{g}_k\ \dot{\sim}\ \mathcal{N}(\vec{0},\mat{S})$. Given $\mat{S}$, $\vec{g}_k$ can be computed using the next $d$ Gaussian keystream samples $\psi_t$, $(k-1)d+1\leq t\leq kd$, as
-\begin{equation}\label{eq:priv_estimation:est_gaussian_noise_stream}
-    \vec{g}_k = \mat{S}^{\frac{1}{2}}\cdot
-    \begin{bmatrix}
-        \psi_{(k-1)d+1} & \dots & \psi_{kd}
-    \end{bmatrix}^\top\,,
-\end{equation}
-for any matrix $\mat{S}^{\frac{1}{2}}$ such that $\mat{S}^{\frac{1}{2}}\mat{S}^{\frac{1}{2}\top}=\mat{S}$. We also note that for the correct removal of noise terms $\vec{g}_k$ by the privileged estimator, index information $k$ is required and available when sensors and estimators are synchronised in timestep $k$.
-
 Using the noise in \eqref{eq:priv_estimation:est_gaussian_noise_stream}, the sensor can now modify measurements $\vec{z}_k$ by
 \begin{equation}\label{eq:priv_estimation:est_modified_measurement}
     \vec{z}^\prime_k = \vec{z}_k + \vec{g}_k\,,
@@ -395,7 +397,7 @@ Both figures capture the difference in estimation error between the best possibl
 % 
 
 \section{Fusion in Privileged Estimation Environments}\label{sec:priv_estimation:privileged_fusion}
-The idea behind our privileged fusion scheme is to add \textit{correlated} Gaussian keystreams to the measurements from each sensor. These noises can be computed and subtracted by estimators holding respective sensor keys, while their correlation limits the additional information gained from fusing unprivileged measurements. 
+Recalling the problem formulation in section \ref{subsec:priv_estimation:fusion_problem}, an effective single-sensor privileged estimation scheme leads to interest in the extension to environments with multiple sensors, where multiple privileges and accesses to measurements are possible, affecting the estimation performance of present estimators. We aim to present a privileged fusion scheme where the Performance Loss Lower Bound (PLLB) and the Performance Gain Upper Bound (PGUB), defined in section \ref{subsec:priv_estimation:fusion_problem}, can be derived and proved using the covariance privilege notation in definition \ref{def:priv_estimation:covariance_privilege_notion}. The idea behind the scheme is to add \textit{correlated} Gaussian keystreams to the measurements from each sensor. These noises can be computed and subtracted by estimators holding respective sensor keys, while their correlation limits the additional information gained from fusing unprivileged measurements.
 
 % 
 %  ######   #######  ########  ########     ##    ## ######## ##    ##  ######  
@@ -408,48 +410,48 @@ The idea behind our privileged fusion scheme is to add \textit{correlated} Gauss
 % 
 
 \subsection{Correlated Gaussian Keystreams}\label{subsec:priv_estimation:fus_gaussian_keystreams}
-Similarly to the Gaussian keystream generation in [eqn:gaussian\_keystream\_generation], pseudorandom samples can be correlated in this way even when generated using different stream cipher keys. To parameterise the correlation between noises at each sensor, we introduce a fully correlated component $\mat{Z}\in\mathbb{R}^{m\times m}$ and an uncorrelated component $\mat{Y}\in\mathbb{R}^{m\times m}$ and define a noise cross-correlation matrix for $x$ noises as $\mat{S}^{(x)} \in \mathbb{R}^{xm\times xm}$,
-\begin{equation}\label{eqn:noise_correlation_matrix}
+Similarly to the multivariate Gaussian keystream in section \ref{subsec:priv_estimation:est_gaussian_keystream}, pseudorandom samples can be correlated in this way even when generated using different stream cipher keys. To parameterise the correlation between noises at each sensor, we introduce a fully correlated component $\mat{V}\in\mathbb{R}^{m\times m}$, $\mat{V}\succ\mat{0}$, and an uncorrelated component $\mat{W}\in\mathbb{R}^{m\times m}$, $\mat{W}\succ\mat{0}$, and define a noise cross-correlation matrix for $x$ noises as $\mat{S}^{(x)} \in \mathbb{R}^{xm\times xm}$,
+\begin{equation}\label{eq:priv_estimation:fus_noise_correlation_matrix}
   \mat{S}^{(x)}=
   \begin{bmatrix}
-    \mat{Z} & \cdots & \mat{Z}\\
+    \mat{V} & \cdots & \mat{V}\\
     \vdots & \ddots & \vdots\\
-    \mat{Z} & \cdots & \mat{Z}\\
+    \mat{V} & \cdots & \mat{V}\\
   \end{bmatrix}+
   \begin{bmatrix}
-    \mat{Y} & \mat{0} & \mat{0}\\
+    \mat{W} & \mat{0} & \mat{0}\\
     \mat{0} & \ddots & \mat{0}\\
-    \mat{0} & \mat{0} & \mat{Y}\\
+    \mat{0} & \mat{0} & \mat{W}\\
   \end{bmatrix}\,,
 \end{equation}
-and $\mat{S}^{(1)}=\mat{Z}+\mat{Y}$. The generation of all $N$ multivariate Gaussian noises at timestep $k$, $\vec{g}_k^{(1:N)}$, can now be written as
-\begin{equation}\label{eqn:all_correlated_noises_generation}
-  \vec{g}_k^{(1:N)}=
+and $\mat{S}^{(1)}=\mat{V}+\mat{W}$. Denoting generated multivariate standard Gaussian noise \eqref{eq:priv_estimation:est_gaussian_standard_noise_stream} and added Gaussian noise \eqref{eq:priv_estimation:est_gaussian_noise_stream} for sensor $i$ at timestep $k$ as $\vec{\psi}_{k, i}$ and $\vec{g}_{k, i}$, respectively, the generation of all $n$ multivariate Gaussian noises at timestep $k$, $\vec{g}_k^{(1:n)}$, can be computed. This can be done by
+\begin{equation}\label{eq:priv_estimation:fus_all_correlated_noises_generation}
+  \vec{g}_k^{(1:n)}=
   \begin{bmatrix}
     \vec{g}_{k,1}\\
     \vdots\\
-    \vec{g}_{k,N}
+    \vec{g}_{k,n}
   \end{bmatrix}=
-  \mat{S}^{(N)\frac{1}{2}}\cdot
+  \mat{S}^{(n)\frac{1}{2}}\cdot
   \begin{bmatrix}
-    \vec{z}_{k,1}\\
+    \vec{\psi}_{k,1}\\
     \vdots\\
-    \vec{z}_{k,N}
+    \vec{\psi}_{k,n}
   \end{bmatrix}\,,
 \end{equation}
-where each $\vec{z}_{k,i}$ is computed as $\vec{z}_k$ in [eqn:standard\_gaussian\_generation] using uniform samples generated with key $\mathsf{sk}_i$, and $\mat{S}^{(N)\frac{1}{2}}$ is a matrix such that $\mat{S}^{(N)\frac{1}{2}}\mat{S}^{(N)\frac{1}{2}\top}=\mat{S}^{(N)}$. Notably, it is important that the vector of the first $p$ noises $\vec{g}_{k,i}$, $1\leq i \leq p$, in [eqn:all\_correlated\_noises\_generation], denoted $\vec{g}_k^{(1:p)}$, can be reproduced by an estimator of privilege $p$, holding only the keys $\mathsf{sk}_i$, $1\leq i \leq p$. One case where this is possible is when a lower-triangular decomposition, such as the Cholesky decomposition, is used to compute $\mat{S}^{(N)\frac{1}{2}}$ from $\mat{S}^{(N)}$. Here, each correlated Gaussian sample $\vec{g}_{k,i}$ is computable from preceeding uniform samples $\vec{z}_{k,j}$, $j\leq i$ only, and the generalised noise generation equation
-\begin{equation}\label{eqn:p_correlated_noises_generation}
-  \vec{g}_k^{(1:p)}=
-  \mat{S}^{(p)\frac{1}{2}}\cdot
+where each $\vec{\psi}_{k, i}$ is computed as $\vec{\psi}_k$ in \eqref{eq:priv_estimation:est_gaussian_standard_noise_stream} using uniform samples generated with key $\mathsf{sk}_{\mathsf{g}, i}$, and $\mat{S}^{(n)\frac{1}{2}}$ is a matrix such that $\mat{S}^{(n)\frac{1}{2}}\mat{S}^{(n)\frac{1}{2}\top}=\mat{S}^{(n)}$. Notably, as we consider sequential access to keys, it is important that the vector of the first $\pi$ noises $\vec{g}_{k, i}$, $1\leq i\leq \pi$, in \eqref{eq:priv_estimation:fus_all_correlated_noises_generation}, denoted $\vec{g}_k^{(1:\pi)}$, can be reproduced by an estimator of privilege $\pi$, holding only the keys $\mathsf{sk}_{\mathsf{g}, i}$, $1\leq i\leq \pi$. One case where this is possible is when a lower-triangular decomposition, such as the Cholesky decomposition, is used to compute $\mat{S}^{(n)\frac{1}{2}}$ from $\mat{S}^{(n)}$. Then, each correlated Gaussian sample $\vec{g}_{k,i}$ is computable from preceding standard samples $\vec{\psi}_{k,j}$, $j\leq i$ only, and the generalised noise generation equation
+\begin{equation}\label{eq:priv_estimation:fus_p_correlated_noises_generation}
+  \vec{g}_k^{(1:\pi)}=
+  \mat{S}^{(\pi)\frac{1}{2}}\cdot
   \begin{bmatrix}
-    \vec{z}_{k,1}\\
+    \vec{\psi}_{k,1}\\
     \vdots\\
-    \vec{z}_{k,p}
+    \vec{\psi}_{k,\pi}
   \end{bmatrix}
 \end{equation}
-generates the same first $p$ noises $\vec{g}_k^{(1:p)}$ as would be obtained from \eqref{eqn:all_correlated_noises_generation}. This is due to $\mat{S}^{(p)\frac{1}{2}}\in\mathbb{R}^{pm\times pm}$ equalling the top left block of matrix $\mat{S}^{(N)\frac{1}{2}}$ when using a lower-triangular decomposition.
+generates the same first $\pi$ noises $\vec{g}_k^{(1:\pi)}$ as would be obtained from \eqref{eq:priv_estimation:fus_all_correlated_noises_generation}. This is due to $\mat{S}^{(\pi)\frac{1}{2}}\in\mathbb{R}^{\pi m\times \pi m}$ equalling the top left block of matrix $\mat{S}^{(n)\frac{1}{2}}$ when using the lower-triangular decomposition.
 
-With \eqref{eqn:p_correlated_noises_generation}, at every timestep $k$, $\vec{g}_k^{(1:N)}$ can be generated using all $N$ keys and used to modify sensor measurements, while the subset $\vec{g}_k^{(1:p)}$ can be generated by estimators of privilege $p$ using only the keys they hold.
+At every timestep $k$, $\vec{g}_k^{(1:n)}$ can be generated with \eqref{eq:priv_estimation:fus_p_correlated_noises_generation} using all $n$ keys and used to modify sensor measurements, while the subset $\vec{g}_k^{(1:\pi)}$ can be generated by estimators of privilege $\pi$ using only the keys they hold.
 
 % 
 % ##     ##  #######  ########  
