@@ -258,14 +258,14 @@ for \textit{any} estimator $\mathcal{A}$ following definition \ref{def:priv_esti
 We wish to show that the scheme in section \ref{subsec:priv_estimation:est_measurement_mod} meets $\{\mat{D}_1,\mat{D}_2,\dots\}$-Covariance Privilege for Models $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$, for a computable series $\mat{D}_k$, $k>0$ dependent on a noise parameter $\mat{S}$, when $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$ are Gaussian and linear. 
 
 Since a cryptographically pseudorandom stream cipher is used, the stream integers, and therefore the uniform samples $\upsilon_t$ and normal Gaussian samples $\psi_t$, are indistinguishable from those generated from a truly random stream for any PPT estimator without the secret key. We persist with the previous assumption that floating-point representations of $\psi_t$ are sufficiently close to Gaussian and assume the KF to provide optimal estimation when using floating-point arithmetic. Using the $\mathsf{Setup}$ and $\mathsf{Noise}$ algorithms given in section \ref{subsec:priv_estimation:est_security} leads to pseudorandom measurements $\vec{z}^\prime_k$ that are indistinguishable from measurements following the unprivileged measurement model \eqref{eq:priv_estimation:est_unpriv_measurement_model}. We can then compute a lower-bound $\mat{P}_k^{\prime(l)}$ for any unprivileged estimator as $\mat{P}_0^{\prime(l)}=\mat{0}$ and
-\begin{equation}\label{eq:priv_estimation:unprivileged_lower_bound_error_cov}
+\begin{equation}\label{eq:priv_estimation:est_unprivileged_lower_bound_error_cov}
    \begin{split}
       \mat{P}_k^{\prime(l)} =& \Bigl( \mat{I} - (\mat{F}_k\mat{P}_{k-1}^{\prime(l)}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^\top\bigl(\mat{H}_k(\mat{F}_k\mat{P}_{k-1}^{\prime(l)}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^\top + \mat{R}_k+\mat{S}\bigr)^{-1}\mat{H}_k\Bigr)\cdot\\
       &\quad\Bigl(\mat{F}_k\mat{P}_{k-1}^{\prime(l)}\mat{F}_k^\top + \mat{Q}_k\Bigr)\,.
    \end{split}
 \end{equation}
-Taking the difference of \eqref{eq:priv_estimation:unprivileged_lower_bound_error_cov} and the lower bound error covariances for privileged estimators \eqref{eq:priv_estimation:est_lower_bound_error_cov} produces the series
-\begin{equation}\label{eq:priv_estimation:covariance_difference_series}
+Taking the difference of \eqref{eq:priv_estimation:est_unprivileged_lower_bound_error_cov} and the lower bound error covariances for privileged estimators \eqref{eq:priv_estimation:est_lower_bound_error_cov} produces the series
+\begin{equation}\label{eq:priv_estimation:est_covariance_difference_series}
    \mat{D}_k = \mat{P}_k^{\prime(l)} - \mat{P}_k^{(l)}\,,
 \end{equation}
 for $k>0$, which can be tuned by the parameter $\mat{S}$. Since both series $\mat{P}_k^{(l)}$ and $\mat{P}_k^{\prime(l)}$ give the lowest possible error covariance of the respective estimators, an estimator following the true model \eqref{eq:priv_estimation:single_sensor_measurement_model} can always be created for one following the unprivileged model \eqref{eq:priv_estimation:est_unpriv_measurement_model} such that their error covariances differ by at least $\mat{D}_k$ for each timestep $k$. A reduction proof can therefore be constructed, in which the existence of an unprivileged estimator that produces estimates such that \eqref{eq:priv_estimation:covariance_privilege} does not hold, implies the existence of an estimator with an error covariance lower than $\mat{P}_k^{\prime(l)}$ following model \eqref{eq:priv_estimation:est_unpriv_measurement_model}. As no such estimator exists, we conclude that our scheme meets $\{\mat{D}_1,\mat{D}_2,\dots\}$-Covariance Privilege for Models $\mathcal{M}_S$ and $\mathcal{M}_M$, when models are Gaussian and linear, concluding our proof sketch.
@@ -360,7 +360,7 @@ The sensor added pseudorandom Gaussian samples with a covariance $\mat{S}=35 \cd
     \label{fig:priv_estimation:est_sim_bounded}
     % TODO Make larger and make the colours match. Also, add a grid
 \end{figure}
-As expected, it can be seen that the privileged estimator's error covariance trace is lower than the unprivileged estimator's and that the privileged estimator has a lower MSE. The difference in trace between the two estimators has also been plotted and equals the trace of the series \eqref{eq:priv_estimation:covariance_difference_series} due to the simulation initial error covariance $\mat{0}$.
+As expected, it can be seen that the privileged estimator's error covariance trace is lower than the unprivileged estimator's and that the privileged estimator has a lower MSE. The difference in trace between the two estimators has also been plotted and equals the trace of the series \eqref{eq:priv_estimation:est_covariance_difference_series} due to the simulation initial error covariance $\mat{0}$.
 
 The second simulation considers an unobservable system where only state velocity is measured and has an unbounded error covariance as $k \rightarrow \infty$. It is given by 
 \begin{equation}\label{eq:priv_estimation:est_simulation_measurement_model_unbounded}
@@ -584,19 +584,17 @@ From the observed measurement models \eqref{eq:priv_estimation:fus_0q_obs_measur
 % 
 
 \subsection{Distribution of Noise Terms}\label{subsec:priv_estimation:fus_noise_dist}
-While we have described a method for generating noises that modify $N$ measurements and result in different observed measurement models depending on estimator privilege, we have not discussed where the noise is generated and how it is distributed to sensors. To handle the inherent correlation of the noises $\vec{g}_{k}^{(1:N)}$, they can be generated either centrally before distribution to sensors or sequentially at the sensors themselves, given previously generated values.
+While we have described a method for generating noises that modify $n$ measurements and result in different observed measurement models depending on estimator privilege, we have not discussed where the noise is generated and how it is distributed to sensors. To handle the inherent correlation of the noises $\vec{g}_{k}^{(1:n)}$, here we briefly consider how they can be generated either centrally before distribution to sensors or sequentially at the sensors themselves, given previously generated values.
 \begin{description}
-  \item[Central noise generation] To compute noises centrally, \eqref{eqn:p_correlated_noises_generation} can be computed for all $N$ noises at a central processor and each noise $\vec{g}_{k,i}$ sent to the respective sensor $i$ before it modifies its local measurement by \eqref{eqn:modified_measurement}.
-  \item[Sequential noise generation] To compute the same noises sequentially for each timestep $k$, sensor $1$ can generate its noise independently using its current standard Gaussian sample $\vec{z}_{k,1}$, by $\vec{g}_{k,1} = \mat{S}^{(1)\frac{1}{2}}\vec{z}_{k,1}$. Each following sensor $i>1$ can generate its noise $\vec{g}_{k,i}$ given the preceeding noises $\vec{g}_k^{(1:i-1)}$ and following the conditional reasoning in \eqref{eqn:conditional_noise_distribution}, as
-  \begin{equation}
-    \begin{split}
-      \vec{g}_{k,i} = &\bar{\mat{Z}}^\top\mat{S}^{(i-1)-1}\vec{g}_k^{(1:i-1)} +\\
-      &\qquad (\mat{S}^{(1)}-\bar{\mat{Z}}^\top\mat{S}^{(i-1)-1}\bar{\mat{Z}})^\frac{1}{2}\vec{z}_{k,i}\,.
-    \end{split}
-  \end{equation}
-  After local noise generation, sensor $i$ sends its and preceding noises, $\vec{g}_k^{(1:i)}$, to the next sensor $i+1$. This method has the clear downside of increasing communication costs with each successive generation but requires no central communicator.
+    \item[Central noise generation] To compute noises centrally, \eqref{eq:priv_estimation:fus_p_correlated_noises_generation} can be computed for all $n$ noises at a central processor and each noise $\vec{g}_{k,i}$ sent to the respective sensor $i$ before it modifies its local measurement by \eqref{eq:priv_estimation:fus_modified_measurements}.
+    \item[Sequential noise generation] To compute the same noises sequentially for each timestep $k$, sensor $1$ can generate its noise independently using its current standard Gaussian sample $\vec{z}_{k,1}$, by $\vec{g}_{k,1} = \mat{S}^{(1)\frac{1}{2}}\vec{\psi}_{k,1}$. Each following sensor $i>1$ can generate its noise $\vec{g}_{k,i}$ given the preceding noises $\vec{g}_k^{(1:i-1)}$ and following the conditional reasoning in \eqref{eq:priv_estimation:fus_conditional_noise_distribution}, as
+    \begin{equation}
+        \vec{g}_{k,i} = \bar{\mat{V}}^\top\mat{S}^{(i-1)-1}\vec{g}_k^{(1:i-1)} +
+        (\mat{S}^{(1)}-\bar{\mat{V}}^\top\mat{S}^{(i-1)-1}\bar{\mat{V}})^\frac{1}{2}\vec{\psi}_{k,i}\,.
+    \end{equation}
+    After local noise generation, sensor $i$ sends its and preceding noises, $\vec{g}_k^{(1:i)}$, to the next sensor $i+1$. This method has the clear downside of increasing communication costs with each successive generation but requires no central communicator.
 \end{description}
-In both cases above, the computation of all noises $\vec{g}_k^{(1:N)}$ can be performed offline, reducing the complexity of real-time measurement modification.
+In both cases above, the computation of all noises $\vec{g}_k^{(1:n)}$ can be performed offline, reducing the complexity of real-time measurement modification.
 
 % 
 %  ######  ########  ##    ## ########  ########  #######  
@@ -608,7 +606,7 @@ In both cases above, the computation of all noises $\vec{g}_k^{(1:N)}$ can be pe
 %  ######  ##     ##    ##    ##           ##     #######  
 % 
 \subsection{Security Analysis}\label{subsec:priv_estimation:fus_security}
-To give proof sketches of the cryptographic guarantees provided by the presented scheme, we first recall some assumptions. We consider floating-point numbers to be sufficiently close to real random numbers that real-number proofs still hold, and that all sensors are synchronised in $k$ such that observed measurement models \eqref{eqn:0q_obs_measurement_model}, \eqref{eqn:pp_obs_measurement_model} and \eqref{eqn:pq_obs_measurement_model} are exactly correct. Using these assumptions, the proofs rely on the optimality of the linear Kalman filter (KF) [haugBayesianEstimationTracking2012] to produce a series of covariances for optimal estimators before taking their differences to obtain the \textit{Performance Loss Lower Bound} and \textit{Performance Gain Upper Bound} from section [sec:prob]. Similarly to [risticCryptographicallyPrivilegedState2022], these series can be used as $\mat{D}_1,\mat{D}_2,\dots$ in definition [def:cov\_priv\_security\_notion] for appropriately formulated privileged estimation schemes for the two bounds, and demonstrate that the existence of an estimator violating the notion implies the existence of a linear estimator with error covariance lower than the KF. This guarantees the bounds by contrapositive.
+The security analysis of the fusion problem aims to give proof sketches of the desired estimation performance differences. As in the single-sensor case, we again assume floating-point numbers to be sufficiently close to real random numbers such that the optimality of the linear KF in section \ref{subsec:prelims:kf_opt} holds, and recall that all sensors are synchronised in timestep $k$, leading to observed measurement models \eqref{eq:priv_estimation:fus_0q_obs_measurement_model}, \eqref{eq:priv_estimation:fus_pp_obs_measurement_model} and \eqref{eq:priv_estimation:fus_pq_obs_measurement_model} being exactly correct. Similarly to the proof sketch in section \ref{subsec:priv_estimation:est_security}, these assumptions are used to produce a series of covariances for optimal estimators before taking their difference to obtain the semi-definite series corresponding to the PLLB and PGUB. The series can then be used as the sequence $\mat{D}_1,\mat{D}_2,\dots$ in definition \ref{def:priv_estimation:covariance_privilege_notion} for individual proofs of appropriate privilege estimation schemes for the two bounds. As before, the existence of an estimator violating the notion implies the existence of a linear estimator with error covariance lower than the KF, proving the bounds by contrapositive.
 
 % 
 % .##........#######...######...######.....########...#######..##.....##.##....##.########.
