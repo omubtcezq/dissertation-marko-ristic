@@ -324,7 +324,7 @@ Simulation results of the presented privileged estimation scheme are shown here 
 \end{equation}
 with noise term
 \begin{equation}
-    \vec{w}_k \sim \mathcal{N}\left(\vec{0}, 
+    \vec{w}_k \sim \mathcal{N}\left(\vec{0},\ \frac{1}{10^{3}}\cdot
     \begin{bmatrix}
         0.42 & 0 & 1.25 & 0\\
         0 & 0.42 & 0 & 1.25\\
@@ -333,11 +333,11 @@ with noise term
     \end{bmatrix}
     \right)\,.
 \end{equation}
-Two measurement models were considered, with bounded and unbounded system errors, respectively, and estimators were implemented using the linear Kalman filter with initial error covariance $\mat{0}$. Simulations were written in the Python programming language and the AES block cipher in CTR mode (AES-CTR) [gueronIntelAdvancedEncryption2010] was used as the cryptographically secure stream cipher.
+Two measurement models were considered, with bounded and unbounded system errors, respectively, and estimators were implemented using the linear KF with initial error covariance $\mat{0}$. Simulations were written in the Python programming language and the AES block cipher in CTR mode (AES-CTR) [gueronIntelAdvancedEncryption2010] was used as the cryptographically secure stream cipher.
 
-The first measurement model measured state location, leading to an observable system with bounded error covariances as $k \rightarrow \infty$. It was given by 
+The first measurement model measured state location, leading to an asymptotically stable system with bounded error covariances as $k \rightarrow \infty$. It was given by 
 \begin{equation}\label{eq:priv_estimation:est_simulation_measurement_model_bounded}
-    \mat{z}_k=
+    \vec{z}_k=
     \begin{bmatrix}
         1 & 0 & 0 & 0\\
         0 & 1 & 0 & 0
@@ -356,13 +356,13 @@ The sensor added pseudorandom Gaussian samples with a covariance $\mat{S}=35 \cd
 \begin{figure}[htbp]
     \centering
     \includegraphics{figures/single_level_bounded.pdf}
-    \caption{Privileged estimation with bounded error covariance.}
+    \caption{Error covariance trace and average MSE from $1000$ simulation runs and measurement model \eqref{eq:priv_estimation:est_simulation_measurement_model_bounded}}
     \label{fig:priv_estimation:est_sim_bounded}
-    % TODO Make larger and make the colours match. Also, add a grid
+    % TODO Make larger and make the colours match. Also, add a grid. Say 'Mean squared error (MSE) in the axis name.
 \end{figure}
 As expected, it can be seen that the privileged estimator's error covariance trace is lower than the unprivileged estimator's and that the privileged estimator has a lower MSE. The difference in trace between the two estimators has also been plotted and equals the trace of the series \eqref{eq:priv_estimation:est_covariance_difference_series} due to the simulation initial error covariance $\mat{0}$.
 
-The second simulation considers an unobservable system where only state velocity is measured and has an unbounded error covariance as $k \rightarrow \infty$. It is given by 
+The second simulation considered an asymptotically unstable system where only state velocity is measured, leading to an unbounded error covariance as $k \rightarrow \infty$. It was given by 
 \begin{equation}\label{eq:priv_estimation:est_simulation_measurement_model_unbounded}
     \mat{z}_k=
     \begin{bmatrix}
@@ -375,9 +375,9 @@ and the same noise distribution and keystream covariance $\mat{S}$ as in the bou
 \begin{figure}[htbp]
     \centering
     \includegraphics{figures/single_level_unbounded.pdf}
-    \caption{Privileged estimation with unbounded error covariance.}
+    \caption{Error covariance trace and average MSE from $1000$ simulation runs and measurement model \eqref{eq:priv_estimation:est_simulation_measurement_model_unbounded}}
     \label{fig:priv_estimation:est_sim_unbounded}
-    % TODO Make larger and make the colours match. Also, add a grid
+    % TODO Make larger and make the colours match. Also, add a grid. Say 'Mean squared error (MSE) in the axis name.
 \end{figure}
 
 Both figures capture the difference in estimation error between the best possible estimators given the simulated processes (in terms of MSE) and support the security proof sketch in section \ref{subsec:priv_estimation:est_security}.
@@ -397,7 +397,7 @@ Both figures capture the difference in estimation error between the best possibl
 % 
 
 \section{Fusion in Privileged Estimation Environments}\label{sec:priv_estimation:privileged_fusion}
-Recalling the problem formulation in section \ref{subsec:priv_estimation:fusion_problem}, an effective single-sensor privileged estimation scheme leads to interest in the extension to environments with multiple sensors, where multiple privileges and accesses to measurements are possible, affecting the estimation performance of present estimators. We aim to present a privileged fusion scheme where the Performance Loss Lower Bound (PLLB) and the Performance Gain Upper Bound (PGUB), defined in section \ref{subsec:priv_estimation:fusion_problem}, can be derived and proved using the covariance privilege notation in definition \ref{def:priv_estimation:covariance_privilege_notion}. The idea behind the scheme is to add \textit{correlated} Gaussian keystreams to the measurements from each sensor. These noises can be computed and subtracted by estimators holding respective sensor keys, while their correlation limits the additional information gained from fusing unprivileged measurements.
+Recalling the problem formulation in section \ref{subsec:priv_estimation:fusion_problem}, an effective single-sensor privileged estimation scheme leads to interest in the extension to environments with multiple sensors, where multiple privileges and accesses to measurements are possible, affecting the estimation performance of present estimators. We aim to present a scheme where the Performance Loss Lower Bound (PLLB) and the Performance Gain Upper Bound (PGUB), defined in section \ref{subsec:priv_estimation:fusion_problem}, can be derived and proved using the covariance privilege notation in definition \ref{def:priv_estimation:covariance_privilege_notion}. The idea behind the scheme is to add \textit{correlated} Gaussian keystreams to the measurements from each sensor. These noises can be computed and subtracted by estimators holding respective sensor keys, while their correlation limits the additional information gained from fusing unprivileged measurements.
 
 % 
 %  ######   #######  ########  ########     ##    ## ######## ##    ##  ######  
@@ -606,7 +606,7 @@ In both cases above, the computation of all noises $\vec{g}_k^{(1:n)}$ can be pe
 %  ######  ##     ##    ##    ##           ##     #######  
 % 
 \subsection{Security Analysis}\label{subsec:priv_estimation:fus_security}
-The security analysis of the fusion problem aims to give proof sketches of the desired estimation performance differences. As in the single-sensor case, we again assume floating-point numbers to be sufficiently close to real random numbers such that the optimality of the linear KF in section \ref{subsec:prelims:kf_opt} holds, and recall that all sensors are synchronised in timestep $k$, leading to observed measurement models \eqref{eq:priv_estimation:fus_0q_obs_measurement_model}, \eqref{eq:priv_estimation:fus_pp_obs_measurement_model} and \eqref{eq:priv_estimation:fus_pq_obs_measurement_model} being exactly correct. Similarly to the proof sketch in section \ref{subsec:priv_estimation:est_security}, these assumptions are used to produce a series of covariances for optimal estimators before taking their difference to obtain the semi-definite series corresponding to the PLLB and PGUB. The series can then be used as the sequence $\mat{D}_1,\mat{D}_2,\dots$ in definition \ref{def:priv_estimation:covariance_privilege_notion} for individual proofs of appropriate privilege estimation schemes for the two bounds. As before, the existence of an estimator violating the notion implies the existence of a linear estimator with error covariance lower than the KF, proving the bounds by contrapositive.
+The security analysis of the fusion problem aims to give proof sketches of the desired estimation performance differences. As in the single-sensor case, we again assume floating-point numbers to be sufficiently close to real random numbers such that the optimality of the linear KF in section \ref{subsec:prelims:kf_opt} holds, and recall that all sensors are synchronised in timestep $k$, leading to observed measurement models \eqref{eq:priv_estimation:fus_0q_obs_measurement_model}, \eqref{eq:priv_estimation:fus_pp_obs_measurement_model} and \eqref{eq:priv_estimation:fus_pq_obs_measurement_model} being exactly correct. Similarly to the proof sketch in section \ref{subsec:priv_estimation:est_security}, these assumptions are used to produce a series of covariances for optimal estimators before taking their difference to obtain the semi-definite series corresponding to the PLLB and PGUB. The series can then be used as the sequence $\mat{D}_1,\mat{D}_2,\dots$ in definition \ref{def:priv_estimation:covariance_privilege_notion} for individual proofs of appropriate privilege estimation schemes for the two bounds.
 
 % 
 % .##........#######...######...######.....########...#######..##.....##.##....##.########.
@@ -619,51 +619,43 @@ The security analysis of the fusion problem aims to give proof sketches of the d
 % 
 
 \subsubsection{Performance Loss Lower Bound (PLLB)}
-First, we consider the lower bound to the loss in estimation performance an estimator $\mathsf{e}^{[0,N]}$ has on an estimator $\mathsf{e}^{[p,p]}$ when measurements follow the presented scheme. Since the observed measurement models for these estimators, \eqref{eqn:0q_obs_measurement_model} and \eqref{eqn:pp_obs_measurement_model}, interpret available measurements as a single stacked measurement, and since we do not consider estimators that corrupt sensors, we can treat the stacked measurement as coming from a single sensor and use the notion of covariance privilege in definition [def:cov\_priv\_security\_notion] to guarantee the bound. The associated privileged estimation scheme for the PLLB can be written for each privilege $p$ as
+First, we consider the lower bound to the loss in estimation performance an estimator $\mathsf{e}^{[0, n]}$ has compared to an estimator $\mathsf{e}^{[\pi,\pi]}$ when measurements follow the presented scheme. Since the observed measurement models for these estimators, \eqref{eq:priv_estimation:fus_0q_obs_measurement_model} and \eqref{eq:priv_estimation:fus_pp_obs_measurement_model}, interpret available measurements as a single stacked measurement, and since we do not consider estimators that corrupt sensors, we can treat the stacked measurement as coming from a single sensor and use the notion of covariance privilege in definition \ref{def:priv_estimation:covariance_privilege_notion} to guarantee the bound. The associated privileged estimation scheme for the PLLB can be written for each privilege $\pi$ as
 \begin{description}
-  \item[$\mathsf{Setup}$] Given the system model [eqn:system\_model], all measurements models [eqn:measurement\_models] (interpretable as a single stacked measurement model) and a security parameter $\kappa$ used by all sensors, generate $N$ stream cipher keys $\mathsf{sk_i}$, $1\leq i \leq N$, and let the secret key $\mathsf{sk}$ include all $N$ keys. Generate the correlated and uncorrelated noise components $\mat{Z}$ and $\mat{Y}$, an initial estimate and error covariance $\hat{\vec{x}}_0$ and $\mat{P}_0$, and include these in the public parameters $\mathsf{pub}$.
+    \item[$\mathsf{Setup}$] Given the system model \eqref{eq:priv_estimation:system_model}, all measurements models \eqref{eq:priv_estimation:multi_sensor_measurement_models} (interpretable as a single stacked measurement model) and a security parameter $\kappa$ used by all sensors, generate $n$ stream cipher keys $\mathsf{sk}_{\mathsf{g}, i}$, $1\leq i\leq n$, and let the scheme definition secret key $\mathsf{sk}_{\mathsf{g}}$ include all $n$ keys. Generate the correlated and uncorrelated noise components $\mat{V}$ and $\mat{W}$, an initial estimate and error covariance $\hat{\vec{x}}_0$ and $\mat{P}_0$, and include these in the public parameters $\mathsf{pub}$.
   
-  \item[$\mathsf{Noise}_{\mathsf{PLLB}}$] Given parameters, cipher keys, a timestep $k$ and true sensor measurements $\vec{y}_k^{(1:N)}$, let $\vec{y}_k^{\{\mathsf{up}\}}=\vec{y}_k^{[0,N]}$ following \eqref{eqn:0q_obs_measurement_model} and $\vec{y}_k^{\{\mathsf{p}\}}=\vec{y}_k^{[p,p]}$ following \eqref{eqn:pp_obs_measurement_model}.
+    \item[$\mathsf{Noise}_{\mathsf{PLLB}}$] Given parameters, cipher keys, a timestep $k$ and true sensor measurements $\vec{z}_k^{(1:n)}$, let $\vec{z}_k^{\{\mathsf{p}\}}=\vec{z}_k^{[\pi,\pi]}$ following \eqref{eq:priv_estimation:fus_0q_obs_measurement_model} and $\vec{z}_k^{\{\mathsf{up}\}}=\vec{z}_k^{[0,n]}$ following \eqref{eq:priv_estimation:fus_pp_obs_measurement_model}.
 \end{description}
-With the above formulation, we can use the KF to recursively compute the optimal estimate error covariances for estimators with access to only measurements $\vec{y}_k^{\{\mathsf{up}\}}$ or $\vec{y}_k^{\{\mathsf{p}\}}$, for all $k$. Since the KF preserves initial covariance order, $\mat{P}_k \succeq \mat{P}_k^\prime \implies \mat{P}_{k+1} \succeq \mat{P}_{k+1}^\prime$, a lower bound can be guaranteed when using the initial covariance $\mat{P}_0=\mat{0}$. Therefore, the minimum achievable error covariance for an estimator $\mathsf{e}^{[0,N]}$, with access to measurements $\vec{y}_k^{\{\mathsf{up}\}}=\vec{y}_k^{[0,N]}$, is given by the combined KF predict and update equations
-\begin{equation}\label{eqn:0N_lower_bound_covariance}
-  \begin{split}
-    \mat{P}_k^{[0,N]} =& \Bigl( \mat{I} - (\mat{F}_k\mat{P}_{k-1}^{[0,N]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:N)\top} \cdot \\
-    &\quad\bigl(\mat{H}_k^{(1:N)}(\mat{F}_k\mat{P}_{k-1}^{[0,N]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:N)\top} \\
-    &\quad+ \mat{R}_k^{(1:N)} + \mat{S}^{(N)}\bigr)^{-1}\mat{H}_k^{(1:N)}\Bigr)\cdot\\
-    &\Bigl(\mat{F}_k\mat{P}_{k-1}^{[0,N]}\mat{F}_k^\top + \mat{Q}_k\Bigr)\,,
- \end{split}
+With the above formulation, we can use the KF to compute the optimal estimate error covariances for estimators with access to only measurements $\vec{z}_k^{\{\mathsf{p}\}}$ or $\vec{z}_k^{\{\mathsf{up}\}}$, for all $k$ as in the proof sketch in section \ref{subsec:priv_estimation:est_security}. Again, an initial covariance $\mat{P}_0=\mat{0}$ is used, giving the minimum achievable error covariance for an estimator $\mathsf{e}^{[\pi,\pi]}$, with access to measurements $\vec{z}_k^{\{\mathsf{p}\}}=\vec{z}_k^{[\pi,\pi]}$, as
+\begin{equation}\label{eq:priv_estimation:fus_pp_lower_bound_covariance}
+    \begin{split}
+        \mat{P}_k^{[\pi,\pi]} =& \Bigl( \mat{I} - (\mat{F}_k\mat{P}_{k-1}^{[\pi,\pi]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:\pi)\top} \cdot \\
+        &\qquad\bigl(\mat{H}_k^{(1:\pi)}(\mat{F}_k\mat{P}_{k-1}^{[\pi,\pi]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:\pi)\top}+ \mat{R}_k^{(1:\pi)}\bigr)^{-1}\mat{H}_k^{(1:\pi)}\Bigr)\cdot\\
+        &\quad\Bigl(\mat{F}_k\mat{P}_{k-1}^{[\pi,\pi]}\mat{F}_k^\top + \mat{Q}_k\Bigr)
+    \end{split}
 \end{equation}
-when $\mat{P}_0^{[0,N]}=\mat{0}$. Similarly, the same can be done for an estimator $\mathsf{e}^{[p,p]}$, with access to measurements $\vec{y}_k^{\{\mathsf{p}\}}=\vec{y}_k^{[p,p]}$, as
-\begin{equation}\label{eqn:pp_lower_bound_covariance}
-  \begin{split}
-    \mat{P}_k^{[p,p]} =& \Bigl( \mat{I} - (\mat{F}_k\mat{P}_{k-1}^{[p,p]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:p)\top} \cdot \\
-    &\quad\bigl(\mat{H}_k^{(1:p)}(\mat{F}_k\mat{P}_{k-1}^{[p,p]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:p)\top} \\
-    &\quad+ \mat{R}_k^{(1:p)}\bigr)^{-1}\mat{H}_k^{(1:p)}\Bigr)\cdot\\
-    &\Bigl(\mat{F}_k\mat{P}_{k-1}^{[p,p]}\mat{F}_k^\top + \mat{Q}_k\Bigr)
-  \end{split}
+and $\mat{P}_0^{[\pi,\pi]}=\mat{0}$. Similarly, the same can be done for an estimator $\mathsf{e}^{[0,n]}$, with access to measurements $\vec{z}_k^{\{\mathsf{up}\}}=\vec{z}_k^{[0,n]}$, as
+\begin{equation}\label{eq:priv_estimation:fus_0n_lower_bound_covariance}
+    \begin{split}
+        \mat{P}_k^{[0,n]} =& \Bigl( \mat{I} - (\mat{F}_k\mat{P}_{k-1}^{[0,n]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:n)\top} \cdot \\
+        &\qquad\bigl(\mat{H}_k^{(1:n)}(\mat{F}_k\mat{P}_{k-1}^{[0,n]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:n)\top}+ \mat{R}_k^{(1:n)} + \mat{S}^{(n)}\bigr)^{-1}\mat{H}_k^{(1:n)}\Bigr)\cdot\\
+        &\quad\Bigl(\mat{F}_k\mat{P}_{k-1}^{[0,n]}\mat{F}_k^\top + \mat{Q}_k\Bigr)\,,
+    \end{split}
 \end{equation}
-and $\mat{P}_0^{[p,p]}=\mat{0}$. The bounds \eqref{eqn:0N_lower_bound_covariance} and \eqref{eqn:pp_lower_bound_covariance} are constructed such that at every timestep $k$,
-\begin{equation}\label{eqn:0N_cov_bound}
-  \begin{split}
-    &\mat{P}_k^{[0,N]} \preceq\\
-    &\qquad \mathsf{Cov}\left[\mathcal{A}\left(k,\mathcal{M}_S,\mathcal{M}_M,\vec{y}_1^{[0,N]},\dots,\vec{y}_k^{[0,N]}\right) - \vec{x}_k\right]
-  \end{split}
+and $\mat{P}_0^{[0,n]}=\mat{0}$. The bounds \eqref{eq:priv_estimation:fus_pp_lower_bound_covariance} and \eqref{eq:priv_estimation:fus_0n_lower_bound_covariance} are constructed such that at every timestep $k$,
+\begin{equation}\label{eq:priv_estimation:fus_pp_cov_bound}
+    \mat{P}_k^{[\pi,\pi]} \preceq\mathsf{Cov}\left[\mathcal{A}\left(k,\mathcal{M}_{\mathsf{S}},\mathcal{M}_{\mathsf{M}},\vec{z}_1^{[\pi,\pi]},\dots,\vec{z}_k^{[\pi,\pi]}\right) - \vec{x}_k\right]
 \end{equation}
 and
-\begin{equation}\label{eqn:pp_cov_bound}
-  \begin{split}
-    &\mat{P}_k^{[p,p]} \preceq\\
-    &\qquad \mathsf{Cov}\left[\mathcal{A}\left(k,\mathcal{M}_S,\mathcal{M}_M,\vec{y}_1^{[p,p]},\dots,\vec{y}_k^{[p,p]}\right) - \vec{x}_k\right]
-  \end{split}
+\begin{equation}\label{eq:priv_estimation:fus_0n_cov_bound}
+    \mat{P}_k^{[0,n]} \preceq \mathsf{Cov}\left[\mathcal{A}\left(k,\mathcal{M}_{\mathsf{S}},\mathcal{M}_{\mathsf{M}},\vec{z}_1^{[0,n]},\dots,\vec{z}_k^{[0,n]}\right) - \vec{x}_k\right]
 \end{equation}
-hold. Recalling definition [def:cov\_priv\_security\_notion], and knowing that the minimum achievable covariance of the estimators is produced using the KF, it can be seen that the difference 
-\begin{equation}\label{eqn:unpriv_priv_pllb_difference_series}
-  \mat{D}_{\mathsf{PLLB},k} = \mat{P}_k^{[0,N]} - \mat{P}_k^{[p,p]}\,
+hold for any PPT estimator $\mathcal{A}$. As before, taking the difference 
+\begin{equation}\label{eq:priv_estimation:fus_unpriv_priv_pllb_difference_series}
+  \mat{D}_{\mathsf{PLLB},k} = \mat{P}_k^{[0,n]} - \mat{P}_k^{[\pi,\pi]}\,
 \end{equation}
-produces a series where for any PPT estimator $\mathsf{e}^{[0,N]}$, an equivalent PPT estimator $\mathsf{e}^{[p,p]}$, lower bounded in error by \eqref{eqn:pp_lower_bound_covariance}, can always be created such that the difference between their error covariances at time $k$ is at least $\mat{D}_{\mathsf{PLLB},k}$. Here, the PPT requirement guarantees the indistinguishabilty of pseudorandom streams to truly random ones and a negligible performance gain for $\mathsf{e}^{[0,N]}$ is present on average if secret keys or keystreams are guessed. The existence of an estimator of the form $\mathsf{e}^{[0,N]}$ where this condition cannot be met, implies the existence of an estimator with error covariances smaller than the KF for linear models. As no such estimator exists, we conclude that the $\mathsf{Setup}$ and $\mathsf{Noise_{\mathsf{PLLB}}}$ algorithms above meet \textit{$\{\mat{D}_{\mathsf{PLLB},1},\mat{D}_{\mathsf{PLLB},2},\dots\}$-Covariance Privilege for System Model [eqn:system\_model] and Stacked Measurement Models [eqn:measurement\_models]}.
+produces a series where for any PPT estimator $\mathsf{e}^{[0,n]}$, an equivalent PPT estimator $\mathsf{e}^{[\pi,\pi]}$, lower bounded in error by \eqref{eq:priv_estimation:fus_pp_lower_bound_covariance}, can always be created such that the difference between their error covariances at timestep $k$ is at least $\mat{D}_{\mathsf{PLLB},k}$. The existence of an estimator violating the notion implies the existence of a linear estimator with error covariance lower than the KF, proving the bounds by contrapositive. We therefore conclude that the $\mathsf{Setup}$ and $\mathsf{Noise_{\mathsf{PLLB}}}$ algorithms above meet \textit{$\{\mat{D}_{\mathsf{PLLB},1},\mat{D}_{\mathsf{PLLB},2},\dots\}$-Covariance Privilege for System Model \ref{eq:priv_estimation:system_model} and Stacked Measurement Models \ref{eq:priv_estimation:multi_sensor_measurement_models}}.
 
-In the above, we lower bound the estimation performance loss an estimator $\mathsf{e}^{[0,N]}$ has on estimators $\mathsf{e}^{[p,p]}$. In the cases where the unprivileged estimator has access to fewer measurements, $\mathsf{e}^{[0,q]}$, $q<N$, or the privileged one to more, $\mathsf{e}^{[p,q]}$, $q>p$, the achievable difference can only increase (fewer measurements can only increase error covariance while more can only decrease it). This ensures the computed bound remains a lower bound for \textit{any} unprivileged estimator.
+In the above, we lower bound the estimation performance loss an estimator $\mathsf{e}^{[0,n]}$ has on estimators $\mathsf{e}^{[\pi,\pi]}$. In the cases where the unprivileged estimator has access to fewer measurements, $\mathsf{e}^{[0,\tau]}$, $\tau<n$, or the privileged one to more, $\mathsf{e}^{[\pi,\tau]}$, $\tau>\pi$, the achievable difference can only increase (fewer measurements increase optimal error covariance while more decrease it). This ensures the computed bound remains a lower bound for \textit{any} unprivileged estimator.
 
 % 
 % ..######......###....####.##....##....########...#######..##.....##.##....##.########.
@@ -676,40 +668,37 @@ In the above, we lower bound the estimation performance loss an estimator $\math
 % 
 
 \subsubsection{Performance Gain Upper Bound (PGUB)}
-Similar to the lower bound above, we can use the same properties of the KF to give an upper bound to the gain in estimation performance an estimator $\mathsf{e}^{[p,N]}$ has on an estimator $\mathsf{e}^{[p,p]}$ when measurements follow the presented scheme. The associated privileged estimation scheme for the PGUB for each privilege $p$ is given by the same $\mathsf{Setup}$ algorithm as in section [subsec:crypto\_performance\_loss\_lower\_bound] and
+Similar to the lower bound, we can use the same properties of the KF to give an upper bound to the gain in estimation performance an estimator $\mathsf{e}^{[\pi,n]}$ has compared to an estimator $\mathsf{e}^{[\pi,\pi]}$ when measurements follow the presented scheme. The associated privileged estimation scheme for the PGUB for each privilege $\pi$ is given by the same $\mathsf{Setup}$ algorithm as in the PLLB case above and
 \begin{description}
-  \item[$\mathsf{Noise}_{\mathsf{PGUB}}$] Given parameters, cipher keys, a timestep $k$ and true sensor measurements $\vec{y}_k^{(1:N)}$, let $\vec{y}_k^{\{\mathsf{up}\}}=\vec{y}_k^{[p,N]}$ following \eqref{eqn:pq_obs_measurement_model} and $\vec{y}_k^{\{\mathsf{p}\}}=\vec{y}_k^{[p,p]}$ following \eqref{eqn:pp_obs_measurement_model}.
+  \item[$\mathsf{Noise}_{\mathsf{PGUB}}$] Given parameters, cipher keys, a timestep $k$ and true sensor measurements $\vec{z}_k^{(1:n)}$, let $\vec{z}_k^{\{\mathsf{p}\}}=\vec{z}_k^{[\pi,\pi]}$ following \eqref{eq:priv_estimation:fus_pq_obs_measurement_model} and $\vec{z}_k^{\{\mathsf{up}\}}=\vec{z}_k^{[\pi,n]}$ following \eqref{eq:priv_estimation:fus_pp_obs_measurement_model}.
 \end{description}
-The minimum error covariances achievable by an estimator $\mathsf{e}^{[p,p]}$ is again given by \eqref{eqn:pp_lower_bound_covariance} and $\mat{P}_0^{[p,p]} = \mat{0}$. For an estimator $\mathsf{e}^{[p,N]}$ with access to measurements $\vec{y}_k^{\{\mathsf{up}\}}=\vec{y}_k^{[p,N]}$ it is given by
-\begin{equation}\label{eqn:pN_lower_bound_covariance}
+The minimum error covariances achievable by an estimator $\mathsf{e}^{[\pi,\pi]}$ is again given by \eqref{eq:priv_estimation:fus_pp_lower_bound_covariance} and $\mat{P}_0^{[\pi,\pi]} = \mat{0}$. For an estimator $\mathsf{e}^{[\pi,n]}$ with access to measurements $\vec{z}_k^{\{\mathsf{up}\}}=\vec{z}_k^{[\pi,n]}$ it is given by
+\begin{equation}\label{eq:priv_estimation:fus_pn_lower_bound_covariance}
   \begin{split}
-    \mat{P}_k^{[p,N]} =& \Bigl( \mat{I} - (\mat{F}_k\mat{P}_{k-1}^{[p,N]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:N)\top} \cdot \\
-    &\quad\bigl(\mat{H}_k^{(1:N)}(\mat{F}_k\mat{P}_{k-1}^{[p,N]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:N)\top} \\
-    &\quad+ \mat{X}\bigr)^{-1}\mat{H}_k^{(1:N)}\Bigr)\Bigl(\mat{F}_k\mat{P}_{k-1}^{[p,N]}\mat{F}_k^\top + \mat{Q}_k\Bigr)\,,
+    \mat{P}_k^{[\pi,n]} =& \Bigl( \mat{I} - (\mat{F}_k\mat{P}_{k-1}^{[\pi,n]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:n)\top} \cdot \\
+    &\qquad\bigl(\mat{H}_k^{(1:n)}(\mat{F}_k\mat{P}_{k-1}^{[\pi,n]}\mat{F}_k^\top + \mat{Q}_k)\mat{H}_k^{(1:n)\top}+ \mat{X}\bigr)^{-1}\mat{H}_k^{(1:n)}\Bigr)\\
+    &\quad\Bigl(\mat{F}_k\mat{P}_{k-1}^{[\pi,n]}\mat{F}_k^\top + \mat{Q}_k\Bigr)\,,
  \end{split}
 \end{equation}
 where
 \begin{equation}
   \mat{X} = 
   \begin{bmatrix}
-    \mat{R}_k^{(1:p)} & \mat{0}\\
-    \mat{0} & \mat{S}^{(N-p)} - \bar{\mat{Z}}^\top\mat{S}^{(p)-1}\bar{\mat{Z}} + \mat{R}_k^{(p+1:N)}
+    \mat{R}_k^{(1:\pi)} & \mat{0}\\
+    \mat{0} & \mat{S}^{(n-\pi)} - \bar{\mat{V}}^\top\mat{S}^{(\pi)-1}\bar{\mat{V}} + \mat{R}_k^{(\pi+1:n)}
   \end{bmatrix}
 \end{equation}
-and $\mat{P}_0^{[p,N]} = \mat{0}$. Again, the bounding series are such that \eqref{eqn:pp_cov_bound} and
-\begin{equation}\label{eqn:pN_cov_bound}
-  \begin{split}
-    &\mat{P}_k^{[p,N]} \preceq\\
-    &\qquad \mathsf{Cov}\left[\mathcal{A}\left(k,\mathcal{M}_S,\mathcal{M}_M,\vec{y}_1^{[p,N]},\dots,\vec{y}_k^{[p,N]}\right) - \vec{x}_k\right]
-  \end{split}
+and $\mat{P}_0^{[\pi,n]} = \mat{0}$. Again, the bounding series are such that \eqref{eq:priv_estimation:fus_pp_cov_bound} and
+\begin{equation}\label{eq:priv_estimation:fus_pn_cov_bound}
+    \mat{P}_k^{[\pi,n]} \preceq \mathsf{Cov}\left[\mathcal{A}\left(k,\mathcal{M}_{\mathsf{S}},\mathcal{M}_{\mathsf{M}},\vec{z}_1^{[\pi,n]},\dots,\vec{z}_k^{[\pi,n]}\right) - \vec{x}_k\right]
 \end{equation}
-hold. Now, the difference
-\begin{equation}\label{eqn:unpriv_priv_pgub_difference_series}
-  \mat{D}_{\mathsf{PGUB},k} = \mat{P}_k^{[p,N]} - \mat{P}_k^{[p,p]}\,
+hold for any PPT estimator $\mathcal{A}$. Now, the difference
+\begin{equation}\label{eq:priv_estimation:fus_unpriv_priv_pgub_difference_series}
+  \mat{D}_{\mathsf{PGUB},k} = \mat{P}_k^{[\pi,n]} - \mat{P}_k^{[\pi,\pi]}\,
 \end{equation}
-produces a series where for any PPT estimator $\mathsf{e}^{[p,N]}$, an equivalent PPT estimator $\mathsf{e}^{[p,p]}$, lower bounded in error by \eqref{eqn:pp_lower_bound_covariance}, can always be created such that the difference between their error covariances at time $k$ is at least $\mat{D}_{\mathsf{PGUB},k}$. With the same reasoning as for the lower bound, we conclude that the $\mathsf{Setup}$ and $\mathsf{Noise}_{\mathsf{PGUB}}$ algorithms above meet \textit{$\{\mat{D}_{\mathsf{PGUB},1},\mat{D}_{\mathsf{PGUB},2},\dots\}$-Covariance Privilege for System Model [eqn:system\_model] and Stacked Measurement Models [eqn:measurement\_models]}.
+produces a series where for any PPT estimator $\mathsf{e}^{[\pi,n]}$, an equivalent PPT estimator $\mathsf{e}^{[\pi,\pi]}$, lower bounded in error by \eqref{eq:priv_estimation:fus_pp_lower_bound_covariance}, can always be created such that the difference between their error covariances at timestep $k$ is at least $\mat{D}_{\mathsf{PGUB},k}$. With the same reasoning as for the lower bound, we conclude that the $\mathsf{Setup}$ and $\mathsf{Noise}_{\mathsf{PGUB}}$ algorithms above meet \textit{$\{\mat{D}_{\mathsf{PGUB},1},\mat{D}_{\mathsf{PGUB},2},\dots\}$-Covariance Privilege for System Model \ref{eq:priv_estimation:system_model} and Stacked Measurement Models \ref{eq:priv_estimation:multi_sensor_measurement_models}}.
 
-In \eqref{eqn:unpriv_priv_pgub_difference_series}, $\mat{D}_{\mathsf{PGUB},k} \preceq 0$ for all $k>0$ and lower bounds the (negative) loss in performance an estimator $\mathsf{e}^{[p,N]}$ has on estimators $\mathsf{e}^{[p,p]}$. We refer to the bound as an upper bound as its negation $-\mat{D}_{\mathsf{PGUB},k}$, $k>0$, upper bounds the estimation performance gain achievable by $\mathsf{e}^{[p,N]}$ on the estimators $\mathsf{e}^{[p,p]}$, as desired in section [sec:prob]. In the case where fewer unprivileged measurements are accessible, $\mathsf{e}^{[p,q]}$, $q<N$, this gain can only decrease, keeping the upper bound valid for any estimators $\mathsf{e}^{[p,q]}$, $q>p$.
+In \eqref{eq:priv_estimation:fus_unpriv_priv_pgub_difference_series}, $\mat{D}_{\mathsf{PGUB},k} \preceq 0$ for all $k>0$ and lower bounds the (negative) loss in performance an estimator $\mathsf{e}^{[\pi,n]}$ has on estimators $\mathsf{e}^{[\pi,\pi]}$. We refer to the bound as an upper bound as its negation $-\mat{D}_{\mathsf{PGUB},k}$, $k>0$, upper bounds the estimation performance gain achievable by $\mathsf{e}^{[\pi,n]}$ on the estimators $\mathsf{e}^{[\pi,\pi]}$, as desired in the multiple sensor problem from section \ref{subsec:priv_estimation:fusion_problem}. In the case where fewer unprivileged measurements are accessible, $\mathsf{e}^{[\pi,\tau]}$, $\tau<n$, this gain decrease, keeping the upper bound valid for any estimators $\mathsf{e}^{[\pi,\tau]}$, $\tau>\pi$.
 
 % 
 % .##....##..#######..##....##.........##.......####.##....##
@@ -722,6 +711,7 @@ In \eqref{eqn:unpriv_priv_pgub_difference_series}, $\mat{D}_{\mathsf{PGUB},k} \p
 % 
 
 \subsubsection{Non-Linear Systems}
+Again, we are left with the question of what can be said about the above covariance privilege proof sketches when models are arbitrary non-linear functions. Using the same reasoning for the usefulness of the notion in the presence of a single sensor and with non-linear models, discussed in section \ref{subsec:priv_estimation:est_security}, we argue that applying the above methodology to non-linear methods, and therefore non-optimal estimators, remains useful. That is, although the differences are no longer cryptographically guaranteed, since better estimators may exist, derivable bounds PLLB and PGUB when some arbitrary well-performance estimators are known still provides meaningful security information in a multiple sensor privileged estimation environment.
 
 % 
 %  ######  #### ##     ## 
@@ -732,66 +722,73 @@ In \eqref{eqn:unpriv_priv_pgub_difference_series}, $\mat{D}_{\mathsf{PGUB},k} \p
 % ##    ##  ##  ##     ## 
 %  ######  #### ##     ## 
 % 
+
 \subsection{Simulation}\label{subsec:priv_estimation:fus_simulation}
-In addition to showing how the estimation performance loss and gain bounds can be computed, we have simulated optimal estimators to demonstrate the effects of the correlated and uncorrelated components, $\mat{Z}$ and $\mat{Y}$, respectively. The state of an aircraft $\begin{bmatrix}x & y & v_x & v_y\end{bmatrix}^\top$, capturing its position $x$, $y$ (m) and velocity $v_x$, $v_y$ (m/s), was simulated following a constant velocity system model given by [eqn:system\_model] with parameters
+Lastly, a simulation for the multiple sensor scheme is presented to demonstrate the effects of the correlated and uncorrelated components $\mat{V}$ and $\mat{W}$, respectively, on the bounds PLLB and PGUB. We simulated the same time-invariant constant velocity system model
 \begin{equation}
-  \mat{F}_k=
+    \vec{x}_k =
+    \begin{bmatrix}
+        1 & 0 & 0.5 & 0\\
+        0 & 1 & 0 & 0.5\\
+        0 & 0 & 1 & 0\\
+        0 & 0 & 0 & 1
+    \end{bmatrix}
+    \vec{x}_{k-1} + \vec{w}_k\,,
+\end{equation}
+with
+\begin{equation}
+    \vec{w}_k \sim \mathcal{N}\left(\vec{0},\ \frac{1}{10^{3}}\cdot
+    \begin{bmatrix}
+        0.42 & 0 & 1.25 & 0\\
+        0 & 0.42 & 0 & 1.25\\
+        1.25 & 0 & 5.0 & 0\\
+        0 & 1.25 & 0 & 5
+    \end{bmatrix}\right)\,,
+\end{equation}
+which was measured independently by location sensors $i$, $1\leq i\leq n=4$, with measurement models
+\begin{equation}
+  \vec{z}_{k,i}=
   \begin{bmatrix}
-     1 & 0.5 & 0 & 0\\
-     0 & 1 & 0 & 0\\
-     0 & 0 & 1 & 0.5\\
-     0 & 0 & 0 & 1
-  \end{bmatrix}\,,
+     1 & 0 & 0 & 0\\
+     0 & 1 & 0 & 0
+  \end{bmatrix}
+  \vec{x}_k + \vec{v}_{k,i}
 \end{equation}
 and
 \begin{equation}
-  \mat{Q}_k=10^{-3}\cdot
-  \begin{bmatrix}
-     0.42 & 1.25 & 0 & 0\\
-     1.25 & 5 & 0 & 0\\
-     0 & 0 & 0.42 & 1.25\\
-     0 & 0 & 1.25 & 5
-  \end{bmatrix}\,,
-\end{equation}
-for all $k$, and measured independently by location sensors $i$, $1\leq i \leq N=4$, following [eqn:measurement\_models] with constant parameters
-\begin{equation}
-  \mat{H}_{k,i}=
-  \begin{bmatrix}
-     1 & 0 & 0 & 0\\
-     0 & 0 & 1 & 0
-  \end{bmatrix}
-  \text{ and }
-  \mat{R}_{k,i}=
+  \vec{v}_{k,i}\sim\mathcal{N}\left(\vec{0},
   \begin{bmatrix}
      5 & 2\\
      2 & 5
-  \end{bmatrix}\,,
+  \end{bmatrix}\right)\,.
 \end{equation}
-for all $k$. Simulations were implemented in the Python programming language and the considered correlated and uncorrelated parameters were restricted to the forms $\mat{Z}=\Sigma_z\cdot\mat{I}$ and $\mat{Y}=\Sigma_y\cdot\mat{I}$ for simplicity. All estimators executed linear Kalman filters with the parameters above and the exact knowledge of the initial state ($\mat{P}_0=\mat{0}$).
+Simulations were implemented in the Python programming language and the AES-CTR cipher was used for the required stream ciphers. The correlated and uncorrelated parameters were restricted to the forms $\mat{V}=V\cdot\mat{I}$ and $\mat{W}=W\cdot\mat{I}$ for simplicity. All estimators implemented the linear KF with the model parameters above and initialised with a known initial state ($\mat{P}_0=\mat{0}$).
 
-Figure \ref{fig:mse_privs} shows the errors of different privileged estimators with access to varying sensor measurements when added noise parameters $\Sigma_z$ and $\Sigma_y$ are held constant. As would be expected, the error decreases when more keys are available, while a further decrease is achieved as more additional unprivileged measurements are fused. Here, the difference in mean squared error (MSE) between $\mathsf{e}^{[0,4]}$ and $\mathsf{e}^{[p,p]}$ (shaded blue region), and between $\mathsf{e}^{[p,p]}$ and $\mathsf{e}^{[p,4]}$ (shaded red region), are bounded on average by the trace of the PLLB series \eqref{eqn:unpriv_priv_pllb_difference_series} and PGUB series \eqref{eqn:unpriv_priv_pgub_difference_series}, respectively, when $\Sigma_z=2$ and $\Sigma_y=10$.
+Figure \ref{fig:priv_estimation:fus_mse_privs} shows the errors of different privileged estimators with access to varying sensor measurements when added noise parameters $V$ and $W$ are held constant. As expected, the error decreases when more keys are available, while a further decrease is achieved as more additional unprivileged measurements are fused. Here, the differences in mean squared error (MSE) between $\mathsf{e}^{[0,4]}$ and $\mathsf{e}^{[\pi,\pi]}$ (shaded blue region), and between $\mathsf{e}^{[\pi,\pi]}$ and $\mathsf{e}^{[\pi,4]}$ (shaded red region), are bounded on average by the trace of the PLLB series \eqref{eq:priv_estimation:fus_unpriv_priv_pllb_difference_series} and PGUB series \eqref{eq:priv_estimation:fus_unpriv_priv_pgub_difference_series}, respectively, when $V=2$ and $W=10$.
 \begin{figure}[htbp]
   \centering
   \includegraphics{figures/mse_privs.pdf}
-  \caption{The average errors of different estimators for $1000$ simulation runs when $\Sigma_z=2$ and $\Sigma_y=10$.}
-  \label{fig:mse_privs}
+  \caption{Average MSE of different estimators for $1000$ simulation runs when $V=2$ and $W=10$.}
+  \label{fig:priv_estimation:fus_mse_privs}
 \end{figure}
 
-To demonstrate the effect of parameters $\Sigma_z$ and $\Sigma_y$ (and therefore $\mat{Z}$ and $\mat{Y}$), figure \ref{fig:mse_params} shows their effect on the MSE given fixed estimators. It can be seen that $\Sigma_z$ has a more prominent effect on the PLLB while $\Sigma_y$ has it on the PGUB. However, it can also be observed that both parameters affect both bounds to some degree, revealing some limitations when specific bounds are desired using the proposed scheme.
+To demonstrate the effect of parameters $V$ and $W$ (and therefore $\mat{V}$ and $\mat{W}$), figure \ref{fig:priv_estimation:fus_mse_params} shows their effect on the MSE given fixed estimators. It can be seen that $V$ has a more prominent effect on the PLLB while $W$ has it on the PGUB. However, it can also be observed that both parameters affect both bounds to some degree, revealing some limitations when specific bounds are desired using the proposed scheme.
 \begin{figure}[htbp]
   \centering
   \includegraphics{figures/mse_params.pdf}
-  \caption{The average errors of unprivileged and privilege-$2$ estimators for $1000$ simulation runs when varying $\Sigma_z$ and $\Sigma_y$.}
-  \label{fig:mse_params}
+  \caption{Average MSE of unprivileged and privilege-$2$ estimators for $1000$ simulation runs when varying $V$ and $W$.}
+  \label{fig:priv_estimation:fus_mse_params}
+  % Variables, colours and sizes to look like others.
 \end{figure}
-Figure \ref{fig:trace_params} further captures this relation between the bounds and the parameters $\Sigma_z$ and $\Sigma_y$. As the simulated system is asymptotically stable, steady-state error covariances are reached as $k \to \infty$, and therefore $\mat{D}_{\mathsf{PLLB},k}$ and $\mat{D}_{\mathsf{PGUB},k}$ stabilise as well. From the plot, we can see that increasing the fully correlated noise parameter $\Sigma_z$ cannot greatly reduce the PGUB (\textit{i.e.}, bring $\mathsf{tr}(\mat{D}_{\mathsf{PGUB},k})$ closer to $0$), likely due to the accurate estimation of this component by privileged estimators and the remaining uncorrelated component staying unchanged. Simultaneously, however, the fully correlated component can greatly increase the PLLB (\textit{i.e.}, take $\mathsf{tr}(\mat{D}_{\mathsf{PLLB},k})$ further from $0$) as it increases the redundancy of fusing only unprivileged measurements. The effects of increasing $\Sigma_y$ are less one-sided. The PGUB is reduced due to sufficient uncorrelated noise making the fusion of unprivileged measurements hold little information even when some keys are known, but the PLLB is increased, as uncorrelated noise still affects estimators fusing only unprivileged measurements, albeit less drastically.
+Figure \ref{fig:priv_estimation:fus_trace_params} further captures this relation between the bounds and the parameters $V$ and $W$. As the simulated system is asymptotically stable, steady-state error covariances are reached as $k \to \infty$, and therefore $\mat{D}_{\mathsf{PLLB},k}$ and $\mat{D}_{\mathsf{PGUB},k}$ stabilise as well. From the figure, we can see that increasing the fully correlated noise parameter $V$ cannot greatly reduce the PGUB (\textit{i.e.}, bring $\mathsf{tr}(\mat{D}_{\mathsf{PGUB},k})$ closer to $0$), likely due to the accurate estimation of this component by privileged estimators and the remaining uncorrelated component staying unchanged. Simultaneously, however, the fully correlated component can greatly increase the PLLB (\textit{i.e.}, take $\mathsf{tr}(\mat{D}_{\mathsf{PLLB},k})$ further from $0$) as it increases the redundancy of fusing only unprivileged measurements. The effects of increasing $W$ are less one-sided. The PGUB is reduced due to sufficient uncorrelated noise making the fusion of unprivileged measurements hold little information even when some keys are known, but the PLLB is increased, as uncorrelated noise still affects estimators fusing only unprivileged measurements, albeit less drastically.
 
-Figure \ref{fig:trace_params} also shows how the bounds are affected by the privilege $p$ they are computed for. Predictably, a higher privilege results in fewer additional unprivileged measurements to fuse, lowering the PGUB, but also producing better privileged estimates, increasing the PLLB. We can also see that when the fully correlated noise term $\Sigma_z$ is small and privilege is low ($p=1$), unprivileged estimators with access to all measurements can perform better than privileged ones accessing only privileged measurements (resulting in a negative $\mathsf{tr}(\mat{D}_{\mathsf{PLLB},k})$).
+Figure \ref{fig:priv_estimation:fus_trace_params} also shows how the bounds are affected by the privilege $\pi$ they are computed for. Predictably, higher privilege results in fewer additional unprivileged measurements to fuse, lowering the PGUB but also producing better estimates for the privileged estimator, increasing the PLLB. We can also see that when the fully correlated noise term $V$ is small and privilege is low ($\pi=1$), unprivileged estimators with access to all measurements can perform better than privileged ones accessing only privileged measurements (resulting in a negative $\mathsf{tr}(\mat{D}_{\mathsf{PLLB},k})$).
 \begin{figure}[htbp]
   \centering
   \includegraphics{figures/trace_params.pdf}
-  \caption{Steady-state traces of the PLLB and PGUB for privileges $p=1$ and $p=2$ when $\Sigma_z$ and $\Sigma_y$ are varied.}
-  \label{fig:trace_params}
+  \caption{Steady-state traces of the PLLB and PGUB for privileges $\pi=1$ and $\pi=2$ when $V$ and $W$ are varied.}
+  \label{fig:priv_estimation:fus_trace_params}
+  % Variables, colours and sizes to look like others.
 \end{figure}
 
 % 
@@ -809,10 +806,6 @@ Figure \ref{fig:trace_params} also shows how the bounds are affected by the priv
 % 
 
 \section{Conclusions on Provable Estimation Performances}\label{sec:priv_estimation:conclusion}
-% In this work, we have presented the idea of a privileged estimation scheme and given a formal cryptographic definition for its security. A concrete scheme was provided that meets this notion and an intuitive extension to multiple privilege levels was discussed. A simulation demonstrating a simple use case has been presented, while the benefits of controlling estimation accuracy on a per-party basis have wide application from privatized localization hardware to subscription-based data access. Future work on the topic includes achieving formal security for broader model requirements and testing our scheme on dedicated hardware to demonstrate the method's real-time capability. 
+In this chapter, we have presented the idea of privileged estimation and given a formal cryptographic definition of covariance privilege that can be used to derive and prove an estimation performance difference between privileged and unprivileged estimators. One free parameter allowed the magnitude of this difference to be controlled by the scheme designer. The extension to an environment with multiple sensors and multiple privileges was also considered, and two key privilege-dependent estimation performance differences were derived for which the same notion could also be used to prove them. Here, two free parameters loosely controlled the magnitudes of the differences but their complex relationship showed that more care needs to be taken when choosing them than in the single-sensor case. Both cases were analysed cryptographically and simulated to evaluate performance.
 
-
-
-% The presented method demonstrates how different levels of estimation performance can be cryptographically guaranteed in a network of multiple sensors. The problem considered requires sequential access to sensors and sensor keys and allows for two free parameters, $\mat{Z}$ and $\mat{Y}$, to loosely control the two relevant cryptographic bounds. The different bounds for each privilege, changing bounds over time and the relation between these parameters and the bounds themselves mean that choosing these parameters is a task-specific problem where care must be taken to meet any desired bounds without overly affecting others. The resulting cryptographic bounds can, however, always be computed exactly.
-
-% Future work on this topic includes deriving parameters that affect the relevant cryptographic bounds independently, relaxing sequential sensor and key access requirements and exploring methods for decentralised correlated noise generation with fewer communication costs.
+Future work on provable estimation performances includes hardware implementations to demonstrate real-time capability, finding independent free parameters in the multiple-sensor case and exploring methods for decentralised correlated noise generation with fewer communication costs.
