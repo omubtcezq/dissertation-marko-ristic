@@ -182,8 +182,8 @@ def estimation_plot():
         eif_plot_handles.append(ph_eif)
 
     # Shared axis labels
-    fig.supxlabel(r'Filter Timestep')
-    fig.supylabel(r'Simulation Error (MSE)')
+    fig.supxlabel(r'Simulation Timestep')
+    fig.supylabel(r'Mean Square Error (MSE)')
 
     # Legend only uses lines from first plot (all are the same colours)
     fig.legend((enc_plot_handles[0], eif_plot_handles[0]), (r'Confidential Filter', r'Unmodified EIF'), loc='upper center', ncol=2)
@@ -231,7 +231,7 @@ def timing_plot():
     ax.set_yticks([0,50,100,150])
 
     # Used gloabl axis labels to match the other figures
-    ax.set_xlabel(r'Number of sensors')
+    ax.set_xlabel(r'Number of Sensors')
     ax.set_ylabel(r'Runtime ($s$)')
 
     # Legend

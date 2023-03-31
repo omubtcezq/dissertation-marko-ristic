@@ -10,3 +10,4 @@
 *.synctex.gz
 *.toc
 code/__pycache__/*
+code/priv_estimation_sims.p
