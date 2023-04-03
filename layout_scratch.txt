@@ -85,86 +85,37 @@ Appendix
 
 
 #==========================================================================================#
-#=====================================# OLD AS GUIDE #=====================================#
+#=====================================#    INTRO.    #=====================================#
 #==========================================================================================#
 
-Introduction
-	State-of-the-art and Research Questions
-	Contributions
-	Thesis Structure
-Preliminaries
-	Estimation Preliminaries
-		Kalman Filter
-		Kalman Filter Optimality
-		Extended Kalman Filter
-		Information Fiilter
-		Extended Information Filter
-		Fast Covariance Intersection
-	Encryption Preliminaries
-		Meeting CRyptographic notations
-		Paillier Homomorphic Encryption Scheme
-		Joye-Libert Aggregation Scheme
-		Lewi Order-Revealing Encryption Scheme
-		Encoding Numbers for Encryption
+INTRO POINTS
 
-Estimation Fusion on an Untrusted Cloud
-	Problem Formulation
-	Related Literature
-	Confidential Cloud Fusion leaking Fusion Weights
-		Two-sensor Secure Fast Covariance Intersection
-		Multi-sensor Secure Fast Covariance Intersection
-		Computational Complexity
-		Simulation Results
-	Confidential Cloud Fusion Without Leakage
-		..
-		Complexity
-		Security Analysis
-		Simulation
-	Conclusions
+Estimation
+Estimation prevalence
+Ubiquitous computing and IOT led to need for distributed estimation
+Distributed estimation has lead to its own challenges
+Bayesian methods, KF
+Cross correlations and security concerns
+Cross correlations
+Security concerns are more recent deveopment with prevalence of public networks
+Focus on providing confidentiality in distributed tasks
+Confidentiality from CIA
+Use of term privacy-preserving
 
-Distributed Non-Linear Measurement Fusion with Untrusted Participants
-	Problem Formulation
-		Formal Cryptographic Problem
-		Estimation Problem
-	Related Literature
-	Confidential Range-Only Localisation
-		Private Linear Combination Aggregation Scheme
-		Privacy-Preserving Loclisation
-			..
-			Range Measurement Modification
-			Localisation
-			PseudoCode
-			Leakage
-		Simulation and Results
-		Solvable Sub-Class of Non-Linear measurement Models
-	Conclusions
+Many applications meet confidentiality requirements with AES, RSA with existing estimation solutions
+Implies a trust between enc and dec parties
+Cases where this is not the case exist
+Partial results need to remain confidential or only explicit leakage accepted lead to PHE and FHE
+Preference for PHE in signal processing including estimation
+FHE still typically too slow, but quickly progressing (secfci example). Still, not a focus in thesis
+Context specific
+Distributed multi-party security requires communication-specific cryptographic notions
+Leads to limitations to general estimation methods
+Or general soultions without formal cryptographic backing
+Leads us to the state-of-the-art and the goals of this thesis
 
-Provable Estimation performances
-	Single-Sensor Problem Formulation
-		Formal Cryptographic Problem
-		Estimation Problem
-	Related Literature
-	Privileges Estimation for linear Systems
-		Gaussian Keystream
-		Additional Gaussian Noise
-		Multiple Privileges
-		Scheme Security
-			Single Privileged Case
-			Proof Sketch
-			Multiple Additional Noises
-		Simulation and Results
-		Extension to Non-Linear Systems
-	Multi-sensor Problem Formulation
-		..
-		Fusion in Privielged Estimation Environments
-			Noise Generation
-			Measurement Modification
-			Noise Distribution
-		Cryptographic Bounds
-			Performance Loss Lower Bound (PLLB)
-			Performance Gain Upper Bound (PGUB)
-		Simulation
-	Conclusions
-Conclusion
+SOTA AND RESEARCH QUESTIONS
 
-
+Wide variety of signal processing tasks relevant to estimation or data fusion that take confidentiality of data into account exit
+As stated context specific
+Thesis is grouped into three distinct goals that tackle the gaps in the sota
