@@ -88,7 +88,7 @@ Appendix
 #=====================================#    INTRO.    #=====================================#
 #==========================================================================================#
 
-INTRO POINTS
+INTRODUCTION
 
 Estimation
 Estimation prevalence
@@ -114,8 +114,23 @@ Leads to limitations to general estimation methods
 Or general soultions without formal cryptographic backing
 Leads us to the state-of-the-art and the goals of this thesis
 
-SOTA AND RESEARCH QUESTIONS
+RESEARCH QUESTIONS AND SOTA
 
-Wide variety of signal processing tasks relevant to estimation or data fusion that take confidentiality of data into account exit
-As stated context specific
-Thesis is grouped into three distinct goals that tackle the gaps in the sota
+These limitations form the gaps in research this thesis is centred around
+Overarching topics
+Distributed Kalman filter based solutions for non-linear models with provable security
+Non-linear solutions are the most general solutions in estimation
+Novel cryptographic definitions to capture suitable comunications and leakages
+As such general solutions do not exist it is reasonable that novel cryptographic notions are required as well and therefore an extension to the previous topic
+Additionally, generalisable cryptographic definition for estimation performance
+Present to account for many existing schemes without cryptographic backing. Notions for achieving computational security in these cases could potnetially provide provable security in cases where there is currently no such possibility
+
+Wide variety of sota signal processing tasks relevant to estimation or data fusion that take confidentiality of data into account exist
+
+Targetting these topics, we group this thesis and the state-of-the art into three aims
+
+CONFIDENTIAL ESTIMATE FUSION
+
+CONFIDENTIAL DISTRIBUTED NONLIN MEASUREMENT FUSION
+
+PROVABLE ESTIMATION PERFORMANCE
