@@ -1,9 +1,8 @@
 
 \chapter{Introduction}\label{ch:intro}
-Sensor data processing, state estimation and data fusion have long been active areas of research and continue to find applications in modern systems \cite{andersonOptimalFiltering1979,simonOptimalStateEstimation2006}. As distributed networks have become more prevalent over the years, greater stress has been put on the need for broadly applicable algorithms that support varying types of measurements, estimate accuracies and communication availabilities \cite{mutambaraDecentralizedEstimationControl1998,ligginsDistributedDataFusion2012}, finding uses in localisation, weather forecasting, mapping, cooperative computing and cloud computing []. The use of Bayesian estimation methods such as the popular Kalman filter and its non-linear derivatives have become especially prevalent in application due to their recursive, often optimal, estimation properties and their suitability for modelling cross-correlations between local estimates \cite{chongFortyYearsDistributed2017,haugBayesianEstimationTracking2012}. The handling of these cross-correlations, especially when they are not known in advance, is a common difficulty in state estimation and is tied to the challenges within the field \cite{noackTreatmentDependentInformation2017}. The methods presented in this thesis and much of the related work in data fusion tasks similarly require the consideration of these challenges.
+Sensor data processing, state estimation and data fusion have long been active areas of research and continue to find applications in modern systems \cite{andersonOptimalFiltering1979,simonOptimalStateEstimation2006}. As distributed networks have become more prevalent over the years, greater stress has been put on the need for broadly applicable algorithms that support varying types of measurements, estimate accuracies and communication availabilities \cite{mutambaraDecentralizedEstimationControl1998,ligginsDistributedDataFusion2012}, finding uses in localisation, weather forecasting, mapping, cooperative computing and more []. In particular, handling cross-correlations between distributed data, especially when they are not known in advance, has been a well-studied difficulty in distributed estimation and is closely tied to the challenges in the field \cite{noackTreatmentDependentInformation2017}. The use of Bayesian estimation methods such as the popular Kalman filter and its non-linear derivatives have become especially prevalent in these applications due to their recursive, often optimal, properties and their suitability for modelling these cross-correlations \cite{chongFortyYearsDistributed2017,haugBayesianEstimationTracking2012}. In recent years, widespread advancements in distributed algorithms and the ubiquity of public networks such as the Internet, wireless communication channels and the Internet-of-things (IoT) paradigm, have brought privacy challenges into focus as well\cite{brennerSecretProgramExecution2011,renSecurityChallengesPublic2012}. In particular, the data confidentiality component of the cryptographic Confidentiality-Integrity-Availability (CIA) triad [] has become an important goal in security-aware distributed data processing tasks. That is for concrete data, private to participants, to remain confidential or leakage to be formally quantifiable. In general, the broader topic of data \textit{privacy}, concerned with the identification of individuals by any means including the observation of this data, is used synonymously in literature [] but will not be considered in its entirety in this thesis.
 
-While the challenges relating to correlation errors are a well-established field of research, widespread advancements in distributed computing and uses of public networks for sensor communication have put a focus on the additional requirements of data privacy and state secrecy in recent years as well \cite{brennerSecretProgramExecution2011,renSecurityChallengesPublic2012}. Problems that require both the handling of correlation errors and guaranteeing a level of security for the participants involved are therefore a relevant topic in state estimation today and at the core of the work presented in this thesis. Achieving cryptographic secrecy typically involves hiding transferred information from unauthorised parties and can often be achieved irrespective of the estimation algorithms used by using common symmetric and public-key encryption schemes such as the Advanced Encryption Standard (AES) \cite{gueronIntelAdvancedEncryption2010} and the Rivest-Shamir-Adleman cryptosystem (RSA) \cite{rivestMethodObtainingDigital1978}, respectively. These scenarios, however, imply a trust between encrypting and decrypting parties, which cannot always be assumed in distributed environments. In addition, partial computations on encrypted data or the intended leakage of some results are sometimes required for computing final results. This has led to several operation-providing and leakage-supporting encryption schemes \cite{paillierPublicKeyCryptosystemsBased1999,shiPrivacyPreservingAggregationTimeSeries2011,joyeScalableSchemePrivacyPreserving2013,chotardDecentralizedMultiClientFunctional2018,andresGeoIndistinguishabilityDifferentialPrivacy2013} suitable for these distributed environments or when fine control over leakage is required. While these cryptographic schemes and notations are applicable in estimation and fusion tasks, the nature of cryptographic analysis in distributed environments, heavily dependent on communication protocols, has meant that developed solutions are often very context-specific, leading to numerous solutions for various estimation scenarios, use-cases and security requirements. This leads us to the current state-of-the-art literature on security-oriented state estimation and data fusion, observable gaps in this literature and the research questions we aim to answer.
-
+Traditional data confidentiality involves keeping transmitted information private from unauthorised parties in untrusted networks and can often be achieved irrespective of the data processing algorithms used. Typically, these scenarios can be achieved by using common symmetric and asymmetric encryption schemes such as the Advanced Encryption Standard (AES) \cite{gueronIntelAdvancedEncryption2010} or the Rivest-Shamir-Adleman (RSA) cryptosystem \cite{rivestMethodObtainingDigital1978}, respectively. These scenarios, however, imply trust between encrypting and decrypting parties, which cannot always be assumed in distributed environments. Situations where partial results are considered private, or only partial leakage of data is desired for computing results, do not assume this trust and have led to the development of several encryption schemes that provide encrypted operations and explicit formal leakages \cite{paillierPublicKeyCryptosystemsBased1999,shiPrivacyPreservingAggregationTimeSeries2011,chotardDecentralizedMultiClientFunctional2018,andresGeoIndistinguishabilityDifferentialPrivacy2013}. A very applicable group of these schemes in estimation, homomorphic encryption (HE), allow operations to be performed on encrypted data without decryption. These schemes can be loosely grouped into two categories: fully homomorphic encryption (FHE), allowing arbitrary operations on encryptions; and partially homomorphic encryption (PHE), allowing only a subset, typically one, operations. Although FHE suits a wider variety of estimation problems, essentially allowing arbitrary computations while preserving data confidentiality, its current implementations are still too computationally expensive for large-scale or real-time processing [ASurveyOnHomomrphicEncryptionSchemes, gentry's scheme, faster fhe]. For this reason, PHE has been the more popular choice in providing data confidentiality during a variety of estimation tasks [] and is predominantly relied on throughout this thesis. While these schemes provide a powerful tool for designing data-processing algorithms, the nature of cryptographic analysis in distributed environments depends heavily on communication protocols between participants, limiting the ease of their combination with general estimation and data fusion solutions such as the Bayesian methods mentioned previously. In turn, this has led to various context-specific estimation solutions with differing degrees of cryptographic guarantees, often restricting general solutions to provide meaningful cryptographic guarantees or foregoing provable security for more general algorithms. This leads us to the goals of this thesis and the current state-of-the-art in security-oriented estimation and data fusion.
 
 % 
 %  .d8888b.   .d88888b. 88888888888     d8888 
@@ -19,42 +18,8 @@ While the challenges relating to correlation errors are a well-established field
 %                                             
 % 
 
-\section{State-of-the-Art and Research Questions}\label{sec:intro:sota_and_rq}
-% Makes sense to move this to the introduction above, no?
-To summarise relevant work in security-oriented state estimation and data fusion we first discuss the security and types of data explored in this thesis. Regarding algorithms, we primarily consider stochastic models and outputs. As discussed in section [], Bayesian estimation methods such as the Kalman filter are prevalent due to their applicability and suitability for modelling phenomena accurately. In terms of security, we restrict ourselves to the data confidentiality component of the Confidentiality-Integrity-Availability (CIA) triad []. That is, the primary concern of security in this thesis is that concrete data deemed to be private to some participants remain so and its leakage is formally quantifiable. Data privacy, a related concept, is concerned with stopping the identification of individuals from available information. Although data privacy encompasses data confidentiality, it is a broader topic including communication traffic analyses and external cross-referencing to identify individuals and is not considered in its entirety in this thesis. That said, the terms \textit{data privacy} and \textit{privacy-preserving} are often used in the state-of-the-art to refer to data confidentiality alone and the ability to identify individuals from concrete data available []. The terms will be similarly used throughout this thesis. 
-
-Since knowing exact communications between participating parties is required for meaningful cryptographic analysis of transferred data, many existing general estimation algorithms have been restricted in some way to make communication and security easier to discuss. For example, [aristov] presents a distributed Kalman filter, namely an Information filter, where sensor measurements and measurement errors are known only to the measuring sensors while final estimates are leaked to an estimator. The restriction for this to be achieved requires sensors to form a hierarchical communication structure and measurement models to be linear, limiting the otherwise broadly applicable non-linear models or arbitrary communication structures. Another work, [proloc], presents localisation using range-only measurements where measurements and sensor locations, both required for localisation, are kept private to sensors and a centralised estimator while final estimates are available to an external trusted party. Here, no communication structure is enforced but produced estimates provide no error statistics and do not consider a dynamic system model.
-
-In [pwsac, pwsah], 
-
-
-
-aggregation papers
-
-differential privacy and differentially private Kalman filtering
-
-privacy-preserving optimisation with security based on statistical estimation
-
-added noise estimation
-
---
-
-privacy-preserving image-based localisation
-
-eavesdropper paper with a secure return channel and a lossier channel for eavesdroppers
-
-GPS
-
-chaotic system paper
-
-physical layer noise paper (similar to chaotic noise paper)
-
---
-
-
-The two different approaches, restricting existing broad estimation methods in some ways to make cryptographic analysis plausible and ignoring formal security when assumptions and conclusions are intuitive demonstrate a gap in the existing literature and bring us to the target research topics this thesis aims to explore.
-
-These broad topics aim to fulfil the goal of generalisable but cryptographically provable estimation and fusion methods in distributed environments and lead to the concrete problems tackled in this work
+\section{Research Questions and the State-of-the-Art}\label{sec:intro:sota}
+The restrictions on the generality of solutions and the frequent foregoing of cryptographic guarantees when providing security in estimation tasks form the literature gap that this thesis is centred around. The overarching topics we are interested in are as follows. We wish to find distributed estimation and data fusion solutions based on the Kalman filter for non-linear models with provable security. Here, non-linear models capture the broadest, and therefore most generally applicable, solutions in estimation. Secondly, we are interested in formalising novel cryptographic definitions that capture suitable communication protocols and leakages for any of these solutions should they not exist. Lastly, we would like to define a general cryptographic notion that captures adversary estimation performance and can be applied to existing security-aware estimation schemes with no cryptographically provable guarantees. From these topics, we concentrate on three specific problems that will form the main chapters of this thesis and discuss the state-of-the-art in the context of each.
 
 % 
 % ######## ##     ##  ######  ####  #######  ##    ## 
@@ -91,6 +56,43 @@ These broad topics aim to fulfil the goal of generalisable but cryptographically
 % 
 
 \subsection{Provable Estimate Performances}\label{subsec:intro:provable_est_perf}
+
+Since knowing exact communications between participating parties is required for meaningful cryptographic analysis of transferred data, many existing general estimation algorithms have been restricted in some way to make communication and security easier to discuss. For example, [aristov] presents a distributed Kalman filter, namely an Information filter, where sensor measurements and measurement errors are known only to the measuring sensors while final estimates are leaked to an estimator. The restriction for this to be achieved requires sensors to form a hierarchical communication structure and measurement models to be linear, limiting the otherwise broadly applicable non-linear models or arbitrary communication structures. Another work, [proloc], presents localisation using range-only measurements where measurements and sensor locations, both required for localisation, are kept private to sensors and a centralised estimator while final estimates are available to an external trusted party. Here, no communication structure is enforced but produced estimates provide no error statistics and do not consider a dynamic system model.
+
+
+[artisov], [proloc]
+
+--
+
+In [pwsac, pwsah], 
+
+aggregation papers [joyeScalableSchemePrivacyPreserving2013]
+
+differential privacy and differentially private Kalman filtering
+
+privacy-preserving optimisation with security based on statistical estimation
+
+added noise estimation
+
+--
+
+privacy-preserving image-based localisation
+
+eavesdropper paper with a secure return channel and a lossier channel for eavesdroppers
+
+GPS
+
+chaotic system paper
+
+physical layer noise paper (similar to chaotic noise paper)
+
+--
+
+
+The two different approaches, restricting existing broad estimation methods in some ways to make cryptographic analysis plausible and ignoring formal security when assumptions and conclusions are intuitive demonstrate a gap in the existing literature and bring us to the target research topics this thesis aims to explore.
+
+These broad topics aim to fulfil the goal of generalisable but cryptographically provable estimation and fusion methods in distributed environments and lead to the concrete problems tackled in this work
+
 
 % 
 %  .d8888b.   .d88888b.  888b    888 88888888888 
@@ -132,4 +134,4 @@ The contributions tackle the research topics in section .. by considering three 
 
 \section{Thesis Structure}\label{sec:intro:structure}
 
-Each chapter includes relevant related literature to the specific problem and a formal problem formalisation before presenting the novel solutions.
+Each chapter includes a formal problem formalisation before presenting the novel solutions.

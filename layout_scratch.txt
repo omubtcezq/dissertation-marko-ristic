@@ -1,7 +1,7 @@
 
 Introduction
 	..
-	State-of-the-art and Research Questions
+	Research Questions and the State-of-the-art
 		Confidential Estimate Fusion
 		Confidential Distributed Non-Linear Measurment Models
 		Provable Estimation Performances
@@ -94,9 +94,8 @@ Estimation
 Estimation prevalence
 Ubiquitous computing and IOT led to need for distributed estimation
 Distributed estimation has lead to its own challenges
-Bayesian methods, KF
-Cross correlations and security concerns
 Cross correlations
+Bayesian methods, KF
 Security concerns are more recent deveopment with prevalence of public networks
 Focus on providing confidentiality in distributed tasks
 Confidentiality from CIA
@@ -124,10 +123,8 @@ Novel cryptographic definitions to capture suitable comunications and leakages
 As such general solutions do not exist it is reasonable that novel cryptographic notions are required as well and therefore an extension to the previous topic
 Additionally, generalisable cryptographic definition for estimation performance
 Present to account for many existing schemes without cryptographic backing. Notions for achieving computational security in these cases could potnetially provide provable security in cases where there is currently no such possibility
-
 Wide variety of sota signal processing tasks relevant to estimation or data fusion that take confidentiality of data into account exist
-
-Targetting these topics, we group this thesis and the state-of-the art into three aims
+From these topics, we choose three aims for this thesis and discuss the state-of-the-art applicable to each
 
 CONFIDENTIAL ESTIMATE FUSION
 
