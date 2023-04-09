@@ -30,7 +30,7 @@ Sensor and estimate data that we consider is primarily Bayesian in nature and ty
 % 
 
 \subsection{Kalman Filter}\label{subsec:prelims:kf}
-The Kalman filter (KF) \cite{kalmanNewApproachLinear1960} is a popular and well-studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^d$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{d \times d}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ [kf uses]. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^d$ at each timestep $k$, following the linear system model
+The Kalman filter (KF) \cite{kalmanNewApproachLinear1960,andersonOptimalFiltering1979} is a popular and well-studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^d$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{d \times d}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ \cite{simonOptimalStateEstimation2006,haugBayesianEstimationTracking2012,crassidisOptimalEstimationDynamic2004}. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^d$ at each timestep $k$, following the linear system model
 \begin{equation}\label{eq:prelims:lin_gauss_system_model}
     \vec{x}_k = \mat{F}_k \vec{x}_{k-1} + \vec{w}_k\,,
 \end{equation}
@@ -54,7 +54,7 @@ and
 \begin{equation}\label{eq:prelims:kf_cov_update}
     \mat{P}_{k|k} = \mat{P}_{k|k-1}-\mat{P}_{k|k-1}\mat{H}_k^\top\left(\mat{H}_k\mat{P}_{k|k-1}\mat{H}_k^\top + \mat{R}_k\right)^{-1}\mat{H}\mat{P}_{k|k-1}\,.
 \end{equation}
-In addition to alternating prediction and update steps as time progresses, the update step \eqref{eq:prelims:kf_est_update} and \eqref{eq:prelims:kf_cov_update} can be skipped at timesteps when no measurements are available. Similarly, when multiple independent measurements are present at the same timestep, the update step can be repeated for each measurement individually. Detailed derivations of the KF and discussions on its properties can be found in [huag+chap].
+In addition to alternating prediction and update steps as time progresses, the update step \eqref{eq:prelims:kf_est_update} and \eqref{eq:prelims:kf_cov_update} can be skipped at timesteps when no measurements are available. Similarly, when multiple independent measurements are present at the same timestep, the update step can be repeated for each measurement individually. Detailed derivations of the KF and discussions on its properties can be found in \cite[Chap.~6]{haugBayesianEstimationTracking2012}.
 
 % 
 % ##    ## ########     #######  ########  ######## 
@@ -67,11 +67,11 @@ In addition to alternating prediction and update steps as time progresses, the u
 % 
 
 \subsection{Kalman Filter Optimality}\label{subsec:prelims:kf_opt}
-One of the reasons for the ubiquity and popularity of the KF introduced in section \ref{subsec:prelims:kf} is its optimality in terms of mean square error (MSE) [huag+chap]. That is, the estimate's error covariances, defined by the expectation capturing mean square error,
+One of the reasons for the ubiquity and popularity of the KF introduced in section \ref{subsec:prelims:kf} is its optimality in terms of mean square error (MSE) \cite{simonOptimalStateEstimation2006,haugBayesianEstimationTracking2012,crassidisOptimalEstimationDynamic2004,maybeckStochasticModelsEstimation1982}. That is, the estimate's error covariances, defined by the expectation capturing mean square error,
 \begin{equation}
     \mat{P}_{k|k} = \mathbb{E}\left\{\left(\vec{x}_k - \hat{\vec{x}}_{k|k}\right)\left(\vec{x}_k - \hat{\vec{x}}_{k|k}\right)^\top\right\}\,,
 \end{equation}
-and computed by \eqref{eq:prelims:kf_cov_predict} and \eqref{eq:prelims:kf_cov_update}, can be shown to equal the theoretical lower bound on the covariance of an unbiased estimator when system and measurement models \eqref{eq:prelims:lin_gauss_system_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, respectively, capture the estimated environment exactly [huag refs for crlb]. This property will be used in later cryptographic discussions in this thesis to guarantee estimator performances in terms of MSE. Further reading on the definitions and proofs of KF optimality can be found in [crlb,huag,etc].
+and computed by \eqref{eq:prelims:kf_cov_predict} and \eqref{eq:prelims:kf_cov_update}, can be shown to equal the theoretical lower bound on the covariance of an unbiased estimator when system and measurement models \eqref{eq:prelims:lin_gauss_system_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, respectively, capture the estimated environment exactly \cite{haugBayesianEstimationTracking2012,tichavskyPosteriorCramerRaoBounds1998}. This property will be used in later cryptographic discussions in this thesis to guarantee estimator performances in terms of MSE. Further reading on the definitions and proofs of KF optimality can be found in \cite[Chap.~6]{haugBayesianEstimationTracking2012}.
 
 % 
 % ######## ##    ## ######## 
@@ -84,7 +84,7 @@ and computed by \eqref{eq:prelims:kf_cov_predict} and \eqref{eq:prelims:kf_cov_u
 % 
 
 \subsection{Extended Kalman Filter}\label{subsec:prelims:ekf}
-The extended Kalman filter (EKF) is a recursive state estimation filter applicable to non-linear models and closely related to the linear KF [ekf paper,huag+chap]. The filter produces estimates and their covariances at each timestep by linearising models at the current estimate and evaluating the filter similarly to the KF. As in the KF, a true state $\vec{x}_k$ is assumed to follow known models. The system model is now non-linear and given by
+The extended Kalman filter (EKF) is a recursive state estimation filter applicable to non-linear models and closely related to the linear KF \cite{andersonOptimalFiltering1979}. The filter produces estimates and their covariances at each timestep by linearising models at the current estimate and evaluating the filter similarly to the KF. As in the KF, a true state $\vec{x}_k$ is assumed to follow known models. The system model is now non-linear and given by
 \begin{equation}\label{eq:prelims:nonlin_gauss_system_model}
     \vec{x}_k = \vec{f}_k(\vec{x}_{k-1}) + \vec{w}_k\,,
 \end{equation}
