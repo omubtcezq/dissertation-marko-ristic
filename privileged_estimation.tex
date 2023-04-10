@@ -52,7 +52,7 @@ In addition to the scheme above, we also give the following definitions to help 
     \begin{equation}
         \mathsf{neglCov}_m(\kappa):\mathbb{N}\rightarrow \mathbb{R}^{m\times m}\,,
     \end{equation}
-    is a function that returns a matrix $\mat{A}$ such that $\mat{A}$ is a valid covariance ($\mat{A}\succ 0$ and $\mat{A}=\mat{A}^\top$) and for each of its eigenvalues $a\in\mathsf{eig}(\mat{A})$, there exists a negligible function [Def. 3.4][katzIntroductionModernCryptography2008] $\eta$ such that $a\leq\eta(\kappa)$.
+    is a function that returns a matrix $\mat{A}$ such that $\mat{A}$ is a valid covariance ($\mat{A}\succ 0$ and $\mat{A}=\mat{A}^\top$) and for each of its eigenvalues $a\in\mathsf{eig}(\mat{A})$, there exists a negligible function \cite[Def. 3.4]{katzIntroductionModernCryptography2008} $\eta$ such that $a\leq\eta(\kappa)$.
 \end{definition}
 
 Now we can give the security notion that captures the formal requirements of the estimation difference we want to capture.
@@ -91,7 +91,7 @@ with noise term $\vec{w}_k\sim \mathcal{N}(\vec{0}, \mat{Q}_k)$ and a known non-
 \end{equation}
 with noise term $\vec{v}_k\sim \mathcal{N}(\vec{0}, \mat{R}_k)$ and a known non-zero covariance $\mat{R}_k\in \mathbb{R}^{m\times m}$.
 
-In this scenario, the sensor holds a secret key $\mathsf{sk}_{\mathsf{g}}$ that it uses to modify its measurements, and privileged estimators hold this shared key while unprivileged estimators do not. We also assume that sensors and estimators are synchronised in timestep $k$ to simplify later cryptographic evaluation.% Lastly, an extension to a single-sensor multiple-privilege scheme is also considered and discussed further in section \ref{sec:priv_estimation:privileged_estimation}.
+In this scenario, the sensor holds a secret key $\mathsf{sk}_{\mathsf{g}}$ that it uses to modify its measurements, and privileged estimators hold this shared key while unprivileged estimators do not. We also assume that sensors and estimators are synchronised in timestep $k$ to simplify later cryptographic evaluation.
 
 % 
 % ######## ##     ##  ######     ########  ########   #######  ########  
@@ -153,9 +153,9 @@ In this section, we propose a privileged estimation scheme meeting the security 
 \subsection{Gaussian Keystream}\label{subsec:priv_estimation:est_gaussian_keystream}
 To generate the desired pseudorandom Gaussian noise that can be added to existing measurements, the sensor first generates a typical cryptographic pseudorandom bitstream with its secret key $\mathsf{sk}_{\mathsf{g}}$. This can be done with any cryptographic stream cipher and reduces the security of the method to a single, well-studied and replaceable component. This bitstream can be interpreted as sequential pseudorandom integers of a suitable size and used to generate a sequence of pseudorandom uniform real numbers $\upsilon_t\ \dot{\sim}\ \mathcal{U}(0,1)$ for sequence indices $t>0$.
 
-Here, we note that the conversion to real numbers $\upsilon_t$ is cryptographically non-trivial due to floating-point representation affecting the pseudorandomness of the samples, and complicating the meeting of a desired cryptographic notion. Instead, we assume that floating-point numbers are sufficiently close to real numbers and rely on any common method for choosing the bit size of pseudorandom integers and the generation of uniform numbers $\upsilon_t$ [goualardGeneratingRandomFloatingPoint2020]. This assumption will be further discussed with the security of the presented scheme in section \ref{subsec:priv_estimation:est_security}.
+Here, we note that the conversion to real numbers $\upsilon_t$ is cryptographically non-trivial due to floating-point representation affecting the pseudorandomness of the samples, and complicating the meeting of a desired cryptographic notion. Instead, we assume that floating-point numbers are sufficiently close to real numbers and rely on any common method for choosing the bit size of pseudorandom integers and the generation of uniform numbers $\upsilon_t$ \cite{goualardGeneratingRandomFloatingPoint2020}. This assumption will be further discussed with the security of the presented scheme in section \ref{subsec:priv_estimation:est_security}.
 
-With this assumption, we are left with generating a series of pseudorandom standard Gaussian samples, which can be readily computed using the Box-Muller transform [paleyFourierTransformsComplex1934]. This is given by
+With this assumption, we are left with generating a series of pseudorandom standard Gaussian samples, which can be readily computed using the Box-Muller transform \cite{paleyFourierTransformsComplex1934}. This is given by
 \begin{equation}
     \psi_t = \sqrt{-2\ln (\upsilon_t)}\cos(2\pi \upsilon_{t+1})
 \end{equation}
@@ -333,7 +333,7 @@ with noise term
     \end{bmatrix}
     \right)\,.
 \end{equation}
-Two measurement models were considered, with bounded and unbounded system errors, respectively, and estimators were implemented using the linear KF with initial error covariance $\mat{0}$. Simulations were written in the Python programming language and the AES block cipher in CTR mode (AES-CTR) [gueronIntelAdvancedEncryption2010] was used as the cryptographically secure stream cipher.
+Two measurement models were considered, with bounded and unbounded system errors, respectively, and estimators were implemented using the linear KF with initial error covariance $\mat{0}$. Simulations were written in the Python programming language and the AES block cipher in CTR mode (AES-CTR) \cite{gueronIntelAdvancedEncryption2010} was used as the cryptographically secure stream cipher.
 
 The first measurement model measured state location, leading to an asymptotically stable system with bounded error covariances as $k \rightarrow \infty$. It was given by 
 \begin{equation}\label{eq:priv_estimation:est_simulation_measurement_model_bounded}

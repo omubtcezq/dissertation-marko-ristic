@@ -78,9 +78,9 @@ The scheme in section \ref{sec:nonlin_fusion:lcao_scheme} will be shown to meet 
 \begin{equation*}
     \mathsf{Adv}^{LCAO}(\mathcal{A}) > \eta_1(\kappa) \implies \mathsf{Adv}^{AO}(\mathcal{A}') > \eta_2(\kappa)\,,
 \end{equation*}
-for \textit{any} negligible functions $\eta_1$, $\eta_2$ and security parameter $\kappa$. That is, if we assume our scheme does not meet LCAO, then the Joye-Libert scheme in section \ref{subsec:prelims:joye_libert_agg} does not meet AO (which is not the case, [joyeScalableSchemePrivacyPreserving2013]).
+for \textit{any} negligible functions $\eta_1$, $\eta_2$ and security parameter $\kappa$. That is, if we assume our scheme does not meet LCAO, then the Joye-Libert scheme in section \ref{subsec:prelims:joye_libert_agg} does not meet AO (which is not the case, \cite{joyeScalableSchemePrivacyPreserving2013}).
 \begin{proof}
-    Consider adversary $\mathcal{A}$ playing the LCAO game. The following is a construction of an adversary $\mathcal{A}'$ playing the AO game [shiPrivacyPreservingAggregationTimeSeries2011] against a challenger $\mathcal{C}$ using the Joye-Libert aggregation scheme.
+    Consider adversary $\mathcal{A}$ playing the LCAO game. The following is a construction of an adversary $\mathcal{A}'$ playing the AO game \cite{shiPrivacyPreservingAggregationTimeSeries2011} against a challenger $\mathcal{C}$ using the Joye-Libert aggregation scheme.
     \begin{description}
         \item[Setup] When receiving $N$ and $H$ as public parameters from $\mathcal{C}$, choose an $l>1$ and give public parameter $H$, number of weights $l$, and $\mathsf{pk}_{\mathsf{a}}=N$ to $\mathcal{A}$.
         \item[Queries] Handle queries from $\mathcal{A}$:
