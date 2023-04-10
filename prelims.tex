@@ -30,7 +30,7 @@ Sensor and estimate data that we consider is primarily Bayesian in nature and ty
 % 
 
 \subsection{Kalman Filter}\label{subsec:prelims:kf}
-The Kalman filter (KF) \cite{kalmanNewApproachLinear1960,andersonOptimalFiltering1979} is a popular and well-studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^d$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{d \times d}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ \cite{simonOptimalStateEstimation2006,haugBayesianEstimationTracking2012,crassidisOptimalEstimationDynamic2004}. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^d$ at each timestep $k$, following the linear system model
+The Kalman filter (KF) \cite{andersonOptimalFiltering1979,kalmanNewApproachLinear1960} is a popular and well-studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^d$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{d \times d}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ \cite{simonOptimalStateEstimation2006,haugBayesianEstimationTracking2012,crassidisOptimalEstimationDynamic2004,chuiKalmanFilteringRealTime2013}. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^d$ at each timestep $k$, following the linear system model
 \begin{equation}\label{eq:prelims:lin_gauss_system_model}
     \vec{x}_k = \mat{F}_k \vec{x}_{k-1} + \vec{w}_k\,,
 \end{equation}
@@ -67,7 +67,7 @@ In addition to alternating prediction and update steps as time progresses, the u
 % 
 
 \subsection{Kalman Filter Optimality}\label{subsec:prelims:kf_opt}
-One of the reasons for the ubiquity and popularity of the KF introduced in section \ref{subsec:prelims:kf} is its optimality in terms of mean square error (MSE) \cite{simonOptimalStateEstimation2006,haugBayesianEstimationTracking2012,crassidisOptimalEstimationDynamic2004,maybeckStochasticModelsEstimation1982}. That is, the estimate's error covariances, defined by the expectation capturing mean square error,
+One of the reasons for the ubiquity and popularity of the KF introduced in section \ref{subsec:prelims:kf} is its optimality in terms of mean square error (MSE) \cite{simonOptimalStateEstimation2006,haugBayesianEstimationTracking2012,crassidisOptimalEstimationDynamic2004,chuiKalmanFilteringRealTime2013,maybeckStochasticModelsEstimation1982}. That is, the estimate's error covariances, defined by the expectation capturing mean square error,
 \begin{equation}
     \mat{P}_{k|k} = \mathbb{E}\left\{\left(\vec{x}_k - \hat{\vec{x}}_{k|k}\right)\left(\vec{x}_k - \hat{\vec{x}}_{k|k}\right)^\top\right\}\,,
 \end{equation}
@@ -84,7 +84,7 @@ and computed by \eqref{eq:prelims:kf_cov_predict} and \eqref{eq:prelims:kf_cov_u
 % 
 
 \subsection{Extended Kalman Filter}\label{subsec:prelims:ekf}
-The extended Kalman filter (EKF) is a recursive state estimation filter applicable to non-linear models and closely related to the linear KF \cite{andersonOptimalFiltering1979}. The filter produces estimates and their covariances at each timestep by linearising models at the current estimate and evaluating the filter similarly to the KF. As in the KF, a true state $\vec{x}_k$ is assumed to follow known models. The system model is now non-linear and given by
+The extended Kalman filter (EKF) is a recursive state estimation filter applicable to non-linear models and closely related to the linear KF \cite{andersonOptimalFiltering1979,corporationAppliedOptimalEstimation1974}. The filter produces estimates and their covariances at each timestep by linearising models at the current estimate and evaluating the filter similarly to the KF. As in the KF, a true state $\vec{x}_k$ is assumed to follow known models. The system model is now non-linear and given by
 \begin{equation}\label{eq:prelims:nonlin_gauss_system_model}
     \vec{x}_k = \vec{f}_k(\vec{x}_{k-1}) + \vec{w}_k\,,
 \end{equation}
@@ -116,7 +116,7 @@ with Jacobian
 \begin{equation}\label{eq:prelims:ekf_update_jacobian}
     \hat{\mat{H}}_k = \left.\frac{\partial \vec{h}_k}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k|k-1}}
 \end{equation}
-linearising the measurement model. Unlike the linear KF, by linearising the models the EKF propagates Gaussian model noises in its estimates that may not be Gaussian in reality, even when system and measurement models \eqref{eq:prelims:nonlin_gauss_system_model} and \eqref{eq:prelims:nonlin_gauss_measurement_model}, respectively, are exactly correct. For this reason, the EKF does not hold the same guarantees on optimality as the KF does. To a similar effect, highly non-linear models or inaccurate models can lead to greater inaccuracies and divergence of estimates from true states in EKF estimates. Despite these downsides, its scalability and efficiency have made the EKF an industry-standard estimation filter for non-linear systems [smth on uses of ekf]. More details on the EKF and its derivation can be found in [huag+chap].
+linearising the measurement model. Unlike the linear KF, by linearising the models the EKF propagates Gaussian model noises in its estimates that may not be Gaussian in reality, even when system and measurement models \eqref{eq:prelims:nonlin_gauss_system_model} and \eqref{eq:prelims:nonlin_gauss_measurement_model}, respectively, are exactly correct. For this reason, the EKF does not hold the same guarantees on optimality as the KF does. To a similar effect, highly non-linear models or inaccurate models can lead to greater inaccuracies and divergence of estimates from true states in EKF estimates. Despite these downsides, its scalability and efficiency have made the EKF an industry-standard estimation filter for non-linear systems \cite{corporationAppliedOptimalEstimation1974,yangExtendedKalmanFilter2017,psiakiExtendedKalmanFilter2002}. More details on the EKF and its derivation can be found in \cite[Chap. 7]{haugBayesianEstimationTracking2012}.
 
 % 
 % #### ######## 
@@ -129,7 +129,7 @@ linearising the measurement model. Unlike the linear KF, by linearising the mode
 % 
 
 \subsection{Information Filter}\label{subsec:prelims:if}
-The information filter (IF) is an algebraic reformulation of the KF from section \ref{subsec:prelims:kf} [niehsenInformationFusionBased2002, Mutambara, another]. The information form of the filter simplifies the update step of the filter making it more suitable when multiple independent measurements are present at the same timestep. The key difference of the IF is the storing and propagation of the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ rather than the estimate and its error covariance, $\hat{\vec{x}}_{k|k'}$ and $\mat{P}_{k|k'}$, stored by the KF. When assuming the same linear and Gaussian models \eqref{eq:prelims:lin_gauss_system_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, the information vector and matrix are related to the estimate and its covariance by
+The information filter (IF) is an algebraic reformulation of the KF from section \ref{subsec:prelims:kf} \cite{simonOptimalStateEstimation2006,mutambaraDecentralizedEstimationControl1998}. The information form of the filter simplifies the update step of the filter making it more suitable when multiple independent measurements are present at the same timestep. The key difference of the IF is the storing and propagation of the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ rather than the estimate and its error covariance, $\hat{\vec{x}}_{k|k'}$ and $\mat{P}_{k|k'}$, stored by the KF. When assuming the same linear and Gaussian models \eqref{eq:prelims:lin_gauss_system_model} and \eqref{eq:prelims:lin_gauss_measurement_model}, the information vector and matrix are related to the estimate and its covariance by
 \begin{equation}\label{eq:prelims:info_vec_defn}
     \hat{\vec{y}}_{k|k'} = \mat{P}_{k|k'}^{-1}\hat{\vec{x}}_{k|k'}
 \end{equation}
@@ -182,7 +182,7 @@ and
 \begin{equation}\label{eq:prelims:if_measurement_mat_defn}
     \mat{I}_{k,i} = \mat{H}_{k,i}^\top\mat{R}_{k,i}^{-1}\mat{H}_{k,i}\,.
 \end{equation}
-The easily computed summation has led to the IF being particularly suited to distributed estimation environments, where multiple sensors are present and communicational costs need to be reduced [if egs]. In addition, since the IF is strictly a rearrangement of terms in the KF, it holds the same optimality properties as the KF, described in section \ref{subsec:prelims:kf_opt}. For additional reading on the IF, see [mutambara+chap].
+The easily computed summation has led to the IF being particularly suited to distributed estimation environments, where multiple sensors are present and communicational costs need to be reduced \cite{pfaffInformationFormDistributed2017,chandraInformationFilterIts2016,assimakisInformationFilterKalman2012,reinhardtDistributedKalmanFiltering}. In addition, since the IF is strictly a rearrangement of terms in the KF, it holds the same optimality properties as the KF, described in section \ref{subsec:prelims:kf_opt}. For additional reading on the IF, see \cite[Chap. 6]{simonOptimalStateEstimation2006}.
 
 % 
 % ######## #### ######## 
@@ -195,7 +195,7 @@ The easily computed summation has led to the IF being particularly suited to dis
 % 
 
 \subsection{Extended Information Filter}\label{subsec:prelims:eif}
-The extended information filter (EIF) is an algebraic reformulation of the EKF and represents a non-linear model extension to the linear IF [thrun, another]. As with the IF, its simplification of the update step to a trivial sum has led to its adoption in suitable distributed environments with multiple sensors and a desire to reduce communicational costs [tobias garritsen thesis]. Similarly, the EIF estimates and propagates the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ that relate to the state estimate and its covariance by \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, respectively. Assuming the non-linear system model \eqref{eq:prelims:nonlin_gauss_system_model} and multiple sensors $i$, $1\leq i \leq n$, making independent non-linear measurements that follow models
+The extended information filter (EIF) is an algebraic reformulation of the EKF and represents a non-linear model extension to the linear IF \cite{mutambaraDecentralizedEstimationControl1998,thrunSimultaneousMappingLocalization2004}. As with the IF, its simplification of the update step to a trivial sum has led to its adoption in suitable distributed environments with multiple sensors and a desire to reduce communicational costs \cite{garritsenUsingExtendedInformation}. Similarly, the EIF estimates and propagates the information vector $\hat{\vec{y}}_{k|k'}$ and information matrix $\mat{Y}_{k|k'}$ that relate to the state estimate and its covariance by \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, respectively. Assuming the non-linear system model \eqref{eq:prelims:nonlin_gauss_system_model} and multiple sensors $i$, $1\leq i \leq n$, making independent non-linear measurements that follow models
 \begin{equation}
     \vec{z}_{k,i} = \vec{h}_{k,i}\left(\vec{x}_k\right) + \vec{v}_{k,i}\,,
 \end{equation}
@@ -231,7 +231,7 @@ with Jacobian
 \begin{equation}
     \hat{\mat{H}}_{k,i} = \left.\frac{\partial \vec{h}_{k,i}}{\partial \vec{x}}\right|_{\hat{\vec{x}}_{k|k-1}}\,.
 \end{equation}
-Similarly to the EKF, the linearisation of models leads to estimation errors making optimality guarantees of the KF and IF not hold for the EIF. For further reading and applications of the EIF, see [refs].
+Similarly to the EKF, the linearisation of models leads to estimation errors making optimality guarantees of the KF and IF not hold for the EIF. For further reading and applications of the EIF, see \cite[Chap. 2]{mutambaraDecentralizedEstimationControl1998}.
 
 % 
 % ########  ######  #### 
@@ -244,7 +244,7 @@ Similarly to the EKF, the linearisation of models leads to estimation errors mak
 % 
 
 \subsection{Covariance Intersection and Fast Covariance Intersection}\label{subsec:prelims:fci}
-In the filters presented in the previous sections, measurements from the same timestep must be independent for sequential update steps to fuse them correctly. That is, non-zero cross-correlations between measurements can lead to overly confident estimate error covariances and estimation track divergence [crosscor paper]. In some cases, this independence of measurements cannot be guaranteed and a conservative fusion method is required to obtain a final estimate and its error covariance using all available measurements. A typical scenario is the fusion of local estimator estimates themselves, such as those produced by separate KF, IF, EKF or EIF instances, that may contain cross-correlations due to shared system model assumptions during estimation [ci and dependence ref]. Covariance intersection (CI), is a time-independent fusion algorithm that fuses estimates or measurements and their error covariances when cross-correlations are unknown [julierNondivergentEstimation] and produces estimates that are guaranteed to be conservative, that is, not overly confident in the error of resulting fused estimates. CI is particularly well suited to fusing estimates $\hat{\vec{x}}_i$ and covariances $\mat{P}_i$ of sensor $i$ in the information form, as given in \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, such that the fusion of $n$ information vectors $\mat{P}_i^{-1}\hat{\vec{x}}_i$, $1\leq i\leq n$, and information matrices $\mat{P}_i^{-1}$, $1\leq i\leq n$, produces a fused information vector $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$ and matrix $\mat{P}_{\mathsf{fus}}^{-1}$. It is given by
+In the filters presented in the previous sections, measurements from the same timestep must be independent for sequential update steps to fuse them correctly. That is, non-zero cross-correlations between measurements can lead to overly confident estimate error covariances and estimation track divergence \cite{bar-shalomTracktotrackCorrelationProblem1981,sunMultisensorOptimalInformation2004}. In some cases, this independence of measurements cannot be guaranteed and a conservative fusion method is required to obtain a final estimate and its error covariance using all available measurements. A typical scenario is the fusion of local estimator estimates themselves, such as those produced by separate KF, IF, EKF or EIF instances, that may contain cross-correlations due to shared system model assumptions during estimation \cite{wangDistributedEstimationFusion2012,radtkeDistributedEstimationUsing2019,ajglInverseCovarianceIntersection2020}. Covariance intersection (CI), is a time-independent fusion algorithm that fuses estimates or measurements and their error covariances when cross-correlations are unknown \cite{julierNondivergentEstimationAlgorithm1997} and produces estimates that are guaranteed to be conservative, that is, not overly confident in the error of resulting fused estimates. CI is particularly well suited to fusing estimates $\hat{\vec{x}}_i$ and covariances $\mat{P}_i$ of sensor $i$ in the information form, as given in \eqref{eq:prelims:info_vec_defn} and \eqref{eq:prelims:info_mat_defn}, such that the fusion of $n$ information vectors $\mat{P}_i^{-1}\hat{\vec{x}}_i$, $1\leq i\leq n$, and information matrices $\mat{P}_i^{-1}$, $1\leq i\leq n$, produces a fused information vector $\mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}}$ and matrix $\mat{P}_{\mathsf{fus}}^{-1}$. It is given by
 \begin{equation}\label{eq:prelims:ci_info_vec}
     \mat{P}_{\mathsf{fus}}^{-1}\hat{\vec{x}}_{\mathsf{fus}} = \sum_{i=1}^n \omega_i \mat{P}_i^{-1} \hat{\vec{x}}_i
 \end{equation}
@@ -256,11 +256,11 @@ for some weights $0\leq \omega_i \leq 1$, $1\leq i \leq n$, such that
 \begin{equation}\label{eq:prelims:ci_weight_sum}
     \sum_{i=1}^n \omega_i = 1\,.
 \end{equation}
-The weights $\omega_i$ are chosen in a way to speed up the convergence of estimate errors over time and to minimise fusion estimate error by minimising some property of the fused estimate error covariance $\mat{P}_{\mathsf{fus}}$. A common choice is to minimise the trace of the covariance [ci example with trace], requiring a solution to
+The weights $\omega_i$ are chosen in a way to speed up the convergence of estimate errors over time and to minimise fusion estimate error by minimising some property of the fused estimate error covariance $\mat{P}_{\mathsf{fus}}$. A common choice is to minimise the trace of the covariance \cite{funkConservativeQuantizationFast2020,chenEstimationUnknownCorrelation2002,arambelCovarianceIntersectionAlgorithm2001}, requiring a solution to
 \begin{equation}\label{eq:prelims:ci_min_trace}
     \argmin_{\omega_1,\dots,\omega_n} \left\{\tr\left(\mat{P}_{\mathsf{fus}}\right)\right\}\,.
  \end{equation}
-However, minimising the non-linear cost function \eqref{eq:prelims:ci_min_trace} can be computationally costly and has led to the development of faster approximation techniques. The Fast Covariance Intersection (FCI) algorithm [niehsenInformationFusionBased] is one such method, that approximates \eqref{eq:prelims:ci_min_trace} non-iteratively, while still guaranteeing consistency. It is defined by adding new constraints
+However, minimising the non-linear cost function \eqref{eq:prelims:ci_min_trace} can be computationally costly and has led to the development of faster approximation techniques. The Fast Covariance Intersection (FCI) algorithm \cite{niehsenInformationFusionBased2002} is one such method, that approximates \eqref{eq:prelims:ci_min_trace} non-iteratively, while still guaranteeing consistency. It is defined by adding new constraints
 \begin{equation}\label{eq:prelims:fci_added_constraints}
    \omega_i \tr(\mat{P}_i) - \omega_{i+1} \tr(\mat{P}_{i+1}) = 0\,,
 \end{equation}
@@ -291,7 +291,7 @@ and its solution
 \begin{equation}\label{eq:prelims:fci_solution}
     \omega_i = \frac{\frac{1}{\mathcal{P}_i}}{\sum_{j=1}^n \frac{1}{\mathcal{P}_j}}\,,
 \end{equation}
-for $1\leq i\leq n$, where $\mathcal{P}_i = \tr(\mat{P}_i)$. Yeilding similar results to the optimal CI \eqref{eq:prelims:ci_min_trace}, FCI has become a popular alternative due to its computational simplicity [uses of fci]. For further reading, and uses of CI and FCI, see [ci refs].
+for $1\leq i\leq n$, where $\mathcal{P}_i = \tr(\mat{P}_i)$. Yeilding similar results to the optimal CI \eqref{eq:prelims:ci_min_trace}, FCI has become a popular alternative due to its computational simplicity \cite{congOrderInsensitiveSequential2016,frankenImprovedFastCovariance2005,zhangFastCovarianceIntersection2019}. For further reading, and uses of CI and FCI, see \cite{julierNondivergentEstimationAlgorithm1997,niehsenInformationFusionBased2002}.
 
 % 
 %  .d8888b.  8888888888 .d8888b.       8888888b.  8888888b.  8888888888 888      8888888 888b     d888 
