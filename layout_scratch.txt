@@ -1,12 +1,23 @@
+#==========================================================================================#
+#=====================================#   FOR DEF.   #=====================================#
+#==========================================================================================#
+
+How to apply covariance privilege to existing schemes (examples)
+Differential privacy applicability
+
+
+
+#==========================================================================================#
+#=====================================#  STRUCTURE   #=====================================#
+#==========================================================================================#
 
 Introduction
 	..
 	Research Questions and the State-of-the-art
-		Confidential Estimate Fusion
-		Confidential Distributed Non-Linear Measurment Models
-		Provable Estimation Performances
-	Contributions
-	Thesis Structure
+		Estimate Fusion on an Untrusted Cloud
+		Non-Linear Measurment Fusion with Untrusted Participants
+		Provable Estimation Difference
+	Structure and Contributions
 
 Preliminaries
 	Estimation Preliminaries
@@ -36,9 +47,9 @@ Estimate Fusion on an Untrusted Cloud
 		Computational Complexity
 		Security Analysis
 		Simulation
-	Conclusions on Confidential Estimate Fusion
+	Conclusions on Estimate Fusion on an Untrusted Cloud
 
-Distributed Non-Linear Measurement Fusion with Untrusted Participants
+Non-Linear Measurment Fusion with Untrusted Participants
 	Problem Formulation
 		Formal Cryptographic Problem
 		Estimation Problem
@@ -51,9 +62,9 @@ Distributed Non-Linear Measurement Fusion with Untrusted Participants
 		Solvable Sub-Class of Non-Linear Measurement Models
 		Security Analysis
 		Simulation
-	Conclusions on Confidential Distributed Non-Linear Measurement Fusion
+	Conclusions on Non-Linear Measurment Fusion with Untrusted Participants
 
-Provable Estimation Performances
+Provable Estimation Difference
 	Problem Formulation
 		Formal Cryptographic Problem
 		Estimation Problem
@@ -75,7 +86,7 @@ Provable Estimation Performances
 			Performance Gain Upper Bound (PGUB)
 			Non-Linear Systems
 		Simulation
-	Conclusions on Provable Estimation Performances
+	Conclusions on Provable Estimation Difference
 
 Conclusion
 

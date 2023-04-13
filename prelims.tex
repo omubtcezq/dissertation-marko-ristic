@@ -321,7 +321,7 @@ Used cryptographic notions and schemes are summarised here. In addition, the enc
 % 
 
 \subsection{Meeting Cryptographic Notions}\label{subsec:prelims:crypto_notions}
-Cryptographic notions are formal mathematical constructs used to prove the security of cryptographic schemes. A cryptographic notion applies to a type of cryptographic scheme, typically defined by a tuple of algorithms, \textit{e.g.} $(\mathsf{Generate},\mathsf{Encrypt},\mathsf{Decrypt})$, and captures the capabilities of considered attackers and accepted leakage of information to these attackers, that is, what an attacker can do and what they can learn \cite{katzIntroductionModernCryptography2008}. When a scheme of an appropriate form is proved to meet a cryptographic notion it is mathematically guaranteed that any attacker with the capabilities specified by the notion is limited in gaining information from encryptions as also specified by the notion.
+Cryptographic notions are formal mathematical constructs used to prove the security of cryptographic schemes. A notion applies to a type of cryptographic scheme, typically defined by a tuple of algorithms, for example, $(\mathsf{Generate},\mathsf{Encrypt},\mathsf{Decrypt})$, and captures the capabilities of considered attackers and accepted leakage of information to these attackers, that is, what an attacker can do and what they can learn \cite{katzIntroductionModernCryptography2008}. When a scheme of an appropriate form is proved to meet a cryptographic notion it is mathematically guaranteed that any attacker with the capabilities specified by the notion is limited in gaining information from encryptions as also specified by the notion.
 
 Notion capabilities and leakages are dependent on the goal of a particular encryption scheme and are typically defined as a \textit{cryptographic game} (or \textit{experiment}) involving an adversary and the encryption scheme algorithms \cite{katzIntroductionModernCryptography2008,hwangModernCryptographyProof2021,bellareRandomOraclesAre1993a}. Proofs that schemes meet these notions are often based on existing proofs or assumptions believed to hold, and proved by contrapositive. Below, some cryptographic notions relevant to this thesis are introduced.
 \begin{description}
@@ -436,14 +436,14 @@ denoting left and right encryption, respectively. Their comparison can be comput
     \mathcal{C}\left(\mathcal{E}^{\mathsf{L}}_{\mathsf{sk}_{\mathsf{o}}}(a_1), \mathcal{E}^{\mathsf{R}}_{\mathsf{sk}_{\mathsf{o}}}(a_2)\right) = \mathsf{cmp}(a_1, a_2)\,,
 \end{equation}
 where
-\begin{equation*}
+\begin{equation}
     \mathsf{cmp}(a_1, a_2)=
     \begin{cases}
         -1 & a_1 < a_2\\
         0 & a_1 = a_2\\
         1 & a_1 > a_2
     \end{cases}\,.
-\end{equation*}
+\end{equation}
 For details on implementation, see \cite{lewiOrderRevealingEncryptionNew2016}.
 
 % 

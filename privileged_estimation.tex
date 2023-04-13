@@ -1,5 +1,5 @@
 
-\chapter{Provable Estimation Performances}\label{ch:priv_estimation}
+\chapter{Provable Estimation Difference}\label{ch:priv_estimation}
 
 % 
 % 8888888b.  8888888b.   .d88888b.  888888b.   
@@ -16,7 +16,7 @@
 % 
 
 \section{Problem Formulation}\label{sec:priv_estimation:problem}
-In this chapter, we look at the problem of formalising estimation performances from a cryptographic perspective and allowing meaningful cryptographic guarantees when comparing estimators. The scenario that we will use to build this formalisation is one where system and measurement models are known and stochastic, and state estimators can have access to secret keys, providing them with a certain privilege. Estimators holding no keys are termed unprivileged. Our goal is to develop a single-sensor scheme that quantifies and cryptographically guarantees a difference between privileged and unprivileged estimator performances when both estimators have access to the same measurements and when models are Gaussian and linear. Further, we look at the extension to multiple sensors and the effect of fusion on cryptographic estimation performance guarantees as well as the applicability of the method to non-linear models.
+In this chapter, we look at the problem of formalising estimation performances from a cryptographic perspective and allowing meaningful cryptographic guarantees when comparing estimators. The scenario that we will use to build this formalisation, capturing a generally applicable scenario, is one where system and measurement models are known and stochastic, and state estimators can have access to secret keys, providing them with a certain privilege. Estimators holding no keys are termed unprivileged. In addition, we will develop a single-sensor scheme that quantifies and cryptographically guarantees a difference between privileged and unprivileged estimator performances when both estimators have access to the same measurements and when models are Gaussian and linear. Further, we look at the extension to multiple sensors and the effect of fusion on cryptographic estimation performance guarantees as well as the applicability of the method to non-linear models.
 
 To capture the aim of comparing a privileged and unprivileged estimator, we first define how to assess the estimation difference between them, and which algorithms are required to characterise a privileged estimation scheme. After giving relevant formal cryptographic definitions, the considered single-sensor privileged estimation problem and its extension to multiple sensors are presented.
 
@@ -65,7 +65,7 @@ Now we can give the security notion that captures the formal requirements of the
             &\quad\succeq \mat{D}_k - \mathsf{neglCov}_m(\kappa)
         \end{split}
     \end{equation}
-   for all $k>0$, some negligible covariance function and where matrices $\mat{D}_k$ are semi-definite, \textit{i.e.} $\mat{D}_k\preceq 0$ or $\mat{D}_k\succeq 0$. Here, estimators $\mathcal{A}$ and $\mathcal{A}^\prime$ are running in polynomial-time with respect to the security parameter $\kappa$, and all probabilities are taken over randomness introduced in models $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$, estimators $\mathcal{A}$ and $\mathcal{A}^\prime$, and algorithms $\mathsf{Setup}$ and $\mathsf{Noise}$.
+   for all $k>0$, some negligible covariance function and where matrices $\mat{D}_k$ are semi-definite, that is, $\mat{D}_k\preceq 0$ or $\mat{D}_k\succeq 0$. Here, estimators $\mathcal{A}$ and $\mathcal{A}^\prime$ are running in polynomial-time with respect to the security parameter $\kappa$, and all probabilities are taken over randomness introduced in models $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$, estimators $\mathcal{A}$ and $\mathcal{A}^\prime$, and algorithms $\mathsf{Setup}$ and $\mathsf{Noise}$.
 \end{definition}
 
 Informally, the above definition states that no estimator that can only access unprivileged measurements $\vec{z}_1^{\{\mathsf{up}\}},\dots,\vec{z}_k^{\{\mathsf{up}\}}$ can estimate a state $\vec{x}_k$ for a timestep $k$ with a mean square error (MSE) covariance less than an equivalent estimator with access to privileged measurements $\vec{z}_1^{\{\mathsf{p}\}},\dots,\vec{z}_k^{\{\mathsf{p}\}}$, by a margin of at least $\mat{D}_k$. We also note that by taking probabilities over randomness introduced in the system model, and therefore the possible true states $\vec{x}_k$, the definition fits a Bayesian interpretation of probability for any stochastic system model.
@@ -426,18 +426,20 @@ Similarly to the multivariate Gaussian keystream in section \ref{subsec:priv_est
 \end{equation}
 and $\mat{S}^{(1)}=\mat{V}+\mat{W}$. Denoting generated multivariate standard Gaussian noise \eqref{eq:priv_estimation:est_gaussian_standard_noise_stream} and added Gaussian noise \eqref{eq:priv_estimation:est_gaussian_noise_stream} for sensor $i$ at timestep $k$ as $\vec{\psi}_{k, i}$ and $\vec{g}_{k, i}$, respectively, the generation of all $n$ multivariate Gaussian noises at timestep $k$, $\vec{g}_k^{(1:n)}$, can be computed. This can be done by
 \begin{equation}\label{eq:priv_estimation:fus_all_correlated_noises_generation}
-    \vec{g}_k^{(1:n)}=
-    \begin{bmatrix}
-        \vec{g}_{k,1}\\
-        \vdots\\
-        \vec{g}_{k,n}
-    \end{bmatrix}=
-    \mat{S}^{(n)\frac{1}{2}}\cdot
-    \begin{bmatrix}
-        \vec{\psi}_{k,1}\\
-        \vdots\\
-        \vec{\psi}_{k,n}
-    \end{bmatrix}\,,
+    \begin{split}
+        \vec{g}_k^{(1:n)}&=
+        \begin{bmatrix}
+            \vec{g}_{k,1}\\
+            \vdots\\
+            \vec{g}_{k,n}
+        \end{bmatrix}\\
+        &=\mat{S}^{(n)\frac{1}{2}}\cdot
+        \begin{bmatrix}
+            \vec{\psi}_{k,1}\\
+            \vdots\\
+            \vec{\psi}_{k,n}
+        \end{bmatrix}\,,
+    \end{split}
 \end{equation}
 where each $\vec{\psi}_{k, i}$ is computed as $\vec{\psi}_k$ in \eqref{eq:priv_estimation:est_gaussian_standard_noise_stream} using uniform samples generated with key $\mathsf{sk}_{\mathsf{g}, i}$, and $\mat{S}^{(n)\frac{1}{2}}$ is a matrix such that $\mat{S}^{(n)\frac{1}{2}}\mat{S}^{(n)\frac{1}{2}\top}=\mat{S}^{(n)}$. Notably, as we consider sequential access to keys, it is important that the vector of the first $\pi$ noises $\vec{g}_{k, i}$, $1\leq i\leq \pi$, in \eqref{eq:priv_estimation:fus_all_correlated_noises_generation}, denoted $\vec{g}_k^{(1:\pi)}$, can be reproduced by an estimator of privilege $\pi$, holding only the keys $\mathsf{sk}_{\mathsf{g}, i}$, $1\leq i\leq \pi$. One case where this is possible is when a lower-triangular decomposition, such as the Cholesky decomposition, is used to compute $\mat{S}^{(n)\frac{1}{2}}$ from $\mat{S}^{(n)}$. Then, each correlated Gaussian sample $\vec{g}_{k,i}$ is computable from preceding standard samples $\vec{\psi}_{k,j}$, $j\leq i$ only, and the generalised noise generation equation
 \begin{equation}\label{eq:priv_estimation:fus_p_correlated_noises_generation}
@@ -509,7 +511,7 @@ with $\vec{v}_k^{(1:\tau)}\sim\mathcal{N}(\vec{0},\mat{R}_k^{(1:\tau)})$ and $\v
 \end{equation*}
 and $\mat{S}^{(\tau)} \in \mathbb{R}^{\tau m\times \tau m}$ defined by \eqref{eq:priv_estimation:fus_noise_correlation_matrix}.
 
-Since we are using a cryptographically sound stream cipher to generate the added Gaussian keystream, the pseudorandom samples are indistinguishable from truly random ones to estimators without appropriate keys, which leads us to three observable measurement models, \textit{i.e.}, the models that capture all the information available to an estimator exactly, for three types of mutually exhaustive estimators. Recalling the estimator notation introduced in section \ref{subsec:priv_estimation:fusion_problem}, we have
+Since we are using a cryptographically sound stream cipher to generate the added Gaussian keystream, the pseudorandom samples are indistinguishable from truly random ones to estimators without appropriate keys, which leads us to three observable measurement models, that is, the models that capture all the information available to an estimator exactly, for three types of mutually exhaustive estimators. Recalling the estimator notation introduced in section \ref{subsec:priv_estimation:fusion_problem}, we have
 \begin{description}
     \item[Estimators of the form $\mathsf{e}^{[0,\tau]}$] Here, no keys are held by an unprivileged estimator with access to $\tau$ measurements, thus all generated noises $\vec{g}_k^{(1:\tau)}$ are indistinguishable from noises from the truly random distribution $\mathcal{N}(\vec{0}, \mat{S}^{(\tau)})$. For these estimators, we can rewrite the measurement equation \eqref{eq:priv_estimation:fus_measurement_equation} as the observed measurement model
     \begin{equation}\label{eq:priv_estimation:fus_0q_obs_measurement_model}
@@ -805,7 +807,7 @@ Figure \ref{fig:priv_estimation:fus_trace_params} also shows how the bounds are 
 %                                               
 % 
 
-\section{Conclusions on Provable Estimation Performances}\label{sec:priv_estimation:conclusion}
-In this chapter, we have presented the idea of privileged estimation and given a formal cryptographic definition of covariance privilege that can be used to derive and prove an estimation performance difference between privileged and unprivileged estimators. One free parameter allowed the magnitude of this difference to be controlled by the scheme designer. The extension to an environment with multiple sensors and multiple privileges was also considered, and two key privilege-dependent estimation performance differences were derived for which the same notion could also be used to prove them. Here, two free parameters loosely controlled the magnitudes of the differences but their complex relationship showed that more care needs to be taken when choosing them than in the single-sensor case. Both cases were analysed cryptographically and simulated to evaluate performance.
+\section{Conclusions on Provable Estimation Difference}\label{sec:priv_estimation:conclusion}
+Tackling this problem, we have presented the idea of privileged estimation and given a formal cryptographic definition of covariance privilege that can be used to derive and prove an estimation performance difference between estimators with different properties. One free parameter allowed the magnitude of this difference to be controlled by the scheme designer. The extension to an environment with multiple sensors and multiple privileges was also considered, and two important privilege-dependent estimation performance differences were derived for which the same notion could also be used. Here, two free parameters loosely controlled the magnitudes of the differences but their complex relationship showed that more care needs to be taken when choosing them than in the single-sensor case. Both cases were analysed cryptographically and simulated to evaluate performance.
 
 Future work on provable estimation performances includes hardware implementations to demonstrate real-time capability, finding independent free parameters in the multiple-sensor case and exploring methods for decentralised correlated noise generation with fewer communication costs.

@@ -2,8 +2,9 @@
 
 % Package Fix
 \usepackage{scrhack}
+% Referencing
+\usepackage{multibib}
 % Graphics
-\usepackage{layouts}
 \usepackage{tikz}
 \usepackage{graphicx}
 \usepackage[labelformat=simple]{subcaption}
@@ -19,6 +20,9 @@
 \usepackage{setspace}
 % Local
 \usepackage{local_macros/isasmathmacros}
+
+% Grouped references
+\newcites{MyPubs}{Thesis Publications}
 
 % Sub figures
 \renewcommand\thesubfigure{(\alph{subfigure})}
@@ -101,6 +105,7 @@
 %                                                           
 %                                                           
 % 
+
 \title{Data Confidentiality for Distributed Sensor Fusion}
 \author{Marko Ristic}
 \date{\today}
@@ -126,6 +131,7 @@
 %                                     
 %                                     
 % 
+
 \chapter{Acknowledgements}
 Acks go here. numjamhdu
 
@@ -142,6 +148,7 @@ Acks go here. numjamhdu
 %                                                                
 %                                                                
 % 
+
 \chapter{Abstract}
 Distributed sensing and fusion algorithms are increasingly present in public computing networks and have led to a natural concern for data security in these environments. This thesis aims to present generalisable data fusion algorithms that simultaneously provide strict cryptographic guarantees on user data confidentiality. While fusion algorithms providing some degrees of security guarantees exist, these are typically either provided at the cost of solution generality or lack formal security proofs. Here, novel cryptographic constructs and state-of-the-art encryption schemes are used to develop formal security guarantees for new and generalised data fusion algorithms. Industry-standard Kalman filter derivates are modified and existing schemes abstracted such that novel cryptographic notions capturing the required communications can be formalised, while simulations provide an analysis of practicality. Due to the generality of the presented solutions, broad applications are supported, including autonomous vehicle communications, smart sensor networks and distributed localisation.
 
@@ -158,8 +165,26 @@ Distributed sensing and fusion algorithms are increasingly present in public com
 %                                                               
 %                                                               
 % 
+
 \chapter{Kurzfassung}
 German abs go here.
+
+% 
+%        d8888  .d8888b.  8888888b.   .d88888b.  888b    888 Y88b   d88P 888b     d888  .d8888b.  
+%       d88888 d88P  Y88b 888   Y88b d88P" "Y88b 8888b   888  Y88b d88P  8888b   d8888 d88P  Y88b 
+%      d88P888 888    888 888    888 888     888 88888b  888   Y88o88P   88888b.d88888 Y88b.      
+%     d88P 888 888        888   d88P 888     888 888Y88b 888    Y888P    888Y88888P888  "Y888b.   
+%    d88P  888 888        8888888P"  888     888 888 Y88b888     888     888 Y888P 888     "Y88b. 
+%   d88P   888 888    888 888 T88b   888     888 888  Y88888     888     888  Y8P  888       "888 
+%  d8888888888 Y88b  d88P 888  T88b  Y88b. .d88P 888   Y8888     888     888   "   888 Y88b  d88P 
+% d88P     888  "Y8888P"  888   T88b  "Y88888P"  888    Y888     888     888       888  "Y8888P"  
+%                                                                                                 
+%                                                                                                 
+%                                                                                                 
+% 
+
+\chapter{Acronyms}
+Complete the acronyms here.
 
 % 
 % 888b    888  .d88888b. 88888888888     d8888 88888888888 8888888 .d88888b.  888b    888 
@@ -174,6 +199,7 @@ German abs go here.
 %                                                                                         
 %                                                                                         
 % 
+
 \chapter{Notation}
 Complete the notation here.
 
@@ -190,6 +216,7 @@ Complete the notation here.
 %                                              
 %                                              
 % 
+
 \mainmatter
 \include{intro}
 \include{prelims}
@@ -211,6 +238,7 @@ Complete the notation here.
 %                                                                                         
 %                                                                                         
 % 
+
 \appendix
 \include{appendix}
 
@@ -227,14 +255,16 @@ Complete the notation here.
 %                                            
 %                                            
 % 
+
 \backmatter
 % List of algorithms
 \listoffigures
 \listoftables
 \listofalgorithms
 % Bibliography
-\bibliographystyle{IEEEtran}
+\bibliographystyle{./IEEEtran}
 \bibliography{bibliography/dissertation-marko-ristic}
-% Index
+\bibliographystyleMyPubs{./IEEEtran}
+\bibliographyMyPubs{bibliography/dissertation-marko-ristic}
 
 \end{document}

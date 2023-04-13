@@ -350,7 +350,7 @@ def secfci_omega_plot():
 
     w_errs = [sum((np.array(sims[0]['fci'][-1][1]) - np.array(sims[0]['secfci'][-1][1][g]))**2) for g in [0,1,3]]
 
-    ax.plot([0.1,0.2,0.5], w_errs, marker='', label=r'$\hat{\vec{\omega}}$ Estimate Error')
+    ax.plot([0.1,0.2,0.5], w_errs, marker='.', label=r'$\hat{\vec{\omega}}$ Estimate Error')
 
     ax.set_xlabel(r'$g$')
     ax.set_ylabel(r'Mean Square Error (MSE)')
@@ -412,6 +412,6 @@ def secfci2_error_plot():
 
 
 #store_sims(runs=1000)
-secfci_error_plot()
+#secfci_error_plot()
 secfci_omega_plot()
-secfci2_error_plot()
+#secfci2_error_plot()
