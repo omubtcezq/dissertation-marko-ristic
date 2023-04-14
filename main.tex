@@ -8,6 +8,7 @@
 \usepackage{tikz}
 \usepackage{graphicx}
 \usepackage[labelformat=simple]{subcaption}
+\usepackage{longtable}
 % Maths
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -45,7 +46,7 @@
 
 % Tikz reused commands
 \tikzset{
-   plane/.pic = {
+    plane/.pic = {
     \draw[fill]  plot[smooth, tension=0.6] coordinates {
         (-0.65,-0.9) 
         (-0.6,-0.85) 
@@ -77,7 +78,7 @@
         (-0.15,-0.91) 
         (-0.65,-0.9) 
         } -- cycle;
-   }
+    }
 }
 \definecolor{pyplotblue}{RGB}{31,119,180}
 \definecolor{pyplotorange}{RGB}{255,127,14}
@@ -184,7 +185,183 @@ German abs go here.
 % 
 
 \chapter{Notation}
-Complete the notation here.
+\section*{Symbols}
+\begin{longtable}{p{.20\textwidth}p{.80\textwidth}}
+    $\vec{v}$ & Column vector (underlined)\\
+    $\mat{M}$ & Matrix (bold)\\
+    $\mathbb{N}$ & Set of natural numbers\\
+    $\mathbb{Z}$ & Set of integers\\
+    $\mathbb{Q}$ & Set of rational numbers\\
+    $\mathbb{R}$ & Set of real numbers\\
+    $\mathbb{R}^n$ & $n$-dimensional Euclidian space\\
+    $\mathbb{R}^{n\times m}$ & Vector space of all $n$-by-$m$-dimensional matrices\\
+    $\mathbb{Z}_n$ & Set of integers modulo $n$\\
+    $\mathbb{Z}_n^*$ & Multiplicative group of integers modulo $n$\\
+    $\vec{0}$ & Arbitrary-size zero vector\\
+    $\mat{0}$ & Arbitrary-size zero matrix\\
+    $\mat{I}$ & Arbitrary-size identity matrix\\
+    $\mathcal{N}(\vec{x},\mat{P})$ & Gaussian distribution with mean $\vec{x}$ and covariance $\mat{P}$\\
+    $\left\{a_1,\dots,a_n\right\}$ & Set of $n$ elements\\
+    $\langle a_1,\dots,a_n\rangle$ & Ordered list of $n$ elements\\
+    $\vec{v}^{(a:b)}$ & Stacked vector $\begin{bmatrix}\vec{v}^\top_a \cdots \vec{v}^\top_b\end{bmatrix}^\top$\\
+    $\mat{M}^{(a:b)}$ & Block diagonal matrix with diagonal block elements $\mat{M}_a$, \dots, $\mat{M}_b$\\
+    $\hat{\vec{x}}_{k|k'}$ & Estimate of $\vec{x}$ at timestep $k$ given measurements up to timestep $k'$\\
+    $\mathcal{A}(\vec{v})$ & Arbitrary algorithm output given inputs $\vec{v}$
+\end{longtable}
+\section*{Operations}
+\begin{longtable}{p{.20\textwidth}p{.80\textwidth}}
+    $\vec{v}^\top$ & Transpose of vector $\vec{v}$\\
+    $\mat{M}^\top$ & Transpose of matrix $\mat{M}$\\
+    $\mat{M}^{-1}$ & Inverse of matrix $\mat{M}$\\
+    $\mat{M}\succ\mat{0}$ & Positive-definiteness of matrix $\mat{M}$\\
+    $\mat{M}\succeq\mat{0}$ & Positive-semidefiniteness of matrix $\mat{M}$\\
+    $\mat{M}\succ\mat{N}$ & Positive-definiteness of matrix $\mat{M}-\mat{N}$\\
+    $\mat{M}\succeq\mat{N}$ & Positive-semidefiniteness of matrix $\mat{M}-\mat{N}$\\
+    $\tr(\cdot)$ & Trace\\
+    $\mathsf{eig}(\cdot)$ & Set of eigenvalues\\
+    $|\cdot|$ & Absolute value\\
+    $\lVert\cdot\rVert$ & Vector norm\\
+    $\log{\cdot}$ & Base-$2$ logarithm\\
+    $\lfloor\cdot\rfloor$ & Rounding towards zero\\
+    $\lfloor\cdot\rceil$ & Rounding to nearest integer\\
+    $\mathsf{E}[\cdot]$ & Statistical expectation\\
+    $\mathsf{Var}[\cdot]$ & Statistical variance\\
+    $\mathsf{Cov}[\cdot]$ & Statistical covariance\\
+    $\sim$ & Real distribution\\
+    $\dot{\sim}$ & Pseudorandom distribution\\
+    $\|$ & Binary concatenation operator\\
+    $\pmod{\cdot}$ & Modulo\\
+    $\mathsf{lcm}(\cdot,\cdot)$ & Lowest common denominator\\
+    $\mathsf{cmp}(\cdot,\cdot)$ & Comparison function\\
+    $\mathcal{E}_{\mathsf{sk}}(\cdot)$ & Encryption with key $\mathsf{sk}$\\
+    $\mathcal{E}^{\mathsf{L}}_{\mathsf{sk}}(\cdot)$ & Lewi order-revealing ``left'' encryption with key $\mathsf{sk}$\\
+    $\mathcal{E}^{\mathsf{R}}_{\mathsf{sk}}(\cdot)$ & Lewi order-revealing ``right'' encryption with key $\mathsf{sk}$\\
+    $\mathcal{D}_{\mathsf{sk}}(\cdot)$ & Decryption with key $\mathsf{sk}$\\
+    $\mathcal{C}(\cdot)$ & Lewi order-revealing encryption comparison function\\
+    $\mathsf{E}_{\delta}(\cdot)$ & Integer encoding with parameter $\delta$\\
+    $\mathsf{E}_{\delta}^{-1}(\cdot)$ & Integer decoding with parameter $\delta$\\
+    $\otimes$ & Elementwise plaintext-ciphertext homomorphic multiplication\\
+    $\oplus$ & Elementwise ciphertext-ciphertext homomorphic addition\\
+    $\oplus_{i=1}^n$ & Elementwise ciphertext-ciphertext homomorphic summation\\
+\end{longtable}
+\section*{Variable Conventions}
+\begin{longtable}{p{.20\textwidth}p{.80\textwidth}}
+    $d$ & State dimension\\
+    $e^{(t)}_i$ & Linear combination from sensor $i$ at instance $t$\\
+    $\mathsf{e}^{[\pi,\tau]}$ & Estimator with privilege $\pi$ and measurement access $\tau$\\
+    $\vec{f}_k(\cdot)$ & System model transition function at timestep $k$\\
+    $\mat{F}_k$ & Linear system model transition matrix at timestep $k$\\
+    $\hat{\mat{F}}_k$ & Linearisation of system model transition function $\vec{f}_k$\\
+    $g$ & Stepsize of covariance intersection weight discretisation\\
+    $\vec{g}_k$ & Pseudorandom noise at timestep $k$\\
+    $\vec{g}_{k,i}$ & Correlated pseudorandom noise for sensor $i$ at timestep $k$\\
+    $h_i(\cdot)$ & Measurement model scalar function from sensor $i$\\
+    $\vec{h}_k(\cdot)$ & Measurement model function at timestep $k$\\
+    $\vec{h}_{k,i}(\cdot)$ & Measurement model function from sensor $i$ at timestep $k$\\
+    $\mat{H}_k$ & Linear measurement model function at timestep $k$\\
+    $\mat{H}_{k,i}$ & Linear measurement model function from sensor $i$ at timestep $k$\\
+    $\hat{\mat{H}}_k$ & Linearisation of measurement model function $\vec{h}_k$\\
+    $\hat{\mat{H}}_{k,i}$ & Linearisation of measurement model function $\vec{h}_k$ from sensor $i$\\
+    $H(\cdot)$ & Encryption scheme public hash function\\
+    $i$ & Sensor or estimator identifier\\
+    $\vec{i}_k$ & Measurement vector at timestep $k$\\
+    $\vec{i}_{k,i}$ & Measurement vector from sensor $i$ at timestep $k$\\
+    $\mat{I}_k$ & Measurement matrix at timestep $k$\\
+    $\mat{I}_{k,i}$ & Measurement matrix from sensor $i$ at timestep $k$\\
+    $k$ & Timestep\\
+    $l$ & Number of linear combination aggregation weights $\theta^{(t)}_j$ broadcast at a single instance $t$\\
+    $m$ & Measurement dimension\\
+    $M$ & Integer range encoding parameter\\
+    $\mathcal{M}_{\mathsf{M}}$ & Measurement model parameters\\
+    $\mathcal{M}_{\mathsf{S}}$ & System model parameters\\
+    $n$ & Number of sensors or estimators\\
+    $N$ & Homomorphic encryption modulus, $N=pq$\\
+    $p$ & Random prime of equal bit length to $q$\\
+    $\mat{P}$ & Estimate covariance\\
+    $\mat{P}_{k|k'}$ & Estimate covariance at timestep $k$ given measurements up to timestep $k'$\\
+    $\mat{P}_{\mathsf{fus}}$ & Fused Estimate covariance\\
+    $\mathsf{pk}$ & Paillier encryption scheme public key\\
+    $\mathsf{pk}_{\mathsf{a}}$ & Linear combination aggregation scheme navigator public key\\
+    $\mathsf{pub}$ & Public parameters of an encryption scheme\\
+    $q$ & Random prime of equal bit length to $p$\\
+    $\mat{Q}_k$ & System model noise covariance at timestep $k$\\
+    $r_{k,i}$ & Measurement model scalar noise variance from sensor $i$ at timestep $k$\\
+    $\mat{R}_k$ & Measurement model noise covariance at timestep $k$\\
+    $\mat{R}_{k,i}$ & Measurement model noise covariance from sensor $i$ at timestep $k$\\
+    $s_{x,i}$ & $x$-position of sensor $i$\\
+    $s_{y,i}$ & $y$-position of sensor $i$\\
+    $\vec{s}_i$ & Position vector of sensor $i$\\
+    $\mat{S}$ & Pseudorandom noise covariance\\
+    $\mat{S}^{(n)}$ & Correlated pseudorandom noise covariance for $n$ sensors\\
+    $\mathsf{sk}$ & Paillier encryption scheme secret key\\
+    $\mathsf{sk}_0$ & Joye-Libert aggregation scheme aggregator key\\
+    $\mathsf{sk}_i$ & Joye-Libert aggregation scheme sensor $i$ key\\
+    $\mathsf{sk}_{\mathsf{a},0}$ & Linear combination aggregation scheme aggregator key\\
+    $\mathsf{sk}_{\mathsf{a},i}$ & Linear combination aggregation scheme sensor $i$ key\\
+    $\mathsf{sk}_\mathsf{g}$ & Privileged estimation scheme generation key\\
+    $\mathsf{sk}_{\mathsf{g},i}$ & Privileged estimation scheme sensor $i$ generation key\\
+    $t$ & Time instance (timestep for time-series other than the system state)\\
+    $t_{k,\epsilon}$ & Time instance computed as the bit concatenation of timestep $k$ and position index $\epsilon$\\
+    $v_{k,i}$ & Scalar measurement model noise from sensor $i$ at timestep $k$\\
+    $\vec{v}_k$ & Measurement model noise at timestep $k$\\
+    $\vec{v}_{k,i}$ & Measurement model noise from sensor $i$ at timestep $k$\\
+    $\mat{V}$ & Fully correlated component of correlated pseudorandom noise covariance\\
+    $\vec{w}_k$ & System model noise at timestep $k$\\
+    $\mat{W}$ & Uncorrelated component of correlated pseudorandom noise covariance\\
+    $\vec{x}_k$ & System state at timestep $k$\\
+    $\hat{\vec{x}}$ & Estimate of system state\\
+    $\hat{\vec{x}}_{k|k'}$ & Estimate of system state at timestep $k$ given measurements up to timestep $k'$\\
+    $\hat{\vec{x}}_{\mathsf{fus}}$ & Fused estimate of system state\\
+    $\hat{\vec{y}}_{k|k'}$ & Estimated information vector at timestep $k$ given measurements up to timestep $k'$\\
+    $\mat{Y}_{k|k'}$ & Estimated information matrix at timestep $k$ given measurements up to timestep $k'$\\
+    $z_{k,i}$ & Scalar measurement of state $\vec{x}$ from sensor $i$ at timestep $k$\\
+    $\vec{z}_k$ & Measurement of state $\vec{x}$ at timestep $k$\\
+    $\vec{z}_{k,i}$ & Measurement of state $\vec{x}$ from sensor $i$ at timestep $k$\\
+    $\vec{z}_k^{\{\mathsf{p}\}}$ & Measurement of state $\vec{x}$ at timestep $k$ available to a privileged estimator\\
+    $\vec{z}_k^{\{\mathsf{up}\}}$ & Measurement of state $\vec{x}$ at timestep $k$ available to an unprivileged estimator\\
+    $\vec{z}^{[\pi,\tau]}_k$ & Observed measurement at timestep $k$ for estimator of privilege $\pi$ and measurement access $\tau$\\
+    $\delta$ & Prior number of multiplications encoding parameter\\
+    $\eta(\kappa)$ & Negligible function in security parameter $\kappa$\\
+    $\theta^{(t)}_j$ & $j$-th linear combination aggregation weight at time instance $t$\\
+    $\kappa$ & Encryption scheme setup security parameter\\
+    $\lambda$ & Lowest common multiple of random primes $p$ and $q$\\
+    $\pi$ & Number of sequential privileged estimation generation keys are held (estimator privilege)\\
+    $\tau$ & Number of sequential privileged estimation measurements can be accessed (estimator measurement access)\\
+    $\phi$ & Precision encoding parameter\\
+    $\psi_t$ & Pseudorandom Gaussian noise at instance $t$\\
+    $\vec{\psi}_k$ & Pseudorandom Gaussian noise at timestep $k$\\
+    $\vec{\psi}_{k,i}$ & Pseudorandom Gaussian noise for sensor $i$ at timestep $k$\\
+    $\omega_i$ & Covariance intersection fusion weight for estimator $i$\\
+    $\vec{\omega}$ & Vector of covariance intersection weights, $\vec{\omega}=\begin{bmatrix}\omega_1\cdots\omega_n\end{bmatrix}$\\
+    $\hat{\vec{\omega}}$ & Estimate of covariance intersection weights $\vec{\omega}$
+\end{longtable}
+\section*{Acronyms}
+\begin{longtable}{p{.20\textwidth}p{.80\textwidth}}
+    AES & Advanced Encryption Standard\\
+    AES-CTR & AES block cipher in Counter mode\\
+    AO & Aggregator Obliviousness\\
+    CI & Covariance Intersection\\
+    CIA & Confidentiality-Integrity-Availability\\
+    DCRA & Decisional Composite Residuosity Assumption\\
+    EIF & Extended Information Filter\\
+    EKF & Extended Kalman Filter\\
+    FCI & Fast Covariance Intersection\\
+    FHE & Fully Homomorphic Encryption\\
+    HE & Homomorphic Encryption\\
+    IF & Information Filter\\
+    IND-CPA & Indistinguishability under a Chosen Plaintext Attack\\
+    IND-OCPA & Indistinguishability under an Ordered Chosen Plaintext Attack\\
+    KF & Kalman Filter\\
+    LCAO & Linear Combination Aggregator Obliviousness\\
+    MSE & Mean Square Error\\
+    ORE & Order-Revealing Encryption\\
+    PGUB & Performance Gain Upper Bound\\
+    PHE & Partially Homomorphic Encryption\\
+    PLLB & Performance Loss Lower Bound\\
+    PPT & Probabilistic Polynomial-Time\\
+    RSA & Rivest-Shamir-Adleman\\
+    WSL & Windows Subsystem for Linux
+\end{longtable}
 
 % 
 % 888888b.    .d88888b.  8888888b. Y88b   d88P 

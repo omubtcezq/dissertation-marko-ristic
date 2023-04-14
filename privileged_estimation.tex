@@ -68,7 +68,7 @@ Now we can give the security notion that captures the formal requirements of the
    for all $k>0$, some negligible covariance function and where matrices $\mat{D}_k$ are semi-definite, that is, $\mat{D}_k\preceq 0$ or $\mat{D}_k\succeq 0$. Here, estimators $\mathcal{A}$ and $\mathcal{A}^\prime$ are running in polynomial-time with respect to the security parameter $\kappa$, and all probabilities are taken over randomness introduced in models $\mathcal{M}_{\mathsf{S}}$ and $\mathcal{M}_{\mathsf{M}}$, estimators $\mathcal{A}$ and $\mathcal{A}^\prime$, and algorithms $\mathsf{Setup}$ and $\mathsf{Noise}$.
 \end{definition}
 
-Informally, the above definition states that no estimator that can only access unprivileged measurements $\vec{z}_1^{\{\mathsf{up}\}},\dots,\vec{z}_k^{\{\mathsf{up}\}}$ can estimate a state $\vec{x}_k$ for a timestep $k$ with a mean square error (MSE) covariance less than an equivalent estimator with access to privileged measurements $\vec{z}_1^{\{\mathsf{p}\}},\dots,\vec{z}_k^{\{\mathsf{p}\}}$, by a margin of at least $\mat{D}_k$. We also note that by taking probabilities over randomness introduced in the system model, and therefore the possible true states $\vec{x}_k$, the definition fits a Bayesian interpretation of probability for any stochastic system model.
+Informally, the above definition states that no estimator that can only access unprivileged measurements $\vec{z}_1^{\{\mathsf{up}\}},\dots,\vec{z}_k^{\{\mathsf{up}\}}$ can estimate a state $\vec{x}_k$ for a timestep $k$ with an MSE covariance less than an equivalent estimator with access to privileged measurements $\vec{z}_1^{\{\mathsf{p}\}},\dots,\vec{z}_k^{\{\mathsf{p}\}}$, by a margin of at least $\mat{D}_k$. We also note that by taking probabilities over randomness introduced in the system model, and therefore the possible true states $\vec{x}_k$, the definition fits a Bayesian interpretation of probability for any stochastic system model.
 
 % 
 % ########  ######  ########    ########  ########   #######  ########  
@@ -227,7 +227,7 @@ We consider the stochastic system model \eqref{eq:priv_estimation:system_model} 
 \end{description}
 Here, we note that in the $\mathsf{Setup}$ algorithm above, the inclusion of an initial state estimate, its error covariance and the generated noise covariance in the public parameters $\mathsf{pub}$ are present only for the completeness of the cryptographic definition and not a requirement for the security of the scheme.
 
-The idea behind our proof sketch relies on the optimality of the linear Kalman Filter (KF) introduced in section \ref{subsec:prelims:kf_opt}. Given an initial estimate and its error covariance, the KF produces updated estimates with the minimum mean square error (MSE) achievable for \textit{any} estimator when all measurements $\vec{z}_1,\dots,\vec{z}_k$ are observed, models are Gaussian and linear, and the same initialization is used. Since the KF also preserves the initial error covariance order,
+The idea behind our proof sketch relies on the optimality of the linear KF introduced in section \ref{subsec:prelims:kf_opt}. Given an initial estimate and its error covariance, the KF produces updated estimates with the minimum MSE achievable for \textit{any} estimator when all measurements $\vec{z}_1,\dots,\vec{z}_k$ are observed, models are Gaussian and linear, and the same initialization is used. Since the KF also preserves the initial error covariance order,
 \begin{equation}
    \mat{P}_k \preceq \mat{P}_k^\prime \implies \mat{P}_{k+1} \preceq \mat{P}_{k+1}^\prime\,,
 \end{equation}
@@ -333,7 +333,7 @@ with noise term
     \end{bmatrix}
     \right)\,.
 \end{equation}
-Two measurement models were considered, with bounded and unbounded system errors, respectively, and estimators were implemented using the linear KF with initial error covariance $\mat{0}$. Simulations were written in the Python programming language and the AES block cipher in CTR mode (AES-CTR) \cite{gueronIntelAdvancedEncryption2010} was used as the cryptographically secure stream cipher.
+Two measurement models were considered, with bounded and unbounded system errors, respectively, and estimators were implemented using the linear KF with initial error covariance $\mat{0}$. Simulations were written in the Python programming language and the AES block cipher in counter mode (AES-CTR) \cite{gueronIntelAdvancedEncryption2010} was used as the cryptographically secure stream cipher.
 
 The first measurement model measured state location, leading to an asymptotically stable system with bounded error covariances as $k \rightarrow \infty$. It was given by 
 \begin{equation}\label{eq:priv_estimation:est_simulation_measurement_model_bounded}
@@ -352,13 +352,12 @@ and
         2 & 5
     \end{bmatrix}\right)\,.
 \end{equation}
-The sensor added pseudorandom Gaussian samples with a covariance $\mat{S}=35 \cdot \mat{I}$ according to our scheme in section \ref{subsec:priv_estimation:est_measurement_mod}. Figure \ref{fig:priv_estimation:est_sim_bounded} shows the average error covariance traces and the mean square error (MSE) of a privileged and unprivileged estimator for $1000$ simulations runs using the models \eqref{eq:priv_estimation:est_simulation_system_model} and \eqref{eq:priv_estimation:est_simulation_measurement_model_bounded}. 
+The sensor added pseudorandom Gaussian samples with a covariance $\mat{S}=35 \cdot \mat{I}$ according to our scheme in section \ref{subsec:priv_estimation:est_measurement_mod}. Figure \ref{fig:priv_estimation:est_sim_bounded} shows the average error covariance traces and the MSE of a privileged and unprivileged estimator for $1000$ simulations runs using the models \eqref{eq:priv_estimation:est_simulation_system_model} and \eqref{eq:priv_estimation:est_simulation_measurement_model_bounded}. 
 \begin{figure}[htbp]
     \centering
     \includegraphics{figures/priv_estimation_est_sim_bounded.pdf}
     \caption{Error covariance trace and average MSE from $1000$ simulation runs with measurement model \eqref{eq:priv_estimation:est_simulation_measurement_model_bounded}}
     \label{fig:priv_estimation:est_sim_bounded}
-    % TODO Make larger and make the colours match. Also, add a grid. Say 'Mean squared error (MSE) in the axis name.
 \end{figure}
 As expected, it can be seen that the privileged estimator's error covariance trace is lower than the unprivileged estimator's and that the privileged estimator has a lower MSE. The difference in trace between the two estimators has also been plotted and equals the trace of the series \eqref{eq:priv_estimation:est_covariance_difference_series} due to the simulation initial error covariance $\mat{0}$.
 
@@ -377,7 +376,6 @@ and the same noise distribution and keystream covariance $\mat{S}$ as in the bou
     \includegraphics{figures/priv_estimation_est_sim_unbounded.pdf}
     \caption{Error covariance trace and average MSE from $1000$ simulation runs with measurement model \eqref{eq:priv_estimation:est_simulation_measurement_model_unbounded}}
     \label{fig:priv_estimation:est_sim_unbounded}
-    % TODO Make larger and make the colours match. Also, add a grid. Say 'Mean squared error (MSE) in the axis name.
 \end{figure}
 
 Both figures capture the difference in estimation error between the best possible estimators given the simulated processes (in terms of MSE) and support the security proof sketch in section \ref{subsec:priv_estimation:est_security}.
@@ -397,7 +395,7 @@ Both figures capture the difference in estimation error between the best possibl
 % 
 
 \section{Fusion in Privileged Estimation Environments}\label{sec:priv_estimation:privileged_fusion}
-Recalling the problem formulation in section \ref{subsec:priv_estimation:fusion_problem}, an effective single-sensor privileged estimation scheme leads to interest in the extension to environments with multiple sensors, where multiple privileges and accesses to measurements are possible, affecting the estimation performance of present estimators. Here, we aim to present a scheme where the Performance Loss Lower Bound (PLLB) and the Performance Gain Upper Bound (PGUB), defined in section \ref{subsec:priv_estimation:fusion_problem}, can be derived and proved using the covariance privilege notation from definition \ref{def:priv_estimation:covariance_privilege_notion}. The idea behind the scheme is to add \textit{correlated} Gaussian keystreams to the measurements from each sensor. These noises can be computed and subtracted by estimators holding respective sensor keys, while their correlation limits the additional information gained from fusing unprivileged measurements.
+Recalling the problem formulation in section \ref{subsec:priv_estimation:fusion_problem}, an effective single-sensor privileged estimation scheme leads to interest in the extension to environments with multiple sensors, where multiple privileges and accesses to measurements are possible, affecting the estimation performance of present estimators. Here, we aim to present a scheme where the PLLB and the PGUB, defined in section \ref{subsec:priv_estimation:fusion_problem}, can be derived and proved using the covariance privilege notation from definition \ref{def:priv_estimation:covariance_privilege_notion}. The idea behind the scheme is to add \textit{correlated} Gaussian keystreams to the measurements from each sensor. These noises can be computed and subtracted by estimators holding respective sensor keys, while their correlation limits the additional information gained from fusing unprivileged measurements.
 
 % 
 %  ######   #######  ########  ########     ##    ## ######## ##    ##  ######  
@@ -620,7 +618,7 @@ The security analysis of the fusion problem aims to give proof sketches of the d
 % .########..#######...######...######.....########...#######...#######..##....##.########.
 % 
 
-\subsubsection{Performance Loss Lower Bound (PLLB)}
+\subsubsection{Performance Loss Lower Bound}
 First, we consider the lower bound to the loss in estimation performance an estimator $\mathsf{e}^{[0, n]}$ has compared to an estimator $\mathsf{e}^{[\pi,\pi]}$ when measurements follow the presented scheme. Since the observed measurement models for these estimators, \eqref{eq:priv_estimation:fus_0q_obs_measurement_model} and \eqref{eq:priv_estimation:fus_pp_obs_measurement_model}, interpret available measurements as a single stacked measurement, and since we do not consider estimators that corrupt sensors, we can treat the stacked measurement as coming from a single sensor and use the notion of covariance privilege in definition \ref{def:priv_estimation:covariance_privilege_notion} to guarantee the bound. The associated privileged estimation scheme for the PLLB can be written for each privilege $\pi$ as
 \begin{description}
     \item[$\mathsf{Setup}$] Given the system model \eqref{eq:priv_estimation:system_model}, all measurements models \eqref{eq:priv_estimation:multi_sensor_measurement_models} (interpretable as a single stacked measurement model) and a security parameter $\kappa$ used by all sensors, generate $n$ stream cipher keys $\mathsf{sk}_{\mathsf{g}, i}$, $1\leq i\leq n$, and let the scheme definition secret key $\mathsf{sk}_{\mathsf{g}}$ include all $n$ keys. Generate the correlated and uncorrelated noise components $\mat{V}$ and $\mat{W}$, an initial estimate and error covariance $\hat{\vec{x}}_0$ and $\mat{P}_0$, and include these in the public parameters $\mathsf{pub}$.
@@ -669,7 +667,7 @@ In the above, we lower bound the estimation performance loss an estimator $\math
 % ..######...##.....##.####.##....##....########...#######...#######..##....##.########.
 % 
 
-\subsubsection{Performance Gain Upper Bound (PGUB)}
+\subsubsection{Performance Gain Upper Bound}
 Similar to the lower bound, we can use the same properties of the KF to give an upper bound to the gain in estimation performance an estimator $\mathsf{e}^{[\pi,n]}$ has compared to an estimator $\mathsf{e}^{[\pi,\pi]}$ when measurements follow the presented scheme. The associated privileged estimation scheme for the PGUB for each privilege $\pi$ is given by the same $\mathsf{Setup}$ algorithm as in the PLLB case above and
 \begin{description}
   \item[$\mathsf{Noise}_{\mathsf{PGUB}}$] Given parameters, cipher keys, a timestep $k$ and true sensor measurements $\vec{z}_k^{(1:n)}$, let $\vec{z}_k^{\{\mathsf{p}\}}=\vec{z}_k^{[\pi,\pi]}$ following \eqref{eq:priv_estimation:fus_pq_obs_measurement_model} and $\vec{z}_k^{\{\mathsf{up}\}}=\vec{z}_k^{[\pi,n]}$ following \eqref{eq:priv_estimation:fus_pp_obs_measurement_model}.
@@ -766,7 +764,7 @@ and
 \end{equation}
 Simulations were implemented in the Python programming language and the AES-CTR cipher was used for the required stream ciphers. The correlated and uncorrelated parameters were restricted to the forms $\mat{V}=V\cdot\mat{I}$ and $\mat{W}=W\cdot\mat{I}$ for simplicity. All estimators implemented the linear KF with the model parameters above and initialised with a known initial state ($\mat{P}_0=\mat{0}$).
 
-Figure \ref{fig:priv_estimation:fus_mse_privs} shows the errors of different privileged estimators with access to varying sensor measurements when added noise parameters $V$ and $W$ are held constant. As expected, the error decreases when more keys are available, while a further decrease is achieved as more additional unprivileged measurements are fused. Here, the differences in mean squared error (MSE) between $\mathsf{e}^{[0,4]}$ and $\mathsf{e}^{[\pi,\pi]}$ (shaded orange region), and between $\mathsf{e}^{[\pi,\pi]}$ and $\mathsf{e}^{[\pi,4]}$ (shaded purple region), are bounded on average by the trace of the PLLB series \eqref{eq:priv_estimation:fus_unpriv_priv_pllb_difference_series} and PGUB series \eqref{eq:priv_estimation:fus_unpriv_priv_pgub_difference_series}, respectively, when $V=2$ and $W=10$.
+Figure \ref{fig:priv_estimation:fus_mse_privs} shows the errors of different privileged estimators with access to varying sensor measurements when added noise parameters $V$ and $W$ are held constant. As expected, the error decreases when more keys are available, while a further decrease is achieved as more additional unprivileged measurements are fused. Here, the differences in MSE between $\mathsf{e}^{[0,4]}$ and $\mathsf{e}^{[\pi,\pi]}$ (shaded orange region), and between $\mathsf{e}^{[\pi,\pi]}$ and $\mathsf{e}^{[\pi,4]}$ (shaded purple region), are bounded on average by the trace of the PLLB series \eqref{eq:priv_estimation:fus_unpriv_priv_pllb_difference_series} and PGUB series \eqref{eq:priv_estimation:fus_unpriv_priv_pgub_difference_series}, respectively, when $V=2$ and $W=10$.
 \begin{figure}[htbp]
   \centering
   \includegraphics{figures/priv_estimation_fus_mse_privs.pdf}

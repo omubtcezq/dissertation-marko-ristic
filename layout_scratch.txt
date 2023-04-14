@@ -82,8 +82,8 @@ Provable Estimation Difference
 		Measurement Modification
 		Noise Distribution
 		Security Analysis
-			Performance Loss Lower Bound (PLLB)
-			Performance Gain Upper Bound (PGUB)
+			Performance Loss Lower Bound
+			Performance Gain Upper Bound
 			Non-Linear Systems
 		Simulation
 	Conclusions on Provable Estimation Difference
@@ -91,7 +91,7 @@ Provable Estimation Difference
 Conclusion
 
 Appendix
-	Linear-Combination Aggregator Obliviousness (LCAO)
+	Linear-Combination Aggregator Obliviousness
 	Cryptographic Proof of LCAO Scheme Security
 
 
