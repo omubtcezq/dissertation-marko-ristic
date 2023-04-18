@@ -1,6 +1,6 @@
 
 \chapter{Preliminaries}\label{ch:prelims}
-When introducing novel methods throughout this thesis, we make use of several existing algorithms and constructs. In this chapter, we present these relevant preliminaries grouped by the fields they pertain to; estimation and cryptography.
+When introducing novel methods throughout this thesis, we make use of several existing algorithms and constructs. In this chapter, we present these relevant preliminaries grouped by the fields they belong to: estimation and cryptography.
 
 % 
 % 8888888888 .d8888b. 88888888888      8888888b.  8888888b.  8888888888 888      8888888 888b     d888 
@@ -30,7 +30,7 @@ Sensor and estimate data that we consider is primarily Bayesian in nature and ty
 % 
 
 \subsection{Kalman Filter}\label{subsec:prelims:kf}
-The KF \cite{andersonOptimalFiltering1979,kalmanNewApproachLinear1960} is a popular and well-studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^d$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{d \times d}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ \cite{simonOptimalStateEstimation2006,haugBayesianEstimationTracking2012,crassidisOptimalEstimationDynamic2004,chuiKalmanFilteringRealTime2013}. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these inputs set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^d$ at each timestep $k$, following the linear system model
+The KF \cite{andersonOptimalFiltering1979,kalmanNewApproachLinear1960} is a popular and well-studied recursive state estimation filter that produces estimates and their error covariances $\hat{\vec{x}}_{k|k^\prime} \in \mathbb{R}^d$ and $\mat{P}_{k|k^\prime} \in \mathbb{R}^{d \times d}$, respectively, for a timestep $k \in \mathbb{N}$, given measurements up to and including timestep $k^\prime \in \mathbb{N}$ \cite{simonOptimalStateEstimation2006,haugBayesianEstimationTracking2012,crassidisOptimalEstimationDynamic2004,chuiKalmanFilteringRealTime2013}. Although the KF supports the estimation of a system state which can be manipulated through an external input, this thesis primarily discusses scenarios where no external inputs are known to the estimator and will introduce the filter with these set to $\vec{0}$. In this form, the KF assumes the existence of a true state $\vec{x}_k \in \mathbb{R}^d$ at each timestep $k$, following the linear system model
 \begin{equation}\label{eq:prelims:lin_gauss_system_model}
     \vec{x}_k = \mat{F}_k \vec{x}_{k-1} + \vec{w}_k\,,
 \end{equation}
@@ -182,7 +182,7 @@ and
 \begin{equation}\label{eq:prelims:if_measurement_mat_defn}
     \mat{I}_{k,i} = \mat{H}_{k,i}^\top\mat{R}_{k,i}^{-1}\mat{H}_{k,i}\,.
 \end{equation}
-The easily computed summation has led to the IF being particularly suited to distributed estimation environments, where multiple sensors are present and communicational costs need to be reduced \cite{pfaffInformationFormDistributed2017,chandraCubatureInformationFilter2016,assimakisInformationFilterKalman2012,reinhardtDistributedKalmanFiltering2014}. In addition, since the IF is strictly a rearrangement of terms in the KF, it holds the same optimality properties as the KF, described in section \ref{subsec:prelims:kf_opt}. For additional reading on the IF, see \cite[Chap. 6]{simonOptimalStateEstimation2006}.
+The easily computed summation has led to the IF being particularly suited to distributed estimation environments, where multiple sensors are present and communicational costs need to be reduced \cite{pfaffInformationFormDistributed2017,chandraCubatureInformationFilter2016,assimakisInformationFilterKalman2012,reinhardtDistributedKalmanFiltering2014}. In addition, since the IF is strictly a rearrangement of terms in the KF, it holds the same optimality properties as the KF described in section \ref{subsec:prelims:kf_opt}. For additional reading on the IF, see \cite[Chap. 6]{simonOptimalStateEstimation2006}.
 
 % 
 % ######## #### ######## 
@@ -425,7 +425,7 @@ removing all noise terms.
 % 
 
 \subsection{Lewi Order-Revealing Encryption Scheme}\label{subsec:prelims:lewi_ore}
-The Lewi ORE scheme is a symmetric encryption scheme that allows for message values to be compared numerically after encryption. The scheme does not meet the ideal notion of security for ORE, IND-OCPA, due to the inherent difficulty of this problem but rather meets a weaker simulation-based security that allows for some leakage \cite{chenettePracticalOrderRevealingEncryption2016}.
+The Lewi ORE scheme is a symmetric encryption scheme that allows for message values to be compared numerically after encryption. The scheme does not meet the ideal notion of security for ORE, IND-OCPA, due to inherent difficulties of this problem but rather meets a weaker simulation-based security that allows for some leakage \cite{chenettePracticalOrderRevealingEncryption2016}.
 
 To allow additional control over which encrypted values can be compared, the scheme provides two encryption functions, namely a \textit{left} encryption and \textit{right} encryption, such that comparisons can only take place between left and right encryptions. As complete equations for the scheme are lengthy and unnecessary for following this thesis, only its notation will be introduced here. The two encryption equations provided can encrypt plaintexts $a_1,a_2\in\mathbb{Z}$ with a secret key $\mathsf{sk}_{\mathsf{o}}$ and functions
 \begin{equation}\label{eq:prelims:lewi_enc}

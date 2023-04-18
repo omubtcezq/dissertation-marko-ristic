@@ -34,7 +34,7 @@ are produced. A trusted querying party can then request \eqref{eq:cloud_fusion:f
 
 The cryptographic aims of this problem are captured by the actions of the involved parties and the accepted leakage of confidential information. 
 \begin{description}
-    \item[Honest-but-curious parties] We assume that all sensors and the fusion cloud follow fusion protocols correctly and that no injection or modification to transmitted data is performed by network eavesdroppers, but all parties may use any learned information for external malicious gain. Collusion between any malicious parties is considered possible.
+    \item[Honest-but-curious parties] We assume that all sensors and the fusion cloud follow fusion protocols correctly and that no injection or modification to transmitted data is performed by network eavesdroppers. However, all parties may use any learned information for external malicious gain. Collusion between any malicious parties is considered possible.
     \item[Encrypted estimates meeting IND-CPA] Permitted leakage is such that all estimate information available to a colluding subset of malicious parties, excluding any locally produced estimates (in the case of malicious sensors), is encrypted with a scheme meeting the IND-CPA cryptographic notion, introduced in section \ref{subsec:prelims:crypto_notions}.
 \end{description}
 
@@ -268,7 +268,7 @@ resulting in sequences of the same form as \eqref{eq:cloud_fusion:secfci_2sen_en
         \caption{Intersection of partial solutions spaces gives fusion weights $\vec{\omega}$ in \eqref{eq:prelims:fci_matrix_equation}.}
         \label{fig:cloud_fusion:secfci_partial_sol_intersection}
     \end{subfigure}
-    \caption{Solving fusion weights $\vec{\omega}$ with approximations to \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_point}.}
+    \caption{Solving fusion weights $\vec{\omega}$ as the intersect of partial solutions \eqref{eq:cloud_fusion:secfci_nsen_partial_sol_subspace}.}
     \label{fig:cloud_fusion:secfci_nsen_partial_sols_and_intersect}
 \end{figure}
 
@@ -334,7 +334,7 @@ These complexities show the additional computational cost required for providing
 % 
 
 \subsection{Security Analysis}\label{subsec:cloud_fusion:secfci_security}
-Recalling the cryptographic aims of the estimate fusion problem introduced in the problem formulation and weakened for the presented method, we desire estimate information to be encrypted with a notion meeting IND-CPA at the fusion cloud and eavesdroppers while allowing the leakage of fusion weights, and naturally any functions derivable only from this information.
+Recalling the cryptographic aims of the estimate fusion problem introduced in the problem formulation and weakened for the presented method, we want all estimate information to be encrypted with a notion meeting IND-CPA at the fusion cloud and eavesdroppers while allowing the leakage of fusion weights.
 
 Since Paillier encryptions \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_ests} and \eqref{eq:cloud_fusion:secfci_nsen_paillier_fuse_covs} meet the IND-CPA notion, this information meets the desired aims. The remaining available information to the cloud and eavesdroppers are the sequences encrypted by the Lewi ORE scheme. This scheme meets the simulation-based security discussed in section \ref{subsec:prelims:lewi_ore} and is shown in section \ref{subsec:cloud_fusion:secfci_nsen} to correspond to the leakage of approximations to the weights $\omega_i$, in addition to some leakage beyond the used ciphertext order comparisons due to the relaxation of the IND-OCPA notation (which can be difficult to quantify in context). Lastly, we also acknowledge an implicit leakage of estimate dimension $d$ associated with the use of elementwise encryption. Although methods for the homomorphic encryption of vectors exist \cite{alexandruPrivateWeightedSum2022}, we leave this as future work on this topic and note that the dimension $d$ may leak information about the data fusion use case but that estimates themselves remain encrypted.
 
@@ -607,4 +607,4 @@ In this chapter, we have presented two methods for approximating the FCI fusion 
 
 The first method, providing confidential fusion with the leakage of weights, introduced in section \ref{sec:cloud_fusion:secfci}, has the benefit of allowing the untrusted cloud to prioritise sensors when performing fusion. This is done by preferring sensors that reduce fused estimate error, as indicated by their fusion weight, but requires the assumption that sensors are trusted and cannot collude maliciously. The method also requires the use of two encryption schemes, resulting in higher computational complexity at sensors and the cloud, as can be seen in section \ref{subsec:cloud_fusion:secfci_comp_complexity}. The second method, presented in section \ref{sec:cloud_fusion:secfci2}, provides confidential fusion without the leakage of weights. This method doesn't consider sensors as trusted parties and leaks no information beyond the implicit leakage of state dimension, present in both methods. The stronger security guarantees come with disadvantages, namely that the cloud cannot prioritise estimates based on their fusion error and that an additional, albeit constant, complexity is present at the querying party. Both methods have their computational complexity and security implications analysed and are simulated to demonstrate estimation performance.
 
-Future directions for the topic of confidential data fusion include multi-variable encryption, removing the implicit leakage of state dimension and the extension of the method to decentralised environments where confidential fusion without a centralised cloud is desirable.
+Future directions for the topic of estimate fusion on an untrusted cloud include multi-variable encryption, removing the implicit leakage of state dimension, and the extension of the method to decentralised environments where sensors themselves perform untrusted fusion without a centralised cloud.
