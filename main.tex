@@ -2,6 +2,8 @@
 
 % Package Fix
 \usepackage{scrhack}
+% Date format
+\usepackage[ddmmyyyy]{datetime}
 % Referencing
 \usepackage{multibib}
 % Graphics
@@ -24,6 +26,9 @@
 
 % Grouped references
 \newcites{MyPubs}{Thesis Publications}
+
+% Date
+\renewcommand{\dateseparator}{.}
 
 % Sub figures
 \renewcommand\thesubfigure{(\alph{subfigure})}
@@ -107,14 +112,80 @@
 %                                                           
 % 
 
-\title{Data Confidentiality for Distributed Sensor Fusion}
-\author{Marko Ristic}
-\date{\today}
-\titlehead{Dissertation for the Faculty of Computer Science (FIN),\\Otto von Guericke University (OVGU), Magdeburg}
-\publishers{{\large Supervisor:}\\\vspace{\baselineskip}Prof. Dr.-Ing. Benjamin Noack (OVGU, Magdeburg, Germany)}
-
 \begin{document}
-\maketitle
+\begin{titlepage}
+    \thispagestyle{empty}
+    \begin{center}
+        \includegraphics[trim=0.5cm 3cm 0.5cm 3cm, width=0.7\textwidth]{figures/ovgu_logo}
+
+        \huge
+        \textbf{Data Confidentiality for Distributed Sensor Fusion}
+        
+        \vspace{3\baselineskip}
+        \LARGE
+        DISSERTATION
+
+        \vspace{\baselineskip}
+        \large
+        zur Erlangung des akademischen Grades 
+        
+        \vspace{0.5\baselineskip}
+        \textbf{Doktoringenieur (Dr.-Ing)}
+        
+        \vspace{0.5\baselineskip}
+        vorgelegt der Fakultät für Informatik der Otto-von-Guericke-Universität Magdeburg von
+        
+        \vspace{0.5\baselineskip}
+        \textbf{M.Eng. Marko Ristic}
+        
+        \vspace{0.5\baselineskip}
+        geb. am 05.10.1994 in Brisbane, Australia.
+
+        \vfill
+        \normalsize
+        Supervisor:
+
+        \vspace{0.5\baselineskip}
+        Prof. Dr.-Ing. Benjamin Noack (OVGU, Magdeburg, Germany)
+
+        \vfill
+        \large
+        Magdeburg, den \today
+    \end{center}
+    
+    \newpage
+    \thispagestyle{empty}
+    \LARGE
+    \noindent
+    \textbf{Ehrenerklärung}
+
+    \vspace{1cm}
+    \large
+    \noindent
+    I hereby certify that I have prepared this thesis without the unauthorized assistance of third parties and without the use of resources other than those indicated; external and my own sources used are identified as such. In particular, I have not used the help of a commercial doctoral advisor. Third parties have neither directly nor indirectly received monetary benefits from me for the work related to the content of the submitted dissertation.
+
+    \vspace{0.5cm}
+    \noindent
+    In particular, I did not knowingly:
+    \begin{itemize}
+        \item invent any results or conceal contradictory results,
+        \item intentionally misuse statistical procedures to interpret data in an unjustified manner,
+        \item plagiarize other people's results or publications,
+        \item distort the results of other research.
+    \end{itemize}
+
+    \vspace{0.5cm}
+    \noindent
+    I am aware that violations of copyright law may give rise to injunctive relief and claims for damages by the author as well as criminal prosecution by the law enforcing authorities. The work has not yet been submitted as a dissertation in the same or similar form either in Germany or abroad and has not yet been published as a whole.
+
+    \vspace{0.5cm}
+    \noindent
+    Magdeburg, \today
+
+    \vspace{3cm}
+    \noindent
+    Marko Ristic
+\end{titlepage}
 
 \frontmatter
 \tableofcontents
