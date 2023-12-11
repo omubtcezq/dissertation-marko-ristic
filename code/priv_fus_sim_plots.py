@@ -874,7 +874,7 @@ def plot_privilege_differences():
                 pllb,
                 pgub), 
                (r'$\mathsf{e}^{[\pi,4]}$',
-                r'$\mathsf{e}^{\pi,\pi]}$', 
+                r'$\mathsf{e}^{[\pi,\pi]}$', 
                 r'$\mathsf{e}^{[0,4]}$',
                 r'Error diff. bound by $\mathsf{tr}(\mat{D}_{\mathsf{PLLB}})$',
                 r'Error diff. bound by $\mathsf{tr}(\mat{D}_{\mathsf{PGUB}})$',), loc='upper center', ncol=2)

@@ -49,7 +49,7 @@ def init_matplotlib_params(save_not_show_fig, show_latex_fig):
 
     # Font if saving or ploting in tex mode
     if save_not_show_fig or show_latex_fig:
-        preamble = r"\usepackage{C:/Users/ristic/Documents/GIT_REPOS/dissertation-marko-ristic/local_macros/isasmathmacros}"
+        preamble = r"\usepackage{C:/Users/i_am_/Documents/GIT_REPOS/dissertation-marko-ristic/local_macros/isasmathmacros}"
         matplotlib.rcParams.update({
             "pgf.texsystem": "pdflatex",   
             'font.family': 'serif',             # Use serif/main font for text elements

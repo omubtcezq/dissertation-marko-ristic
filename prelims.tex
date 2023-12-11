@@ -463,9 +463,9 @@ Quantisation to a subset of rational numbers is performed in terms of an output 
 \begin{equation}
     \mathbb{Q}_{M,\phi} = \left\{\chi \,\middle|\, \phi \chi \in \mathbb{N} \wedge -\left\lfloor\frac{M}{2}\right\rfloor \leq \phi \chi < \left\lfloor\frac{M}{2}\right\rfloor \right\}\,,
 \end{equation}
-and can be used to quantise any real number $a \in \mathbb{R}$ by taking the nearest rational $\chi \in \mathbb{Q}_{M,\phi}$, that is, $\argmin_{\chi\in\mathbb{Q}_{M,\phi}} |a-\chi|$. Mapping the rationals $\mathbb{Q}_{M,\phi}$, both positive and negative, to a group $\mathbb{Z}_M$ can then be achieved by modulo arithmetic. Additionally, we note that the Q number format requires a precision factor $\phi$ to be removed after each encoded multiplication. This is captured by a third parameter $\delta$; the number of additional precision factors present in encodings.
+and can be used to quantise any real number $a \in \mathbb{R}$ by taking the nearest rational $\chi \in \mathbb{Q}_{M,\phi}$, that is, $\argmin_{\chi\in\mathbb{Q}_{M,\phi}} |a-\chi|$. Mapping the rationals $\mathbb{Q}_{M,\phi}$, both positive and negative, to a group $\mathbb{Z}_M$ can then be achieved by modulo arithmetic. Additionally, we note that the Q number format requires a precision factor $\phi$ to be removed after each encoded multiplication. This is captured by a third parameter $\delta$; the number of additional precision factors present in encodings, defined by the current multiplicative depth of the encoding.
 
-The function for \textit{combined} quantisation and encoding, $\mathsf{E}_{M,\phi,\delta}(a)$, of a given number $a \in \mathbb{R}$ and with output integer range $\mathbb{Z}_M$, precision $\phi$ and scaling for $\delta$ prior encoded multiplications, is given by
+The function for \textit{combined} quantisation and encoding, $\mathsf{E}_{M,\phi,\delta}(a)$, of a given number $a \in \mathbb{R}$ and with output integer range $\mathbb{Z}_M$, precision $\phi$ and scaling for multiplicative depth $\delta$, is given by
 \begin{equation}\label{eq:prelims:encoding_encode}
     \mathsf{E}_{M,\phi,\delta}(a) = \left\lfloor \phi^{\delta+1} a \right\rceil \pmod{M}\,.
 \end{equation}
@@ -491,7 +491,7 @@ where deviation from equality stems from quantisation and its associated error
     \left|\mathsf{E}^{-1}_{M,\phi,\delta}\left(\mathsf{E}_{M,\phi,\delta}(a)\right) - a\right| \leq \frac{1}{\phi}\,.
 \end{equation}
 
-In general, choosing a large precision parameter $\phi$ reduces quantisation errors but risks overflow after too many multiplications. When the total number of encoded multiplications, $\delta_{\mathsf{max}}$, and the largest value to be encoded, $a_{\mathsf{max}}$, are known, $\phi$ can be chosen to avoid overflow by satisfying
+In general, choosing a large precision parameter $\phi$ reduces quantisation errors but risks overflow after too many multiplications. When the largest multiplicative depth, $\delta_{\mathsf{max}}$, and the largest value to be encoded, $a_{\mathsf{max}}$, are known, $\phi$ can be chosen to avoid overflow by satisfying
 \begin{equation}\label{eq:prelims:encoding_overflow_limit}
     \left|\phi^{\delta_{\mathsf{max}}+1}a_{\mathsf{max}}\right| < \left\lfloor \frac{M}{2} \right\rfloor\,.
 \end{equation}
